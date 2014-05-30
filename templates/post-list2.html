@@ -2,8 +2,12 @@
       <div class="wrap">
         <div class="home">
 
-        <h1>Posts</h1>
-
+        $if(tagName)$
+          <h1>$tagName$ posts</h1>
+        $else$
+          <h1>Posts</h1>
+        $endif$
+        
         <ul class="posts">
           $for(posts)$
           <li>

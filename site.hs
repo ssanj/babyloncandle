@@ -29,17 +29,19 @@ main = hakyllWith (defaultConfiguration { previewPort = 9999 }) $ do
             posts <- recentFirst =<< loadAll pattern
             let ctx = constField "title" title <>
                         listField "posts" (postCtx tags) (return posts) <>
+                        commonCtx <>
+                        (tagName tag) <>
                         defaultContext
             makeItem ""
-                >>= loadAndApplyTemplate "templates/posts.html" ctx
-                >>= loadAndApplyTemplate "templates/default.html" ctx
+                >>= loadAndApplyTemplate "templates/posts2.html" ctx
+                >>= loadAndApplyTemplate "templates/default2.html" ctx
                 >>= relativizeUrls
 
     match "posts/*" $ do
         route $ setExtension "html"
         compile $ pandocCompiler
-            >>= loadAndApplyTemplate "templates/post.html" (postCtx tags)
-            >>= loadAndApplyTemplate "templates/default.html" (postCtx tags)
+            >>= loadAndApplyTemplate "templates/post2.html" (postCtx tags)
+            >>= loadAndApplyTemplate "templates/default2.html" (postCtx tags)
             >>= relativizeUrls
 
     create ["archive.html"] $ do
@@ -62,14 +64,15 @@ main = hakyllWith (defaultConfiguration { previewPort = 9999 }) $ do
         compile $ do
             posts <- recentFirst =<< loadAll "posts/*"
             let indexCtx =
-                    listField "posts" (postCtx tags) (return posts) `mappend`
-                    constField "title" "Home" `mappend`
+                    listField "posts" (postCtx tags) (return posts) <>
+                    constField "title" "Home" <>
+                    commonCtx <>
                     field "tags" (\_ -> renderTagList tags) <>
                     defaultContext
 
             getResourceBody
                 >>= applyAsTemplate indexCtx
-                >>= loadAndApplyTemplate "templates/default.html" indexCtx
+                >>= loadAndApplyTemplate "templates/default2.html" indexCtx
                 >>= relativizeUrls
 
     match "templates/*" $ compile templateCompiler
@@ -81,8 +84,18 @@ postCtx tags = mconcat
     [modificationTimeField "mtime" "%U",
      dateField "date" "%B %e, %Y",
      tagsField "tags" tags,
+     commonCtx,
      defaultContext
     ]
 
-tagCtx :: Tags -> Context String
-tagCtx tags = mconcat [tagsField "tags" tags, defaultContext]
+commonCtx :: Context String
+commonCtx = mconcat [blogTitle, emailAddy]
+
+tagName :: String -> Context String
+tagName = constField "tagName"
+
+blogTitle :: Context String
+blogTitle =  constField "blogTitle" "BabylonCandle"
+
+emailAddy :: Context String
+emailAddy =  constField "email" "sanjsmailbox@gmail.com"  
