@@ -1,0 +1,17 @@
+  <div class="page-content">
+      <div class="wrap">
+        <div class="home">
+
+        <h1>Posts</h1>
+
+        <ul class="posts">
+          $for(posts)$
+          <li>
+            <span class="post-date">$date$</span>
+            <a class="post-link" href="$url$">$title$</a>
+          </li>   
+          $endfor$  
+        </ul>
+
+        <p class="rss-subscribe">subscribe <a href="/feed.xml">via RSS</a></p>
+  </div>
