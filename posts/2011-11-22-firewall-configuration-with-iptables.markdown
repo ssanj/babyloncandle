@@ -1,0 +1,168 @@
+---
+title: Firewall configuration with iptables
+author: sanjiv sahayam
+tags: ubuntu, linux, security
+---
+
+Recently I had the seemingly "daunting" task of adding firewall rules through the iptables command. Here are some of my findings.
+
+__Basic Commands__
+
+To list your current firewall configuration use:
+
+```
+sudo iptables -L --line-numbers -v
+```
+
+If you have no rules in your iptables you should see something like this:
+
+```
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination
+ 
+Chain FORWARD (policy ACCEPT)
+target     prot opt source               destination
+ 
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination
+```
+
+To add a rule to a chain use:
+
+```
+sudo iptables -A CHAIN_NAME
+```
+
+To delete a rule on a chain use:
+
+```
+sudo iptables -D CHAIN_NAME LINE_NUMBER
+```
+
+Make sure your firewall __INPUT__ chain policy is set to __ACCEPT__ not DROP.
+
+Add some basic rules to the INPUT chain:
+
+```{.scrollx}
+sudo iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+sudo iptables -A INPUT -p tcp --dport ssh -j ACCEPT
+sudo iptables -A INPUT -p udp --dport 53 -j ACCEPT
+sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+sudo iptables -A INPUT -p tcp --dport 443 -j ACCEPT
+sudo iptables -A INPUT 5 -m limit --limit 5/min -j LOG --log-prefix "iptables denied: " --log-level 7
+sudo iptables -P INPUT DROP
+```
+
+The above rules allow SSH, DNS, HTTP and HTTPS traffic. It also logs any requests that have not been satisfied by any of the rules to your syslog. We have also blocked all other traffic and ports.
+
+List your iptable rules with:
+
+```
+sudo iptables -L --line-numbers -v
+```
+
+Your iptables should look similar to this:
+
+```{.scrollx}
+Chain INPUT (policy DROP 0 packets, 0 bytes)
+num   pkts bytes target     prot opt in     out     source               destination         
+1        0     0 ACCEPT     all  --  any    any     anywhere             anywhere            ctstate RELATED,ESTABLISHED 
+2        0     0 ACCEPT     tcp  --  any    any     anywhere             anywhere            tcp dpt:ssh 
+3        0     0 ACCEPT     udp  --  any    any     anywhere             anywhere            udp dpt:domain 
+4        0     0 ACCEPT     tcp  --  any    any     anywhere             anywhere            tcp dpt:www 
+5        0     0 ACCEPT     tcp  --  any    any     anywhere             anywhere            tcp dpt:https 
+ 
+Chain FORWARD (policy ACCEPT 0 packets, 0 bytes)
+num   pkts bytes target     prot opt in     out     source               destination         
+ 
+Chain OUTPUT (policy ACCEPT 0 packets, 0 bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+```
+
+For some reason if I leave out the first rule, none of the others work. I presume this has to do with connections coming in on known ports but negotiating on to other ports once a connection is established.
+
+The __DROP__ policy for the __INPUT__ chain drops all traffic to ports other than those specified in your rules. If there's no rule, it's not getting through.
+
+Also of note is that rules are evaluated top-down with the first matching rule executed. Thus if you have a rule that drops traffic for a certain port followed by one that allows traffic for the same port, all traffic will be dropped.
+
+Given the above, if you need to insert a rule at a particular line do so with the following:
+
+```
+sudo iptables -I CHAIN_NAME LINE_NUMBER RULE
+```
+
+Make sure you verify that all the programs you need are allowed through the firewall. If needed you can change the policy of the __INPUT__ chain back to an __ACCEPT__ policy like so:
+
+```
+sudo iptables -P INPUT ACCEPT
+```
+
+One thing to note is that if you are some way locked out of your system due to the above rules, a simple reboot will remove all entries.
+
+__Save and Restoring Rules__
+
+As iptable rules are not saved and restored by default you need to it manually.
+
+1. Save your current changes:
+
+```
+sudo sh -c "iptables-save > /etc/iptables.rules"
+```
+
+2. Create the file __/etc/network/if-pre-up.d/iptablesload__ This will be run just before your network interfaces are brought up. Add the following:
+
+```
+#!/bin/bash
+iptables-restore < /etc/iptables.rules
+exit 0
+```
+
+make it executable with:
+
+```
+sudo chmod +x /etc/network/if-pre-up.d/iptablesload
+```
+
+3. Create the file __/etc/network/if-post-down.d/iptablessave__. This will be run just after your network interfaces are brought down. Add the following:
+
+```
+#!/bin/bash
+iptables-save > /etc/iptables.rules
+if [ -f /etc/iptables.downrules ]; then
+   iptables-restore < /etc/iptables.downrules
+fi
+exit 0
+```
+
+make it executable with:
+
+```
+sudo chmod +x /etc/network/if-post-down.d/iptablessave
+```
+
+Now when you restart your machine your iptables will be saved and restored. You can have a look at the rules that are persisted by looking at the /etc/iptables.rules file:
+
+```
+sudo vim /etc/iptables.rules
+```
+
+Your /etc/iptable.rules file should look something like this:
+
+```
+# Generated by iptables-save v1.4.10 on Wed Nov 16 15:52:09 2011
+*filter
+:INPUT DROP [5:679]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [3:252]
+-A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
+-A INPUT -p udp -m udp --dport 53 -j ACCEPT
+-A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
+-A INPUT -p tcp -m tcp --dport 443 -j ACCEPT
+COMMIT
+# Completed on Wed Nov 16 15:52:09 2011
+```
+
+Comments/suggestions are welcome. :)
+
+Links [1](https://help.ubuntu.com/community/IptablesHowTo), [2](http://www.sshguard.net/docs/setup/firewall/netfilter-iptables)

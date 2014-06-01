@@ -10,12 +10,12 @@ The default settings also don't specify the column names within the inserts.
 
 To solve both of the above problems you could run mysqldump with the following to export the content of a single database:
 
-``` bash
+```{.scrollx}
 mysqldump -u USER -pYOUR_PASSWORD --complete-insert --skip-extended-insert --no-create-info --compact YOUR_DATABASE > YOUR_OUTPUT_FILE.sql
 ```
 
 If you need to export all your database data as insert statements do the following:
 
-``` bash
+```{.scrollx}
 mysqldump -u USER -pYOUR_PASSWORD --all-databases --complete-insert --skip-extended-insert > YOUR_OUTPUT_FILE.sql
 ```

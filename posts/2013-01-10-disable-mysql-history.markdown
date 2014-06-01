@@ -16,7 +16,7 @@ To disable mysql history do the following:
 
 2. Edit your ~/.profile file and add the following:
 
-``` bash
+```
 export MYSQL_HISTFILE=/dev/null
 ```
 
@@ -24,7 +24,7 @@ This directs your mysql history to /dev/null
 
 3. Apply your changes with:
 
-``` bash
+```
 source ~/.profile
 ```
 

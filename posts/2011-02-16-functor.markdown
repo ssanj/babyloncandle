@@ -1,0 +1,266 @@
+---
+title: Functor
+author: sanjiv sahayam
+tags: scala, fp
+---
+
+# What is a Functor?
+
+Chances are you've already used a Functor. You probably use it everyday irrespective of the language you use.
+Paraphrasing [Typeclassopedia](http://www.haskell.org/haskellwiki/Typeclassopedia): "A Functor represent a container of some sort with the ability to apply a function uniformly to every element of that container".
+
+Say we had a List of words and we wanted to find out the lengths of each of those words. We would use a List[String], find the length of each String and get a List[Int] in return.
+
+In scala we could do something like:
+
+
+```{.scala}
+List("one", "two", "three") map (_.length)
+res12: List[Int] = List(3, 3, 5)
+```
+
+We applied the length function to each element of the List "container". What has also happened is that a List[String] has been converted to a List[Int]. We started with a List of words and we end up with a List of word-lengths.
+
+Functors operate on type constructors - which are types that need additional types parameters to be constructed. List[T], Map[K, V], Option[T] and Either[L,R] etc are all type constructors as they need one or more types to be constructed.
+
+For example:
+
+```{.scala}
+List -> is a type constructor
+List[Long] -> is a type
+```
+
+A functor can be defined as:
+
+```{.scala}
+trait Functor[F[_]] {
+ def fmap[A,B](f: A => B, fa:F[A]): F[B]
+}
+```
+
+Assuming the F type constructor was List, the above trait could be implemented as:
+
+```{.scala}
+class ListFunctor extends Functor[List] {
+  def fmap[A,B](f: A => B, fa:List[A]): List[B] = fa match {
+    case Nil => Nil
+    case x::xs => f(x) :: fmap(f, xs)
+  }
+}
+```
+
+class ListFunctor extends Functor[List] {
+  def fmap[A,B](f: A => B, fa:List[A]): List[B] = fa match {
+    case Nil => Nil
+    case x::xs => f(x) :: fmap(f, xs)
+  }
+}
+
+```{.scala}
+new ListFunctor().fmap((_:String).length, List("one", "two", "three"))
+```
+
+his gives us the same results as before, but we've abstracted over the List type constructor and we can covert from List[A] -> List[B] where A and B are any types.
+
+Import points to note are:
+
+1. The container remains the same (F or in the above case List)
+2. The supplied function f, works on the value contained within the container.
+
+As per Typeclassopedia: "fmap applies a function to each element of the container without altering the structure of the container"
+
+# Some Examples
+
+
+Let's create our own type constructor to hold a single value. Let's call it Holder:
+
+```{.scala}
+case class Holder[T](value:T)
+```
+
+Now let's define a Functor for Holder:
+
+```{.scala}
+class HolderFunctor extends Functor[Holder] {
+ def fmap[A,B](f: A => B, fa:Holder[A]): Holder[B] = Holder(f(fa.value))
+}
+```
+
+Here's how we use it:
+
+```{.scala}
+new HolderFunctor().fmap("Give me " + (_:Int).toString, Holder(5))
+res0: Holder[String] = Holder(Give me 5)
+```
+
+We converted a Holder__[Int]__ -> Holder__[String]__ by mapping across the value in the Holder.
+
+# Functor Laws
+
+There are 2 Functor laws:
+
+1. mapping with identity over every item in a container has no effect
+
+```{.scala}
+fmap(identity, F[A]) == F[A]
+```
+
+2. mapping a composition of two functions over any item in a container is the same as mapping the first function and then mapping the second.
+
+```{.scala}
+fmap(g compose f, F[A]) ==  fmap(g, fmap(f, F[A]))
+```
+
+Let's see if HolderFunctor obeys these 2 laws:
+
+```{.scala}
+new HolderFunctor().fmap(identity(_:Int), Holder(5)) == Holder(5)
+res11: Boolean = true
+ 
+def giveMe: Int => String = n => "Give me " + n.toString
+def strLength: String => Int = str => str.length
+ 
+new HolderFunctor().fmap(strLength compose giveMe, Holder(5)) ==
+new HolderFunctor().fmap(strLength, new HolderFunctor().fmap(giveMe, Holder(5)))
+res13: Boolean = true
+```
+
+Looks like it does obey both laws. :)
+
+# Why use Functors?
+
+So here's the real question: Why use Functors? By defining Functors for each container you are interested in, you could define a single function that fmaps across any container containing any type:
+
+```{.scala .scrollx}
+def fmap[F[_], A, B](f: A => B, fa: F[A])(implicit functor:Functor[F]): F[B] = functor.fmap(f, fa)
+```
+
+Let's try and call it with Holder:
+
+```{.scala}
+case class Person(name:String)
+fmap((_:Person).name, Holder(Person("Harry Potter")))
+11: error: could not find implicit value for parameter functor: Functor[Holder]
+```
+
+Let's create an implicit Functor[Holder]:
+
+```{.scala}
+implicit def holderFunctor: Functor[Holder] = new HolderFunctor()
+fmap((_:Person).name, Holder(Person("Harry Potter")))
+res23: Holder[String] = Holder(Harry Potter)
+```
+
+Let's try and use it with Functor[List]:
+
+```{.scala}
+fmap("|" + (_:Int).toString + "|", List(1,2,3,4)) 
+12: error: could not find implicit value for parameter functor: Functor[List]
+```
+
+Let's create an implicit Functor[List]:
+
+```{.scala}
+implicit def listFunctor: Functor[List] = new ListFunctor()
+fmap("|" + (_:Int).toString + "|", List(1,2,3,4)) 
+res28: List[java.lang.String] = List(|1|, |2|, |3|, |4|)
+```
+
+What if we want to use it with Option? We simply create an implicit Functor[Option]:
+
+```{.scala}
+implicit def optionFunctor: Functor[Option] = new Functor[Option] {
+ def fmap[A,B](f: A => B, fa:Option[A]): Option[B] = fa map (f)    
+}
+```
+
+We can now call fmap with Option:
+
+```{.scala}
+fmap((_:Int).toString + " optional", Some(123):Option[Int])
+res37: Option[java.lang.String] = Some(123 optional)
+```
+
+Verifying the laws for Functor[Option]:
+
+```{.scala .scrollx}
+optionFunctor.fmap(identity(_:Int), Some(6)) == Some(6)
+res17: Boolean = true
+ 
+optionFunctor.fmap(identity(_:Int), None) == None     
+res18: Boolean = true
+ 
+optionFunctor.fmap(strLength compose giveMe, Some(6)) == optionFunctor.fmap(strLength, optionFunctor.fmap(giveMe, Some(6)))
+res19: Boolean = true
+ 
+optionFunctor.fmap(strLength compose giveMe, None) == optionFunctor.fmap(strLength, optionFunctor.fmap(giveMe, None))     
+res20: Boolean = true
+```
+
+We could further simplify fmap as:
+
+```{.scala .scrollx}
+def fmap[F[_] : Functor, A, B](f: A => B, fa: F[A]): F[B] = implicitly[Functor[F]].fmap(f, fa)
+```
+
+Functor has allowed us to define a single fmap function to map across any container for any value type! :)
+
+Here's a listing of the snippets:
+
+```{.scala .scrollx}
+List("one", "two", "three") map (_.length)
+ 
+trait Functor[F[_]] {
+ def fmap[A,B](f: A => B, fa:F[A]): F[B]
+}
+ 
+class ListFunctor extends Functor[List] {
+  def fmap[A,B](f: A => B, fa:List[A]): List[B] = fa match {
+    case Nil => Nil
+    case x::xs => f(x) :: fmap(f, xs)
+  }
+}
+ 
+new ListFunctor().fmap((_:String).length, List("one", "two", "three"))
+ 
+case class Holder[T](value:T)
+ 
+class HolderFunctor extends Functor[Holder] {
+ def fmap[A,B](f: A => B, fa:Holder[A]): Holder[B] = Holder(f(fa.value))
+}
+ 
+new HolderFunctor().fmap("Give me " + (_:Int).toString, Holder(5))
+new HolderFunctor().fmap(identity(_:Int), Holder(5)) == Holder(5)
+ 
+def giveMe: Int => String = n => "Give me " + n.toString
+def strLength: String => Int = str => str.length
+ 
+new HolderFunctor().fmap(strLength compose giveMe, Holder(5)) ==
+new HolderFunctor().fmap(strLength, new HolderFunctor().fmap(giveMe, Holder(5)))
+ 
+ 
+def fmap[F[_], A, B](f: A => B, fa: F[A])(implicit functor:Functor[F]): F[B] = functor.fmap(f, fa)
+ 
+case class Person(name:String)
+ 
+implicit def holderFunctor: Functor[Holder] = new HolderFunctor()
+fmap((_:Person).name, Holder(Person("Harry Potter")))
+ 
+implicit def listFunctor: Functor[List] = new ListFunctor()
+fmap("|" + (_:Int).toString + "|", List(1,2,3,4)) 
+ 
+implicit def optionFunctor: Functor[Option] = new Functor[Option] {
+ def fmap[A,B](f: A => B, fa:Option[A]): Option[B] = fa map (f)    
+}
+ 
+fmap((_:Int).toString + " optional", Some(123):Option[Int])
+ 
+ 
+optionFunctor.fmap(identity(_:Int), Some(6)) == Some(6)
+optionFunctor.fmap(identity(_:Int), None) == None
+ 
+optionFunctor.fmap(strLength compose giveMe, Some(6)) == optionFunctor.fmap(strLength, optionFunctor.fmap(giveMe, Some(6)))
+optionFunctor.fmap(strLength compose giveMe, None) == optionFunctor.fmap(strLength, optionFunctor.fmap(giveMe, None))
+ 
+def fmap2[F[_] : Functor, A, B](f: A => B, fa: F[A]): F[B] = implicitly[Functor[F]].fmap(f, fa)
+```
