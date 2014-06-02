@@ -102,7 +102,7 @@ postCtx tags = mconcat
     ]
 
 commonCtx :: Context String
-commonCtx = mconcat [blogTitle, emailAddy]
+commonCtx = mconcat [blogTitle, emailAddy, siteOwnerCtx]
 
 tagName :: String -> Context String
 tagName tn = constField "postTitle" (titleCase tn ++ " Posts")
@@ -115,6 +115,9 @@ blogTitle =  constField "blogTitle" "BabylonCandle"
 
 emailAddy :: Context String
 emailAddy =  constField "email" "sanjsmailbox@gmail.com"  
+
+siteOwnerCtx :: Context String
+siteOwnerCtx = constField "siteOwner" "sanjiv sahayam"
 
 titleCase :: String -> String
 titleCase [] = []
