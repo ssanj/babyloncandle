@@ -1,8 +1,8 @@
 --------------------------------------------------------------------------------
 {-# LANGUAGE OverloadedStrings #-}
 import           Data.Monoid (mappend, mconcat, (<>))
+import           Data.Char (toUpper, toLower)
 import           Hakyll
-
 
 --------------------------------------------------------------------------------
 main :: IO ()
@@ -49,20 +49,21 @@ main = hakyllWith (defaultConfiguration { previewPort = 9999 }) $ do
         compile $ do
             posts <- recentFirst =<< loadAll "posts/*"
             let archiveCtx =
-                    listField "posts" (postCtx tags) (return posts) `mappend`
-                    constField "title" "Archives"            `mappend`
+                    listField "posts" (postCtx tags) (return posts) <>
+                    archive <>
+                    commonCtx <>
                     defaultContext
 
             makeItem ""
-                >>= loadAndApplyTemplate "templates/archive.html" archiveCtx
-                >>= loadAndApplyTemplate "templates/default.html" archiveCtx
+                >>= loadAndApplyTemplate "templates/archive2.html" archiveCtx
+                >>= loadAndApplyTemplate "templates/default2.html" archiveCtx
                 >>= relativizeUrls
 
 
     match "index.html" $ do
         route idRoute
         compile $ do
-            posts <- recentFirst =<< loadAll "posts/*"
+            posts <- topPosts 5 . recentFirst =<< loadAll "posts/*"
             let indexCtx =
                     listField "posts" (postCtx tags) (return posts) <>
                     constField "title" "Home" <>
@@ -79,6 +80,9 @@ main = hakyllWith (defaultConfiguration { previewPort = 9999 }) $ do
 
 
 --------------------------------------------------------------------------------
+topPosts :: (Functor m) => Int -> m [Item a] -> m [Item a]
+topPosts num = fmap (take num)
+
 postCtx :: Tags -> Context String
 postCtx tags = mconcat
     [modificationTimeField "mtime" "%U",
@@ -92,10 +96,17 @@ commonCtx :: Context String
 commonCtx = mconcat [blogTitle, emailAddy]
 
 tagName :: String -> Context String
-tagName = constField "tagName"
+tagName tn = constField "postTitle" (titleCase tn ++ " Posts")
+
+archive :: Context String
+archive = constField "postTitle" "Archive" 
 
 blogTitle :: Context String
 blogTitle =  constField "blogTitle" "BabylonCandle"
 
 emailAddy :: Context String
 emailAddy =  constField "email" "sanjsmailbox@gmail.com"  
+
+titleCase :: String -> String
+titleCase [] = []
+titleCase (x:xs) = toUpper x : (map toLower xs)

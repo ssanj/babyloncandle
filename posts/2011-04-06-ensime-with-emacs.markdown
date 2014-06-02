@@ -135,4 +135,4 @@ __Neat Features__
 
 For a full list have a look at the online Ensime user [manual](http://aemon.com/file_dump/ensime_manual.html).
 
-![](https://github.com/ssanj/Blog/raw/master/ensimeWithEmacs/EnsimeAutoComplete.png "autocomplete")
+![](/images/EnsimeAutoComplete.png "autocomplete")
