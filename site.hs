@@ -17,9 +17,18 @@ main = hakyllWith (defaultConfiguration { previewPort = 9999 }) $ do
 
     match "scripts/*" $ do
         route idRoute
-        compile copyFileCompiler   
+        compile copyFileCompiler           
 
     tags <- buildTags "posts/*" (fromCapture "tags/*.html")
+
+    match "posts/*" $ do
+        route $ setExtension "html"
+        compile $ pandocCompiler          
+            >>= saveSnapshot "content"
+            >>= return . fmap demoteHeaders
+            >>= loadAndApplyTemplate "templates/post2.html" (postCtx tags)
+            >>= loadAndApplyTemplate "templates/default2.html" (postCtx tags)
+            >>= relativizeUrls    
 
     tagsRules tags $ \tag pattern -> do
         let title = "Posts tagged " ++ tag
@@ -36,13 +45,6 @@ main = hakyllWith (defaultConfiguration { previewPort = 9999 }) $ do
                 >>= loadAndApplyTemplate "templates/posts2.html" ctx
                 >>= loadAndApplyTemplate "templates/default2.html" ctx
                 >>= relativizeUrls
-
-    match "posts/*" $ do
-        route $ setExtension "html"
-        compile $ pandocCompiler
-            >>= loadAndApplyTemplate "templates/post2.html" (postCtx tags)
-            >>= loadAndApplyTemplate "templates/default2.html" (postCtx tags)
-            >>= relativizeUrls
 
     create ["archive.html"] $ do
         route idRoute
@@ -75,6 +77,13 @@ main = hakyllWith (defaultConfiguration { previewPort = 9999 }) $ do
                 >>= applyAsTemplate indexCtx
                 >>= loadAndApplyTemplate "templates/default2.html" indexCtx
                 >>= relativizeUrls
+
+    create ["feed.xml"] $ do
+        route idRoute
+        compile $ do
+            loadAllSnapshots "posts/*" "content"
+                >>= fmap (take 10) . recentFirst
+                >>= renderRss feedConfig feedCtx
 
     match "templates/*" $ compile templateCompiler
 
@@ -110,3 +119,15 @@ emailAddy =  constField "email" "sanjsmailbox@gmail.com"
 titleCase :: String -> String
 titleCase [] = []
 titleCase (x:xs) = toUpper x : (map toLower xs)
+
+feedCtx :: Context String
+feedCtx = mconcat [ bodyField "description", defaultContext]
+
+feedConfig :: FeedConfiguration
+feedConfig =  FeedConfiguration { 
+                feedTitle = "BabylonCandle",
+                feedDescription = "The blog of Sanjiv Sahayam",
+                feedAuthorName = "sanjiv sahayam", 
+                feedAuthorEmail = "sanjsmailbox@gmail.com",
+                feedRoot =  "http://sanjivsahayam.com"
+             }
