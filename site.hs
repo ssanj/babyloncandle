@@ -25,7 +25,7 @@ main = hakyllWith (defaultConfiguration { previewPort = 9999 }) $ do
     match "posts/*" $ do
         route $ setExtension "html"
         let precompiler = (pandocCompiler >>= saveSnapshot "content" >>= return . fmap demoteHeaders)
-        compile $ compilerGlue precompiler ["post2.html", defaultTemplate] (postCtx tags)
+        compile $ compilerGlue precompiler [postTemplate, defaultTemplate] (postCtx tags)
 
     tagsRules tags $ \tag pattern -> do
         let title = "Posts tagged " ++ tag
@@ -38,7 +38,7 @@ main = hakyllWith (defaultConfiguration { previewPort = 9999 }) $ do
                         commonCtx <>
                         (tagNameCtx tag) <>
                         defaultContext
-            compilerGlue (makeItem "") ["posts2.html", defaultTemplate] ctx
+            compilerGlue (makeItem "") [postsTemplate, defaultTemplate] ctx
 
     create ["archive.html"] $ do
         route idRoute
@@ -50,7 +50,7 @@ main = hakyllWith (defaultConfiguration { previewPort = 9999 }) $ do
                     commonCtx <>
                     defaultContext
 
-            compilerGlue (makeItem "") ["archive2.html", defaultTemplate] ctx
+            compilerGlue (makeItem "") [archiveTemplate, defaultTemplate] ctx
 
 
     match "index.html" $ do
@@ -78,12 +78,15 @@ main = hakyllWith (defaultConfiguration { previewPort = 9999 }) $ do
         route $ setExtension "html"
         compile $ do
             let ctx = commonCtx <> defaultContext
-            compilerGlue pandocCompiler ["about.html", defaultTemplate] ctx
+            compilerGlue pandocCompiler [aboutTemplate, defaultTemplate] ctx
 
 --------------------------------------------------------------------------------
-topPosts :: (Functor m) => Int -> m [Item a] -> m [Item a]
-topPosts num = fmap (take num)
 
+
+
+--------------------------------------------------------------------------------
+-- Contexts
+--------------------------------------------------------------------------------
 postCtx :: Tags -> Context String
 postCtx tags = mconcat
     [modificationTimeField "mtime" "%U",
@@ -117,13 +120,15 @@ siteOwnerCtx = constField "siteOwner" "sanjiv sahayam"
 sitDesciptionCtx :: Context String
 sitDesciptionCtx = constField "sitDesciption" "Things I would otherwise forget."
 
-titleCase :: String -> String
-titleCase [] = []
-titleCase (x:xs) = toUpper x : (map toLower xs)
-
 feedCtx :: Context String
 feedCtx = mconcat [ bodyField "description", defaultContext]
+--------------------------------------------------------------------------------
 
+
+
+--------------------------------------------------------------------------------
+--- RSS Config
+--------------------------------------------------------------------------------
 feedConfig :: FeedConfiguration
 feedConfig =  FeedConfiguration { 
                 feedTitle = "BabylonCandle",
@@ -132,21 +137,46 @@ feedConfig =  FeedConfiguration {
                 feedAuthorEmail = "sanjsmailbox@gmail.com",
                 feedRoot =  "http://sanjivsahayam.com"
              }
+--------------------------------------------------------------------------------
 
-defaultTemplate :: String
+
+
+--------------------------------------------------------------------------------
+-- Template definitions and helpers
+--------------------------------------------------------------------------------
 defaultTemplate = "default2.html"
-
+archiveTemplate = "archive2.html"
+aboutTemplate = "about.html"
+postTemplate = "post2.html"
+postsTemplate = "posts2.html"
 
 templatesFolder :: String -> Identifier
 templatesFolder file = fromFilePath ("templates/" ++ file)                                                              
+--------------------------------------------------------------------------------
 
+
+
+--------------------------------------------------------------------------------
+-- Compilers and helpers
+--------------------------------------------------------------------------------
 compilerGlue :: Compiler (Item String) -> [String] -> Context String -> Compiler (Item String)
 compilerGlue cmplr tmpls ctx = 
                 let paths = map (templatesFolder) tmpls in
                 foldl (\c t -> c >>= loadAndApplyTemplate t ctx) cmplr paths >>=
                     relativizeUrls
+--------------------------------------------------------------------------------
 
 
 
+--------------------------------------------------------------------------------
+-- Utils
+--------------------------------------------------------------------------------
+topPosts :: (Functor m) => Int -> m [Item a] -> m [Item a]
+topPosts num = fmap (take num)
+
+titleCase :: String -> String
+titleCase [] = []
+titleCase (x:xs) = toUpper x : (map toLower xs)
+--------------------------------------------------------------------------------
 
 
