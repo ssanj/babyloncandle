@@ -24,12 +24,8 @@ main = hakyllWith (defaultConfiguration { previewPort = 9999 }) $ do
 
     match "posts/*" $ do
         route $ setExtension "html"
-        compile $ pandocCompiler          
-            >>= saveSnapshot "content"
-            >>= return . fmap demoteHeaders
-            >>= loadAndApplyTemplate "templates/post2.html" (postCtx tags)
-            >>= loadAndApplyTemplate "templates/default2.html" (postCtx tags)
-            >>= relativizeUrls    
+        let precompiler = (pandocCompiler >>= saveSnapshot "content" >>= return . fmap demoteHeaders)
+        compile $ compilerGlue precompiler ["post2.html", defaultTemplate] (postCtx tags)
 
     tagsRules tags $ \tag pattern -> do
         let title = "Posts tagged " ++ tag
@@ -42,10 +38,7 @@ main = hakyllWith (defaultConfiguration { previewPort = 9999 }) $ do
                         commonCtx <>
                         (tagNameCtx tag) <>
                         defaultContext
-            makeItem ""
-                >>= loadAndApplyTemplate "templates/posts2.html" ctx
-                >>= loadAndApplyTemplate "templates/default2.html" ctx
-                >>= relativizeUrls
+            compilerGlue (makeItem "") ["posts2.html", defaultTemplate] ctx
 
     create ["archive.html"] $ do
         route idRoute
@@ -57,10 +50,7 @@ main = hakyllWith (defaultConfiguration { previewPort = 9999 }) $ do
                     commonCtx <>
                     defaultContext
 
-            makeItem ""
-                >>= loadAndApplyTemplate "templates/archive2.html" ctx
-                >>= loadAndApplyTemplate "templates/default2.html" ctx
-                >>= relativizeUrls
+            compilerGlue (makeItem "") ["archive2.html", defaultTemplate] ctx
 
 
     match "index.html" $ do
@@ -73,10 +63,7 @@ main = hakyllWith (defaultConfiguration { previewPort = 9999 }) $ do
                     commonCtx <>
                     defaultContext
 
-            getResourceBody
-                >>= applyAsTemplate ctx
-                >>= loadAndApplyTemplate "templates/default2.html" ctx
-                >>= relativizeUrls
+            compilerGlue (getResourceBody >>= applyAsTemplate ctx) [defaultTemplate] ctx
 
     create ["feed.xml"] $ do
         route idRoute
@@ -91,11 +78,7 @@ main = hakyllWith (defaultConfiguration { previewPort = 9999 }) $ do
         route $ setExtension "html"
         compile $ do
             let ctx = commonCtx <> defaultContext
-            pandocCompiler                                
-                >>= loadAndApplyTemplate "templates/about.html" ctx
-                >>= loadAndApplyTemplate "templates/default2.html" ctx
-                >>= relativizeUrls
-
+            compilerGlue pandocCompiler ["about.html", defaultTemplate] ctx
 
 --------------------------------------------------------------------------------
 topPosts :: (Functor m) => Int -> m [Item a] -> m [Item a]
@@ -150,8 +133,18 @@ feedConfig =  FeedConfiguration {
                 feedRoot =  "http://sanjivsahayam.com"
              }
 
+defaultTemplate :: String
+defaultTemplate = "default2.html"
 
 
+templatesFolder :: String -> Identifier
+templatesFolder file = fromFilePath ("templates/" ++ file)                                                              
+
+compilerGlue :: Compiler (Item String) -> [String] -> Context String -> Compiler (Item String)
+compilerGlue cmplr tmpls ctx = 
+                let paths = map (templatesFolder) tmpls in
+                foldl (\c t -> c >>= loadAndApplyTemplate t ctx) cmplr paths >>=
+                    relativizeUrls
 
 
 
