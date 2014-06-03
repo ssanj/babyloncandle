@@ -262,6 +262,32 @@ a:visited { color: #205caa; }
   overflow-x: scroll;
 }
 
+/* For tag sizes*/
+.quarter {
+  font-size: 1em;
+}
+
+.half {
+  font-size: 1.125em;
+}
+
+.threequarter {
+ font-size: 1.25em; 
+}
+
+.one {
+  font-size: 1.5em;
+}
+
+#tagslist {
+  margin-top: 20px;
+}
+
+#tagslist li {
+  display: inline-block;
+  list-style-type: none;
+  padding-right: 20px;
+}
 
 /* media queries */
 /* ----------------------------------------------------------*/

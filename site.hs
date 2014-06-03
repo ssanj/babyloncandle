@@ -2,6 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 import           Data.Monoid (mappend, mconcat, (<>))
 import           Data.Char (toUpper, toLower)
+import           Text.Printf
 import           Hakyll
 
 --------------------------------------------------------------------------------
@@ -39,7 +40,7 @@ main = hakyllWith (defaultConfiguration { previewPort = 9999 }) $ do
             let ctx = constField "title" title <>
                         listField "posts" (postCtx tags) (return posts) <>
                         commonCtx <>
-                        (tagName tag) <>
+                        (tagNameCtx tag) <>
                         defaultContext
             makeItem ""
                 >>= loadAndApplyTemplate "templates/posts2.html" ctx
@@ -50,15 +51,15 @@ main = hakyllWith (defaultConfiguration { previewPort = 9999 }) $ do
         route idRoute
         compile $ do
             posts <- recentFirst =<< loadAll "posts/*"
-            let archiveCtx =
+            let ctx =
                     listField "posts" (postCtx tags) (return posts) <>
-                    archive <>
+                    archiveCtx <>
                     commonCtx <>
                     defaultContext
 
             makeItem ""
-                >>= loadAndApplyTemplate "templates/archive2.html" archiveCtx
-                >>= loadAndApplyTemplate "templates/default2.html" archiveCtx
+                >>= loadAndApplyTemplate "templates/archive2.html" ctx
+                >>= loadAndApplyTemplate "templates/default2.html" ctx
                 >>= relativizeUrls
 
 
@@ -66,16 +67,15 @@ main = hakyllWith (defaultConfiguration { previewPort = 9999 }) $ do
         route idRoute
         compile $ do
             posts <- topPosts 5 . recentFirst =<< loadAll "posts/*"
-            let indexCtx =
+            let ctx =
                     listField "posts" (postCtx tags) (return posts) <>
-                    constField "title" "Home" <>
+                    homepageCtx <>
                     commonCtx <>
-                    field "tags" (\_ -> renderTagList tags) <>
                     defaultContext
 
             getResourceBody
-                >>= applyAsTemplate indexCtx
-                >>= loadAndApplyTemplate "templates/default2.html" indexCtx
+                >>= applyAsTemplate ctx
+                >>= loadAndApplyTemplate "templates/default2.html" ctx
                 >>= relativizeUrls
 
     create ["feed.xml"] $ do
@@ -86,6 +86,15 @@ main = hakyllWith (defaultConfiguration { previewPort = 9999 }) $ do
                 >>= renderRss feedConfig feedCtx
 
     match "templates/*" $ compile templateCompiler
+
+    match "about.markdown" $ do
+        route $ setExtension "html"
+        compile $ do
+            let ctx = commonCtx <> defaultContext
+            pandocCompiler                                
+                >>= loadAndApplyTemplate "templates/about.html" ctx
+                >>= loadAndApplyTemplate "templates/default2.html" ctx
+                >>= relativizeUrls
 
 
 --------------------------------------------------------------------------------
@@ -102,22 +111,28 @@ postCtx tags = mconcat
     ]
 
 commonCtx :: Context String
-commonCtx = mconcat [blogTitle, emailAddy, siteOwnerCtx]
+commonCtx = mconcat [blogTitleCtx, emailAddyCtx, siteOwnerCtx, sitDesciptionCtx]
 
-tagName :: String -> Context String
-tagName tn = constField "postTitle" (titleCase tn ++ " Posts")
+tagNameCtx :: String -> Context String
+tagNameCtx tn = constField "postTitle" (titleCase tn ++ " Posts")
 
-archive :: Context String
-archive = constField "postTitle" "Archive" 
+archiveCtx :: Context String
+archiveCtx = constField "postTitle" "Archive" 
 
-blogTitle :: Context String
-blogTitle =  constField "blogTitle" "BabylonCandle"
+blogTitleCtx :: Context String
+blogTitleCtx =  constField "blogTitle" "BabylonCandle"
 
-emailAddy :: Context String
-emailAddy =  constField "email" "sanjsmailbox@gmail.com"  
+homepageCtx :: Context String
+homepageCtx = constField "title" "Home"
+
+emailAddyCtx :: Context String
+emailAddyCtx =  constField "email" "sanjsmailbox@gmail.com"  
 
 siteOwnerCtx :: Context String
 siteOwnerCtx = constField "siteOwner" "sanjiv sahayam"
+
+sitDesciptionCtx :: Context String
+sitDesciptionCtx = constField "sitDesciption" "Things I would otherwise forget."
 
 titleCase :: String -> String
 titleCase [] = []
@@ -134,3 +149,11 @@ feedConfig =  FeedConfiguration {
                 feedAuthorEmail = "sanjsmailbox@gmail.com",
                 feedRoot =  "http://sanjivsahayam.com"
              }
+
+
+
+
+
+
+
+
