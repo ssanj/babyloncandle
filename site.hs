@@ -8,23 +8,23 @@ import           Hakyll
 --------------------------------------------------------------------------------
 main :: IO ()
 main = hakyllWith (defaultConfiguration { previewPort = 9999 }) $ do
-    match "images/*" $ do
+    match imagesPattern $ do
         route   idRoute
         compile copyFileCompiler
 
-    match "css/*" $ do
+    match cssPattern $ do
         route   idRoute
         compile compressCssCompiler
 
-    match "scripts/*" $ do
+    match jsPattern $ do
         route idRoute
         compile copyFileCompiler           
 
-    tags <- buildTags "posts/*" (fromCapture "tags/*.html")
+    tags <- buildTags allPostsPattern (fromCapture tagsCapturePattern)
 
-    match "posts/*" $ do
-        route $ setExtension "html"
-        let precompiler = (pandocCompiler >>= saveSnapshot "content" >>= return . fmap demoteHeaders)
+    match allPostsPattern $ do
+        route $ setExtension htmlExtension
+        let precompiler = (pandocCompiler >>= saveSnapshot contentSnapshot >>= return . fmap demoteHeaders)
         compile $ compilerGlue precompiler [postTemplate, defaultTemplate] (postCtx tags)
 
     tagsRules tags $ \tag pattern -> do
@@ -35,33 +35,32 @@ main = hakyllWith (defaultConfiguration { previewPort = 9999 }) $ do
             let ctx = postListCtx posts tags <> (tagNameCtx tag) <> commonCtx
             compilerGlue (makeItem "") [postsTemplate, defaultTemplate] ctx
 
-    create ["archive.html"] $ do
+    match indexPagePattern $ do
         route idRoute
         compile $ do
-            posts <- recentFirst =<< loadAll "posts/*"
-            let ctx =postListCtx posts tags <> archiveCtx <> commonCtx
-            compilerGlue (makeItem "") [archiveTemplate, defaultTemplate] ctx
-
-
-    match "index.html" $ do
-        route idRoute
-        compile $ do
-            posts <- topPosts 5 . recentFirst =<< loadAll "posts/*"
+            posts <- topPosts numPostsOnHomePage . recentFirst =<< loadAll allPostsPattern
             let ctx = postListCtx posts tags <> homepageCtx <> commonCtx
             compilerGlue (getResourceBody >>= applyAsTemplate ctx) [defaultTemplate] ctx
 
-    create ["feed.xml"] $ do
+    match templatesPattern $ compile templateCompiler
+
+    match aboutPagePattern $ do
+        route $ setExtension htmlExtension
+        compile $ compilerGlue pandocCompiler [aboutTemplate, defaultTemplate] commonCtx
+
+    create [archivePagePattern] $ do
         route idRoute
         compile $ do
-            loadAllSnapshots "posts/*" "content"
-                >>= fmap (take 10) . recentFirst
-                >>= renderRss feedConfig feedCtx
+            posts <- recentFirst =<< loadAll allPostsPattern
+            let ctx =postListCtx posts tags <> archiveCtx <> commonCtx
+            compilerGlue (makeItem "") [archiveTemplate, defaultTemplate] ctx
 
-    match "templates/*" $ compile templateCompiler
-
-    match "about.markdown" $ do
-        route $ setExtension "html"
-        compile $ compilerGlue pandocCompiler [aboutTemplate, defaultTemplate] commonCtx
+    create [rssFeedPattern] $ do
+        route idRoute
+        compile $ do
+            loadAllSnapshots allPostsPattern contentSnapshot
+                >>= fmap (take numPostsInRssFeed) . recentFirst
+                >>= renderRss feedConfig feedCtx        
 
 --------------------------------------------------------------------------------
 
@@ -112,10 +111,35 @@ feedCtx = mconcat [ bodyField "description", defaultContext]
 
 
 
+
+--------------------------------------------------------------------------------
+-- Patterns
+--------------------------------------------------------------------------------
+allPostsPattern    = "posts/*"
+contentSnapshot    = "content"
+imagesPattern      = "images/*"
+cssPattern         = "css/*"
+jsPattern          = "scripts/*"
+templatesPattern   = "templates/*"
+tagsCapturePattern = "tags/*.html"
+indexPagePattern   = "index.html"
+aboutPagePattern   = "about.markdown"
+archivePagePattern = "archive.html"
+rssFeedPattern     = "feed.xml"
+--------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------
+-- Extensions
+--------------------------------------------------------------------------------
+htmlExtension = "html"
+--------------------------------------------------------------------------------
+
+
+
 --------------------------------------------------------------------------------
 --- RSS Config
 --------------------------------------------------------------------------------
-feedConfig :: FeedConfiguration
 feedConfig =  FeedConfiguration { 
                 feedTitle = "BabylonCandle",
                 feedDescription = "The blog of Sanjiv Sahayam",
@@ -130,16 +154,24 @@ feedConfig =  FeedConfiguration {
 --------------------------------------------------------------------------------
 -- Template definitions and helpers
 --------------------------------------------------------------------------------
-defaultTemplate = "default2.html"
-archiveTemplate = "archive2.html"
+defaultTemplate = "default.html"
+archiveTemplate = "archive.html"
 aboutTemplate = "about.html"
-postTemplate = "post2.html"
-postsTemplate = "posts2.html"
+postTemplate = "post.html"
+postsTemplate = "posts.html"
 
 templatesFolder :: String -> Identifier
 templatesFolder file = fromFilePath ("templates/" ++ file)                                                              
 --------------------------------------------------------------------------------
 
+
+
+--------------------------------------------------------------------------------
+-- Constants
+--------------------------------------------------------------------------------
+numPostsOnHomePage = 5
+numPostsInRssFeed = 10
+--------------------------------------------------------------------------------
 
 
 --------------------------------------------------------------------------------
