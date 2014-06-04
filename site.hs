@@ -147,7 +147,12 @@ htmlExtension = "html"
 --------------------------------------------------------------------------------
 -- Site configuration
 --------------------------------------------------------------------------------
-siteConfig = defaultConfiguration { previewPort = 9999 }
+siteConfig = defaultConfiguration { 
+                previewPort = 9999,
+                deployCommand = "rsync -av --checksum --delete --progress " ++ 
+                                 "--exclude-from 'excludes.txt' " ++ 
+                                 "_site/* /Users/sanjivsahayam/projects/code/haskell/babyloncandle"
+             }
 --------------------------------------------------------------------------------
 
 
@@ -171,9 +176,9 @@ feedConfig =  FeedConfiguration {
 --------------------------------------------------------------------------------
 defaultTemplate = "default.html"
 archiveTemplate = "archive.html"
-aboutTemplate = "about.html"
-postTemplate = "post.html"
-postsTemplate = "posts.html"
+aboutTemplate   = "about.html"
+postTemplate    = "post.html"
+postsTemplate   = "posts.html"
 
 templatesFolder :: String -> Identifier
 templatesFolder file = fromFilePath ("templates/" ++ file)                                                              
@@ -185,7 +190,7 @@ templatesFolder file = fromFilePath ("templates/" ++ file)
 -- Constants
 --------------------------------------------------------------------------------
 numPostsOnHomePage = 5
-numPostsInRssFeed = 10
+numPostsInRssFeed  = 10
 --------------------------------------------------------------------------------
 
 
