@@ -48,14 +48,14 @@ main = hakyllWith siteConfig $ do
         route $ setExtension htmlExtension
         compile $ compilerGlue pandocCompiler [aboutTemplate, defaultTemplate] commonCtx
 
-    create [archivePagePattern] $ do
+    create [archivePage] $ do
         route idRoute
         compile $ do
             posts <- recentFirst =<< loadAll allPostsPattern
             let ctx =postListCtx posts tags <> archiveCtx <> commonCtx
             compilerGlue emptyCompiler [archiveTemplate, defaultTemplate] ctx
 
-    create [rssFeedPattern] $ do
+    create [rssFeedPage] $ do
         route idRoute
         compile $ do
             loadAllSnapshots allPostsPattern contentSnapshot
@@ -123,8 +123,15 @@ templatesPattern   = "templates/*"
 tagsCapturePattern = "tags/*.html"
 indexPagePattern   = "index.html"
 aboutPagePattern   = "about.markdown"
-archivePagePattern = "archive.html"
-rssFeedPattern     = "feed.xml"
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+-- Pages
+--------------------------------------------------------------------------------
+archivePage = "archive.html"
+rssFeedPage = "feed.xml"
 --------------------------------------------------------------------------------
 
 
