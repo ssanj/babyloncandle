@@ -28,28 +28,18 @@ main = hakyllWith (defaultConfiguration { previewPort = 9999 }) $ do
         compile $ compilerGlue precompiler [postTemplate, defaultTemplate] (postCtx tags)
 
     tagsRules tags $ \tag pattern -> do
-        let title = "Posts tagged " ++ tag
 
         route idRoute
         compile $ do
             posts <- recentFirst =<< loadAll pattern
-            let ctx = constField "title" title <>
-                        listField "posts" (postCtx tags) (return posts) <>
-                        commonCtx <>
-                        (tagNameCtx tag) <>
-                        defaultContext
+            let ctx = postListCtx posts tags <> (tagNameCtx tag) <> commonCtx
             compilerGlue (makeItem "") [postsTemplate, defaultTemplate] ctx
 
     create ["archive.html"] $ do
         route idRoute
         compile $ do
             posts <- recentFirst =<< loadAll "posts/*"
-            let ctx =
-                    listField "posts" (postCtx tags) (return posts) <>
-                    archiveCtx <>
-                    commonCtx <>
-                    defaultContext
-
+            let ctx =postListCtx posts tags <> archiveCtx <> commonCtx
             compilerGlue (makeItem "") [archiveTemplate, defaultTemplate] ctx
 
 
@@ -57,12 +47,7 @@ main = hakyllWith (defaultConfiguration { previewPort = 9999 }) $ do
         route idRoute
         compile $ do
             posts <- topPosts 5 . recentFirst =<< loadAll "posts/*"
-            let ctx =
-                    listField "posts" (postCtx tags) (return posts) <>
-                    homepageCtx <>
-                    commonCtx <>
-                    defaultContext
-
+            let ctx = postListCtx posts tags <> homepageCtx <> commonCtx
             compilerGlue (getResourceBody >>= applyAsTemplate ctx) [defaultTemplate] ctx
 
     create ["feed.xml"] $ do
@@ -76,9 +61,7 @@ main = hakyllWith (defaultConfiguration { previewPort = 9999 }) $ do
 
     match "about.markdown" $ do
         route $ setExtension "html"
-        compile $ do
-            let ctx = commonCtx <> defaultContext
-            compilerGlue pandocCompiler [aboutTemplate, defaultTemplate] ctx
+        compile $ compilerGlue pandocCompiler [aboutTemplate, defaultTemplate] commonCtx
 
 --------------------------------------------------------------------------------
 
@@ -96,8 +79,11 @@ postCtx tags = mconcat
      defaultContext
     ]
 
+postListCtx :: [Item String] -> Tags -> Context String
+postListCtx posts tags = listField "posts" (postCtx tags) (return posts)
+
 commonCtx :: Context String
-commonCtx = mconcat [blogTitleCtx, emailAddyCtx, siteOwnerCtx, sitDesciptionCtx]
+commonCtx = mconcat [blogTitleCtx, emailAddyCtx, siteOwnerCtx, sitDesciptionCtx, defaultContext]
 
 tagNameCtx :: String -> Context String
 tagNameCtx tn = constField "postTitle" (titleCase tn ++ " Posts")
