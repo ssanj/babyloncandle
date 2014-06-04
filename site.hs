@@ -7,7 +7,7 @@ import           Hakyll
 
 --------------------------------------------------------------------------------
 main :: IO ()
-main = hakyllWith (defaultConfiguration { previewPort = 9999 }) $ do
+main = hakyllWith siteConfig $ do
     match imagesPattern $ do
         route   idRoute
         compile copyFileCompiler
@@ -33,7 +33,7 @@ main = hakyllWith (defaultConfiguration { previewPort = 9999 }) $ do
         compile $ do
             posts <- recentFirst =<< loadAll pattern
             let ctx = postListCtx posts tags <> (tagNameCtx tag) <> commonCtx
-            compilerGlue (makeItem "") [postsTemplate, defaultTemplate] ctx
+            compilerGlue emptyCompiler [postsTemplate, defaultTemplate] ctx
 
     match indexPagePattern $ do
         route idRoute
@@ -53,7 +53,7 @@ main = hakyllWith (defaultConfiguration { previewPort = 9999 }) $ do
         compile $ do
             posts <- recentFirst =<< loadAll allPostsPattern
             let ctx =postListCtx posts tags <> archiveCtx <> commonCtx
-            compilerGlue (makeItem "") [archiveTemplate, defaultTemplate] ctx
+            compilerGlue emptyCompiler [archiveTemplate, defaultTemplate] ctx
 
     create [rssFeedPattern] $ do
         route idRoute
@@ -111,7 +111,6 @@ feedCtx = mconcat [ bodyField "description", defaultContext]
 
 
 
-
 --------------------------------------------------------------------------------
 -- Patterns
 --------------------------------------------------------------------------------
@@ -129,10 +128,19 @@ rssFeedPattern     = "feed.xml"
 --------------------------------------------------------------------------------
 
 
+
 --------------------------------------------------------------------------------
 -- Extensions
 --------------------------------------------------------------------------------
 htmlExtension = "html"
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+-- Site configuration
+--------------------------------------------------------------------------------
+siteConfig = defaultConfiguration { previewPort = 9999 }
 --------------------------------------------------------------------------------
 
 
@@ -182,6 +190,9 @@ compilerGlue cmplr tmpls ctx =
                 let paths = map (templatesFolder) tmpls in
                 foldl (\c t -> c >>= loadAndApplyTemplate t ctx) cmplr paths >>=
                     relativizeUrls
+
+emptyCompiler :: Compiler (Item String)
+emptyCompiler = makeItem ""
 --------------------------------------------------------------------------------
 
 
