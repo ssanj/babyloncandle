@@ -82,7 +82,7 @@ postListCtx :: [Item String] -> Tags -> Context String
 postListCtx posts tags = listField "posts" (postCtx tags) (return posts)
 
 commonCtx :: Context String
-commonCtx = mconcat [blogTitleCtx, emailAddyCtx, siteOwnerCtx, sitDesciptionCtx, defaultContext]
+commonCtx = mconcat [blogTitleCtx, emailAddyCtx, siteOwnerCtx, sitDesciptionCtx, siteSEOCtx, defaultContext]
 
 tagNameCtx :: String -> Context String
 tagNameCtx tn = constField "postTitle" (titleCase tn ++ " Posts")
@@ -104,6 +104,9 @@ siteOwnerCtx = constField "siteOwner" "sanjiv sahayam"
 
 sitDesciptionCtx :: Context String
 sitDesciptionCtx = constField "sitDesciption" "Things I would otherwise forget."
+
+siteSEOCtx :: Context String
+siteSEOCtx = constField "siteSEO" "The personal blog of sanjiv sahayam."
 
 feedCtx :: Context String
 feedCtx = mconcat [ bodyField "description", defaultContext]
@@ -182,7 +185,7 @@ siteConfig = defaultConfiguration {
                 tmpDirectory         = "dist/_cache/tmp",
                 deployCommand = "rsync -av --checksum --delete --progress " ++ 
                                  "--exclude-from 'excludes.txt' " ++ 
-                                 "dist/_site/* $BLOG_"
+                                 "dist/_site/* $BLOG_DIR"
              }
 --------------------------------------------------------------------------------
 

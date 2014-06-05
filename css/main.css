@@ -289,6 +289,10 @@ a:visited { color: #205caa; }
   padding-right: 20px;
 }
 
+.bottom {
+  margin-top: 20px;
+}
+
 /* media queries */
 /* ----------------------------------------------------------*/
 
