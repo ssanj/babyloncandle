@@ -1,8 +1,7 @@
 --------------------------------------------------------------------------------
 {-# LANGUAGE OverloadedStrings #-}
-import           Data.Monoid (mappend, mconcat, (<>))
+import           Data.Monoid (mconcat, (<>))
 import           Data.Char (toUpper, toLower)
-import           Text.Printf
 import           Hakyll
 
 --------------------------------------------------------------------------------
@@ -114,15 +113,38 @@ feedCtx = mconcat [ bodyField "description", defaultContext]
 --------------------------------------------------------------------------------
 -- Patterns
 --------------------------------------------------------------------------------
-allPostsPattern    = "posts/*"
-contentSnapshot    = "content"
-imagesPattern      = "images/*"
-cssPattern         = "css/*"
-jsPattern          = "scripts/*"
-templatesPattern   = "templates/*"
+allPostsPattern :: Pattern
+allPostsPattern = "posts/*"
+
+imagesPattern :: Pattern
+imagesPattern = "images/*"
+
+cssPattern :: Pattern
+cssPattern = "css/*"
+
+jsPattern :: Pattern
+jsPattern = "scripts/*"
+
+templatesPattern :: Pattern
+templatesPattern = "templates/*"
+
+tagsCapturePattern :: Pattern
 tagsCapturePattern = "tags/*.html"
-indexPagePattern   = "index.html"
-aboutPagePattern   = "about.markdown"
+
+indexPagePattern :: Pattern
+indexPagePattern = "index.html"
+
+aboutPagePattern :: Pattern
+aboutPagePattern = "about.markdown"
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+-- Snapshots
+--------------------------------------------------------------------------------
+contentSnapshot :: Snapshot
+contentSnapshot = "content"
 --------------------------------------------------------------------------------
 
 
@@ -130,7 +152,10 @@ aboutPagePattern   = "about.markdown"
 --------------------------------------------------------------------------------
 -- Pages
 --------------------------------------------------------------------------------
+archivePage :: Identifier
 archivePage = "archive.html"
+
+rssFeedPage :: Identifier
 rssFeedPage = "feed.xml"
 --------------------------------------------------------------------------------
 
@@ -139,6 +164,7 @@ rssFeedPage = "feed.xml"
 --------------------------------------------------------------------------------
 -- Extensions
 --------------------------------------------------------------------------------
+htmlExtension :: String
 htmlExtension = "html"
 --------------------------------------------------------------------------------
 
@@ -147,11 +173,12 @@ htmlExtension = "html"
 --------------------------------------------------------------------------------
 -- Site configuration
 --------------------------------------------------------------------------------
+siteConfig :: Configuration
 siteConfig = defaultConfiguration { 
                 previewPort = 9999,
                 deployCommand = "rsync -av --checksum --delete --progress " ++ 
                                  "--exclude-from 'excludes.txt' " ++ 
-                                 "_site/* $BLOG_DIR"
+                                 "_site/* $BLOG_"
              }
 --------------------------------------------------------------------------------
 
@@ -160,6 +187,7 @@ siteConfig = defaultConfiguration {
 --------------------------------------------------------------------------------
 --- RSS Config
 --------------------------------------------------------------------------------
+feedConfig :: FeedConfiguration
 feedConfig =  FeedConfiguration { 
                 feedTitle = "BabylonCandle",
                 feedDescription = "The blog of Sanjiv Sahayam",
@@ -174,11 +202,20 @@ feedConfig =  FeedConfiguration {
 --------------------------------------------------------------------------------
 -- Template definitions and helpers
 --------------------------------------------------------------------------------
+defaultTemplate :: String
 defaultTemplate = "default.html"
+
+archiveTemplate :: String
 archiveTemplate = "archive.html"
-aboutTemplate   = "about.html"
-postTemplate    = "post.html"
-postsTemplate   = "posts.html"
+
+aboutTemplate :: String
+aboutTemplate = "about.html"
+
+postTemplate :: String
+postTemplate = "post.html"
+
+postsTemplate :: String
+postsTemplate = "posts.html"
 
 templatesFolder :: String -> Identifier
 templatesFolder file = fromFilePath ("templates/" ++ file)                                                              
@@ -189,8 +226,11 @@ templatesFolder file = fromFilePath ("templates/" ++ file)
 --------------------------------------------------------------------------------
 -- Constants
 --------------------------------------------------------------------------------
+numPostsOnHomePage :: Int
 numPostsOnHomePage = 5
-numPostsInRssFeed  = 10
+
+numPostsInRssFeed :: Int
+numPostsInRssFeed = 10
 --------------------------------------------------------------------------------
 
 

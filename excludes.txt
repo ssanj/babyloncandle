@@ -1,8 +1,6 @@
 *.git*
 *.sh
-*.o
-*.hi
 site
-test.hs
 excludes.txt
 _cache
+dist
