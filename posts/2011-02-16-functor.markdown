@@ -49,18 +49,15 @@ class ListFunctor extends Functor[List] {
 }
 ```
 
-class ListFunctor extends Functor[List] {
-  def fmap[A,B](f: A => B, fa:List[A]): List[B] = fa match {
-    case Nil => Nil
-    case x::xs => f(x) :: fmap(f, xs)
-  }
-}
+All Functor implementations traverse over the type supplied and apply the function f, to each element within that type. In the case of List, f is applied to each element of the List.
+
+We could use the ListFunctor as:
 
 ```{.scala}
 new ListFunctor().fmap((_:String).length, List("one", "two", "three"))
 ```
 
-his gives us the same results as before, but we've abstracted over the List type constructor and we can covert from List[A] -> List[B] where A and B are any types.
+This gives us the same results as before, but we've abstracted over the List type constructor and we can covert from List[A] -> List[B] where A and B are any types.
 
 Import points to note are:
 
@@ -93,7 +90,7 @@ new HolderFunctor().fmap("Give me " + (_:Int).toString, Holder(5))
 res0: Holder[String] = Holder(Give me 5)
 ```
 
-We converted a Holder__[Int]__ -> Holder__[String]__ by mapping across the value in the Holder.
+We converted a Holder __[Int]__ -> Holder __[String]__ by mapping across the value in the Holder.
 
 # Functor Laws
 
