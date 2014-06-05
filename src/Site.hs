@@ -2,6 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 import           Data.Monoid (mconcat, (<>))
 import           Data.Char (toUpper, toLower)
+import           Control.Monad (liftM)
 import           Hakyll
 
 --------------------------------------------------------------------------------
@@ -23,7 +24,7 @@ main = hakyllWith siteConfig $ do
 
     match allPostsPattern $ do
         route $ setExtension htmlExtension
-        let precompiler = (pandocCompiler >>= saveSnapshot contentSnapshot >>= return . fmap demoteHeaders)
+        let precompiler = liftM (fmap demoteHeaders) (pandocCompiler >>= saveSnapshot contentSnapshot) 
         compile $ compilerGlue precompiler [postTemplate, defaultTemplate] (postCtx tags)
 
     tagsRules tags $ \tag pattern -> do
@@ -31,7 +32,7 @@ main = hakyllWith siteConfig $ do
         route idRoute
         compile $ do
             posts <- recentFirst =<< loadAll pattern
-            let ctx = postListCtx posts tags <> (tagNameCtx tag) <> commonCtx
+            let ctx = postListCtx posts tags <> tagNameCtx tag <> commonCtx
             compilerGlue emptyCompiler [postsTemplate, defaultTemplate] ctx
 
     match indexPagePattern $ do
@@ -56,7 +57,7 @@ main = hakyllWith siteConfig $ do
 
     create [rssFeedPage] $ do
         route idRoute
-        compile $ do
+        compile $
             loadAllSnapshots allPostsPattern contentSnapshot
                 >>= fmap (take numPostsInRssFeed) . recentFirst
                 >>= renderRss feedConfig feedCtx        
@@ -243,7 +244,7 @@ numPostsInRssFeed = 10
 --------------------------------------------------------------------------------
 compilerGlue :: Compiler (Item String) -> [String] -> Context String -> Compiler (Item String)
 compilerGlue cmplr tmpls ctx = 
-                let paths = map (templatesFolder) tmpls in
+                let paths = map templatesFolder tmpls in
                 foldl (\c t -> c >>= loadAndApplyTemplate t ctx) cmplr paths >>=
                     relativizeUrls
 
@@ -261,7 +262,7 @@ topPosts num = fmap (take num)
 
 titleCase :: String -> String
 titleCase [] = []
-titleCase (x:xs) = toUpper x : (map toLower xs)
+titleCase (x:xs) = toUpper x : map toLower xs
 --------------------------------------------------------------------------------
 
 
