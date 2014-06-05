@@ -151,7 +151,7 @@ siteConfig = defaultConfiguration {
                 previewPort = 9999,
                 deployCommand = "rsync -av --checksum --delete --progress " ++ 
                                  "--exclude-from 'excludes.txt' " ++ 
-                                 "_site/* /Users/sanjivsahayam/projects/code/haskell/babyloncandle"
+                                 "_site/* $BLOG_DIR"
              }
 --------------------------------------------------------------------------------
 
@@ -192,6 +192,7 @@ templatesFolder file = fromFilePath ("templates/" ++ file)
 numPostsOnHomePage = 5
 numPostsInRssFeed  = 10
 --------------------------------------------------------------------------------
+
 
 
 --------------------------------------------------------------------------------
