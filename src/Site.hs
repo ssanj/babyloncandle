@@ -176,6 +176,9 @@ htmlExtension = "html"
 siteConfig :: Configuration
 siteConfig = defaultConfiguration { 
                 previewPort = 9999,
+                destinationDirectory = "dist/_site",
+                storeDirectory       = "dist/_cache",
+                tmpDirectory         = "dist/_cache/tmp",
                 deployCommand = "rsync -av --checksum --delete --progress " ++ 
                                  "--exclude-from 'excludes.txt' " ++ 
                                  "_site/* $BLOG_"
