@@ -20,7 +20,7 @@
         <div class="wrap">
           <a class="site-title" href="/">$blogTitle$</a>
           $if(postCount)$ 
-            <span>$postCount$</span>
+            <span class="brace">|</span><span class="post-count">$postCount$</span>
           $endif$          
           <nav class="site-nav">
             <a href="#" class="menu-icon">
@@ -35,9 +35,10 @@
               </svg>
             </a>
             <div class="trigger">                    
-              <a class="page-link" href="/about.html">About</a>
-              <a class="page-link" href="/archive.html">Archive</a>
+              <a class="page-link" href="/index.html">Home</a>
+              <a class="page-link" href="/archive.html">Archive</a>              
               <a class="page-link" href="/feed.xml">Feed</a>
+              <a class="page-link" href="/about.html">About</a>              
             </div>
           </nav>
         </div>

@@ -267,6 +267,19 @@ a:visited { color: #205caa; }
   margin-top: 20px;
 }
 
+.post-count {
+  text-align: center;
+  font-weight: bold;
+  font-size: 1em;
+  vertical-align: text-bottom;
+  color: #87b88d;
+}
+
+.brace {
+  font-size: 2em;
+  margin: 0 3px 0 10px;
+  color: #dfdfdf;
+}
 /* media queries */
 /* ----------------------------------------------------------*/
 
