@@ -38,8 +38,8 @@ main = hakyllWith siteConfig $ do
     match indexPagePattern $ do
         route idRoute
         compile $ do
-            posts <- topPosts numPostsOnHomePage . recentFirst =<< loadAll allPostsPattern
-            let ctx = postListCtx posts tags <> homepageCtx <> commonCtx
+            (posts, count) <- partitionPosts (withLength $ take numPostsOnHomePage) . recentFirst =<< loadAll allPostsPattern
+            let ctx = postListCtx posts tags <> homepageCtx count <> commonCtx
             compilerGlue (getResourceBody >>= applyAsTemplate ctx) [defaultTemplate] ctx
 
     match templatesPattern $ compile templateCompiler
@@ -51,8 +51,8 @@ main = hakyllWith siteConfig $ do
     create [archivePage] $ do
         route idRoute
         compile $ do
-            posts <- recentFirst =<< loadAll allPostsPattern
-            let ctx =postListCtx posts tags <> archiveCtx <> commonCtx
+            (posts, count) <- partitionPosts (withLength id) . recentFirst =<< loadAll allPostsPattern
+            let ctx =postListCtx posts tags <> archiveCtx count <> commonCtx
             compilerGlue emptyCompiler [archiveTemplate, defaultTemplate] ctx
 
     create [rssFeedPage] $ do
@@ -87,14 +87,23 @@ commonCtx = mconcat [blogTitleCtx, emailAddyCtx, siteOwnerCtx, sitDesciptionCtx,
 tagNameCtx :: String -> Context String
 tagNameCtx tn = constField "postTitle" (titleCase tn ++ " Posts")
 
-archiveCtx :: Context String
-archiveCtx = constField "postTitle" "Archive" 
+archiveCtx :: Int -> Context String
+archiveCtx postCount = mconcat [archiveTitleCtx, postCountCtx postCount]
 
 blogTitleCtx :: Context String
 blogTitleCtx =  constField "blogTitle" "BabylonCandle"
 
-homepageCtx :: Context String
-homepageCtx = constField "title" "Home"
+homepageCtx :: Int -> Context String
+homepageCtx postCount = mconcat [homepageTitleCtx, postCountCtx postCount]
+
+homepageTitleCtx :: Context String
+homepageTitleCtx = constField "title" "Home"
+
+archiveTitleCtx :: Context String
+archiveTitleCtx = constField "postTitle" "Archive"
+
+postCountCtx :: Int -> Context String
+postCountCtx = (constField "postCount") . show
 
 emailAddyCtx :: Context String
 emailAddyCtx =  constField "email" "sanjsmailbox@gmail.com"  
@@ -260,8 +269,11 @@ emptyCompiler = makeItem ""
 --------------------------------------------------------------------------------
 -- Utils
 --------------------------------------------------------------------------------
-topPosts :: (Functor m) => Int -> m [Item a] -> m [Item a]
-topPosts num = fmap (take num)
+partitionPosts :: (Functor m) =>  ([Item a] -> b) -> m [Item a] -> m b
+partitionPosts = fmap
+
+withLength :: ([a] -> [a]) -> [a] -> ([a], Int)
+withLength f xs = let r = f xs in (r, length r)
 
 titleCase :: String -> String
 titleCase [] = []
