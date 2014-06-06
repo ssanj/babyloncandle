@@ -280,6 +280,26 @@ a:visited { color: #205caa; }
   margin: 0 3px 0 10px;
   color: #dfdfdf;
 }
+
+/* overriding default padding */
+.site-footer {
+  padding: 15px 0 30px 0;  
+}
+
+/* overriding default padding */
+.wrap {
+  padding: 0 5px 0 0;
+}
+
+.site-footer ul li {
+  display: inline;
+  margin-right: 3px;
+}
+
+.site-footer .generated-by {
+  float: right;
+}
+
 /* media queries */
 /* ----------------------------------------------------------*/
 
