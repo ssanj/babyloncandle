@@ -1,23 +1,18 @@
   <div class="page-content">
       <div class="wrap">
         <div class="home">
-
-          $if(postTitle)$
-            <h1>$postTitle$</h1>
-          $else$
-            <h1>Posts</h1>
-          $endif$
-          
+          <h1>Papers</h1>
+        
           <ul class="posts">
-            $for(posts)$
+            $for(papers)$
             <li>
               <span class="post-date">$date$</span>
               <a class="post-link" href="$url$">$title$</a>
+              <span class="post-date">$author$</span>
+              <span class="post-date">$body$</span>
             </li>   
             $endfor$  
           </ul>
-
-          <p class="rss-subscribe">subscribe <a href="/feed.xml">via RSS</a></p>
         </div>
       </div>
   </div>

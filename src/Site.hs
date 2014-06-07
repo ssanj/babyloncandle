@@ -27,6 +27,9 @@ main = hakyllWith siteConfig $ do
         let precompiler = liftM (fmap demoteHeaders) (pandocCompiler >>= saveSnapshot contentSnapshot) 
         compile $ compilerGlue precompiler [postTemplate, defaultTemplate] (postCtx tags)
 
+    match allPapersPattern $ do
+        compile $ pandocCompiler >>= saveSnapshot "paperContent"
+
     tagsRules tags $ \tag pattern -> do
 
         route idRoute
@@ -48,11 +51,18 @@ main = hakyllWith siteConfig $ do
         route $ setExtension htmlExtension
         compile $ compilerGlue pandocCompiler [aboutTemplate, defaultTemplate] commonCtx
 
+    create [papersPage] $ do
+        route idRoute
+        compile $ do
+            papers <- loadAllSnapshots allPapersPattern "paperContent"
+            let ctx = paperListCtx papers <> commonCtx
+            compilerGlue emptyCompiler [papersTemplate, defaultTemplate] ctx
+
     create [archivePage] $ do
         route idRoute
         compile $ do
             (posts, count) <- partitionPosts (withLength id) . recentFirst =<< loadAll allPostsPattern
-            let ctx =postListCtx posts tags <> archiveCtx count <> commonCtx
+            let ctx = postListCtx posts tags <> archiveCtx count <> commonCtx
             compilerGlue emptyCompiler [archiveTemplate, defaultTemplate] ctx
 
     create [rssFeedPage] $ do
@@ -80,6 +90,17 @@ postCtx tags = mconcat
 
 postListCtx :: [Item String] -> Tags -> Context String
 postListCtx posts tags = listField "posts" (postCtx tags) (return posts)
+
+paperCtx :: Context String
+paperCtx = mconcat [modificationTimeField "mtime" "%U", 
+                    dateField "date" "%B %e, %Y", 
+                    commonCtx]
+
+createItem :: String -> String -> Item String
+createItem path content = Item (fromFilePath path) content 
+
+paperListCtx :: [Item String] -> Context String
+paperListCtx papers = listField "papers" paperCtx (return papers)
 
 commonCtx :: Context String
 commonCtx = mconcat [blogTitleCtx, emailAddyCtx, siteOwnerCtx, sitDesciptionCtx, siteSEOCtx, defaultContext]
@@ -129,6 +150,9 @@ feedCtx = mconcat [ bodyField "description", defaultContext]
 allPostsPattern :: Pattern
 allPostsPattern = "posts/*"
 
+allPapersPattern :: Pattern
+allPapersPattern = "papers/*"
+
 imagesPattern :: Pattern
 imagesPattern = "images/*"
 
@@ -170,6 +194,9 @@ archivePage = "archive.html"
 
 rssFeedPage :: Identifier
 rssFeedPage = "feed.xml"
+
+papersPage :: Identifier
+papersPage = "papers.html"
 --------------------------------------------------------------------------------
 
 
@@ -232,6 +259,12 @@ postTemplate = "post.html"
 
 postsTemplate :: String
 postsTemplate = "posts.html"
+
+papersTemplate :: String
+papersTemplate = "papers.html"
+
+paperTemplate :: String
+paperTemplate = "paper.html"
 
 templatesFolder :: String -> Identifier
 templatesFolder file = fromFilePath ("templates/" ++ file)                                                              
