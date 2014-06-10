@@ -10,7 +10,7 @@ Install the latest mysql with
 
 ```
 sudo apt-get update
- sudo apt-get install mysql-server
+sudo apt-get install mysql-server
 ```
 
 __Note__: _Ensure you remember the root password specified while installing mysql._

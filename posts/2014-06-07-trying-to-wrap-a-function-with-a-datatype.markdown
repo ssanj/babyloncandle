@@ -10,17 +10,17 @@ While using the [Hakyll](http://jaspervdj.be/hakyll) framework, I came across a 
 ```{.haskell}
 renderTagCloudWith :: (Double -> Double ->
                        String -> String -> Int -> Int -> Int -> String)
-                   -- ^ Render a single tag link
-                   -> ([String] -> String)
-                   -- ^ Concatenate links
-                   -> Double
-                   -- ^ Smallest font size, in percent
-                   -> Double
-                   -- ^ Biggest font size, in percent
-                   -> Tags
-                   -- ^ Input tags
-                   -> Compiler String
-                   -- ^ Rendered cloud
+                       -- ^ Render a single tag link
+                       -> ([String] -> String)
+                       -- ^ Concatenate links
+                       -> Double
+                       -- ^ Smallest font size, in percent
+                       -> Double
+                       -- ^ Biggest font size, in percent
+                       -> Tags
+                       -- ^ Input tags
+                       -> Compiler String
+                       -- ^ Rendered cloud
 ```
 
 The first function, which I will refer to as __renderSingleLink__, had 7 types:
@@ -29,17 +29,17 @@ The first function, which I will refer to as __renderSingleLink__, had 7 types:
 (Double -> Double -> String -> String -> Int -> Int -> Int -> String)
 ```
  
- I wasn't sure what each input value represented. After some trial and error I figured out what each of the values where. The input values are explained below:
+ I wasn't sure what each input value represented. After some trial and error I figured out what each of the values where. The input values and output are explained below:
 
-```{.haskell}
-Double  -> Minimum font size as a %
-Double  -> Maximum font size as a %
-String  -> The tag label
-String  -> The tag url
-Int     -> The maximum use of the current tag
-Int     -> The minimum use of the current tag
-Int     -> The maximum use of any tag in the system
-String  -> The html representation of the tag
+``` {.haskell}
+1. Double  -> -- Minimum font size as a %
+2. Double  -> -- Maximum font size as a %
+3. String  -> -- The tag label
+4. String  -> -- The tag url
+5. Int     -> -- The maximum use of the current tag
+6. Int     -> -- The minimum use of the current tag
+7. Int     -> -- The maximum use of any tag in the system
+8. String  -> -- The html representation of the tag (output)
 ```
 I would have preferred a datatype to encapsulate these values instead of a function with 7 parameters. I was fairly sure I wouldn't remember what each value meant were I to revisit this code a month from now. Also the first two parameters (Double, Double), were in min-max order. The fifth and sixth parameters (Int, Int), were in max-min order. I felt this lead to unnecessary confusion. As I was using Haskell I assumed this would be quite easy to encapsulate in a datatype.
 
