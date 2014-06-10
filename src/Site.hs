@@ -28,14 +28,14 @@ main = hakyllWith siteConfig $ do
         compile $ compilerGlue precompiler [postTemplate, defaultTemplate] (postCtx tags)
 
     match allPapersPattern $ do
-        compile $ pandocCompiler >>= saveSnapshot "paperContent"
+        compile $ pandocCompiler >>= saveSnapshot paperSnapshot
 
     tagsRules tags $ \tag pattern -> do
 
         route idRoute
         compile $ do
-            posts <- recentFirst =<< loadAll pattern
-            let ctx = postListCtx posts tags <> tagNameCtx tag <> commonCtx
+            (posts, count) <- partitionPosts (withLength $ id) . recentFirst =<< loadAll pattern
+            let ctx = postListCtx posts tags <> tagNameCtx tag count <> commonCtx
             compilerGlue emptyCompiler [postsTemplate, defaultTemplate] ctx
 
     match indexPagePattern $ do
@@ -54,7 +54,7 @@ main = hakyllWith siteConfig $ do
     create [papersPage] $ do
         route idRoute
         compile $ do
-            papers <- loadAllSnapshots allPapersPattern "paperContent"
+            papers <- loadAllSnapshots allPapersPattern paperSnapshot
             let ctx = paperListCtx papers <> commonCtx
             compilerGlue emptyCompiler [papersTemplate, defaultTemplate] ctx
 
@@ -105,8 +105,11 @@ paperListCtx papers = listField "papers" paperCtx (return papers)
 commonCtx :: Context String
 commonCtx = mconcat [blogTitleCtx, emailAddyCtx, siteOwnerCtx, sitDesciptionCtx, siteSEOCtx, defaultContext]
 
-tagNameCtx :: String -> Context String
-tagNameCtx tn = constField "postTitle" (titleCase tn ++ " Posts")
+tagNameCtx :: String -> Int -> Context String
+tagNameCtx tn tagCount = mconcat [tagTitleCtx tn, postCountCtx tagCount]
+
+tagTitleCtx :: String -> Context String
+tagTitleCtx tn = constField "postTitle" (titleCase tn ++ " Posts")
 
 archiveCtx :: Int -> Context String
 archiveCtx postCount = mconcat [archiveTitleCtx, postCountCtx postCount]
@@ -118,7 +121,7 @@ homepageCtx :: Int -> Context String
 homepageCtx postCount = mconcat [homepageTitleCtx, postCountCtx postCount]
 
 homepageTitleCtx :: Context String
-homepageTitleCtx = constField "title" "Home"
+homepageTitleCtx = mconcat [constField "title" "Home", constField "postTitle" "Posts"]
 
 archiveTitleCtx :: Context String
 archiveTitleCtx = constField "postTitle" "Archive"
@@ -182,6 +185,9 @@ aboutPagePattern = "about.markdown"
 --------------------------------------------------------------------------------
 contentSnapshot :: Snapshot
 contentSnapshot = "content"
+
+paperSnapshot :: Snapshot
+paperSnapshot = "paperContent"
 --------------------------------------------------------------------------------
 
 

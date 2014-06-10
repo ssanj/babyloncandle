@@ -156,7 +156,7 @@ a:visited { color: #205caa; }
   line-height: 1;
 }
 
-.posts .post-date {
+.posts .post-date, .posts .post-author {
   display: block;
   font-size: 15px;
   color: #818181;
@@ -302,6 +302,12 @@ a:visited { color: #205caa; }
 
 /* Fixed indentation of first line in a code block. */
 .post pre code { padding-left: 0;}
+
+
+.posts .post-author {
+  font-style: italic;
+  font-weight: bold;
+}
 
 /* media queries */
 /* ----------------------------------------------------------*/

@@ -2,11 +2,7 @@
       <div class="wrap">
         <div class="home">
 
-          $if(postTitle)$
-            <h1>$postTitle$</h1>
-          $else$
-            <h1>Posts</h1>
-          $endif$
+          <h1>$postTitle$<span class="brace">|</span><span class="post-count">$postCount$</span></h1>
           
           <ul class="posts">
             $for(posts)$
