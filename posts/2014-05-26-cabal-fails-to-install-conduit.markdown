@@ -22,12 +22,17 @@ To overcome this issue you need to do the following:
 3. Make it executable
 
 4. Edit the GHC settings file found at: 
-    ```/Library/Frameworks/GHC.framework/Versions/Current/usr/lib/ghc-7.6.3/settings```
+
+```
+/Library/Frameworks/GHC.framework/Versions/Current/usr/lib/ghc-7.6.3/settings
+```
 
 
 5. Change the "C compiler command" to use the wrapper:
 
-    ```("C compiler command", "/usr/local/bin/clang-xcode5-wrapper"),```
+```
+("C compiler command", "/usr/local/bin/clang-xcode5-wrapper"),
+```
 
 And you're done.
 
