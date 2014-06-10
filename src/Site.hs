@@ -54,8 +54,8 @@ main = hakyllWith siteConfig $ do
     create [papersPage] $ do
         route idRoute
         compile $ do
-            papers <- loadAllSnapshots allPapersPattern paperSnapshot
-            let ctx = paperListCtx papers <> commonCtx
+            (papers, count) <- partitionPosts (withLength id) . recentFirst =<< loadAllSnapshots allPapersPattern paperSnapshot
+            let ctx = paperListCtx papers count <> commonCtx
             compilerGlue emptyCompiler [papersTemplate, defaultTemplate] ctx
 
     create [archivePage] $ do
@@ -96,11 +96,8 @@ paperCtx = mconcat [modificationTimeField "mtime" "%U",
                     dateField "date" "%B %e, %Y", 
                     commonCtx]
 
-createItem :: String -> String -> Item String
-createItem path content = Item (fromFilePath path) content 
-
-paperListCtx :: [Item String] -> Context String
-paperListCtx papers = listField "papers" paperCtx (return papers)
+paperListCtx :: [Item String] -> Int -> Context String
+paperListCtx papers paperCount = mconcat [listField "papers" paperCtx (return papers), postCountCtx  paperCount]
 
 commonCtx :: Context String
 commonCtx = mconcat [blogTitleCtx, emailAddyCtx, siteOwnerCtx, sitDesciptionCtx, siteSEOCtx, defaultContext]
@@ -268,9 +265,6 @@ postsTemplate = "posts.html"
 
 papersTemplate :: String
 papersTemplate = "papers.html"
-
-paperTemplate :: String
-paperTemplate = "paper.html"
 
 templatesFolder :: String -> Identifier
 templatesFolder file = fromFilePath ("templates/" ++ file)                                                              

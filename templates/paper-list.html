@@ -1,14 +1,14 @@
   <div class="page-content">
       <div class="wrap">
         <div class="home">
-          <h1>Some Papers of Interest</h1>
-        
+          <h1>Papers<span class="brace">|</span><span class="post-count">$postCount$</span></h1>
+
           <ul class="posts">
             $for(papers)$
             <li>
               <header>
                 <span class="post-date">$date$</span>
-                <a class="post-link" href="$url$">$title$</a>
+                <a class="post-link" href="$link$">$title$</a>
                 <span class="post-author">$author$</span>
               </header>  
               <article class="post-content">
