@@ -1,15 +1,22 @@
 --------------------------------------------------------------------------------
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings, DeriveGeneric #-}
 import           Data.Monoid (mconcat, (<>))
 import           Data.Char (toUpper, toLower)
+import           Data.List (intercalate)
 import           Control.Monad (liftM)
+import           Data.Aeson
+import           GHC.Generics
+import           qualified Data.Text as T
+--import      Control.Applicative
+import           qualified Data.ByteString.Lazy as B
+import           qualified Data.ByteString.Lazy.Char8 as BS
 import           Hakyll
 
 --------------------------------------------------------------------------------
 main :: IO ()
 main = hakyllWith siteConfig $ do
     match imagesPattern $ do
-        route   idRoute
+        route  idRoute
         compile copyFileCompiler
 
     match cssPattern $ do
@@ -18,7 +25,7 @@ main = hakyllWith siteConfig $ do
 
     match jsPattern $ do
         route idRoute
-        compile copyFileCompiler           
+        compile copyFileCompiler
 
     tags <- buildTags allPostsPattern (fromCapture tagsCapturePattern)
 
@@ -58,6 +65,14 @@ main = hakyllWith siteConfig $ do
             let ctx = paperListCtx papers count <> commonCtx
             compilerGlue emptyCompiler [papersTemplate, defaultTemplate] ctx
 
+    create [searchDataPage] $ do
+        route idRoute
+        compile $ do
+            -- [Item a]
+            (posts, count) <- partitionPosts (withLength id) . recentFirst =<< loadAll allPostsPattern
+            let ctx = jsonPostListCtx posts <> archiveCtx count <> commonCtx
+            compilerGlue emptyCompiler [searchDataTemplate] ctx
+
     create [archivePage] $ do
         route idRoute
         compile $ do
@@ -88,8 +103,51 @@ postCtx tags = mconcat
      defaultContext
     ]
 
+tagsAsStringsCtx :: Item String -> Context String
+tagsAsStringsCtx post = mconcat[
+                         modificationTimeField "mtime" "%U",
+                         dateField "date" "%B %e, %Y",                         
+                         commonCtx,
+                         createField "blah",
+                          --createFieldFromOther "blah" "tags",
+                         --constField "blah" (getField "title" post)
+                         defaultContext
+                        ]         
+
+
+data SearchablePost = SearchablePost { title:: !T.Text, tags:: !T.Text } deriving (Show, Generic)
+
+instance ToJSON SearchablePost
+
+-- get the value of a metadata key
+getField :: String -> Item String -> Compiler String
+getField key item = do
+        f <- getMetadataField (itemIdentifier item) key 
+        case f of
+            Just v  -> return v
+            Nothing -> return ("could not find value for " ++ key)             
+
+-- dumpItem :: [String] -> Item String -> Compiler String
+-- dumpItem keys item = fmap (intercalate "##") $ sequence $ map (\k -> getField k item) keys
+
+dumpItem :: Item String -> Compiler String
+dumpItem item = do
+        _title <- getField "title" item
+        _tags <- getField "tags" item
+        return (BS.unpack $ encode $ SearchablePost (T.pack _title) (T.pack _tags))
+
+createField :: String -> Context String
+createField key = field key $ dumpItem
+
+createFieldFromOther :: String -> String -> Context String
+createFieldFromOther keyn keyo = field keyn $ getField keyo
+
 postListCtx :: [Item String] -> Tags -> Context String
 postListCtx posts tags = listField "posts" (postCtx tags) (return posts)
+
+jsonPostListCtx :: [Item String] -> Context String
+jsonPostListCtx posts = listField "posts" (tagsAsStringsCtx $ head posts) (return posts)
+
 
 paperCtx :: Context String
 paperCtx = mconcat [modificationTimeField "mtime" "%U", 
@@ -200,6 +258,9 @@ rssFeedPage = "feed.xml"
 
 papersPage :: Identifier
 papersPage = "papers.html"
+
+searchDataPage :: Identifier
+searchDataPage = "data/pages.json"
 --------------------------------------------------------------------------------
 
 
@@ -253,6 +314,9 @@ defaultTemplate = "default.html"
 
 archiveTemplate :: String
 archiveTemplate = "archive.html"
+
+searchDataTemplate :: String
+searchDataTemplate = "pages_template.json"
 
 aboutTemplate :: String
 aboutTemplate = "about.html"

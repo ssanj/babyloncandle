@@ -12,8 +12,8 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/syntax.css">
+    <link rel="stylesheet" type="text/css" href="/css/example.css">    
   </head>
-
 
     <body>
       <header class="site-header">
@@ -39,8 +39,28 @@
             </div>
           </nav>
         </div>
+        <div id="remote">
+          <input class="typeahead" type="text" placeholder="Search by title">
+        </div>
       </header>
       $body$
       $partial("templates/footer.html")$
-    </body>
+    </body>    
+    <script src="scripts/jquery-1.11.1.min.js"></script>
+    <script src="scripts/typeahead.bundle.min.js"></script>        
+    <script type="text/javascript">
+      var pages = new Bloodhound({
+        datumTokenizer: function(datum) { alert("called with " + datum); return datum.title; },
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        prefetch: '/pages.json',
+      });
+       
+      pages.initialize(); 
+       
+      $$('#remote .typeahead').typeahead(null, {
+        name: 'blog-titles',
+        displayKey: 'title',
+        source: pages.ttAdapter()
+      });
+    </script>    
 </html>

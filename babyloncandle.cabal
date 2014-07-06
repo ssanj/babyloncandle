@@ -23,6 +23,9 @@ Executable site
 
   build-depends:
     base      >= 4.6    && < 4.7,
-    hakyll    >= 4.5    && < 4.6
+    hakyll    >= 4.5    && < 4.6,
+    text,
+    aeson,
+    bytestring
   
   default-language: Haskell2010

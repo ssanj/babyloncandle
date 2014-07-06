@@ -1,0 +1,9 @@
+[
+	$for(posts)$
+	    { 'loc' : '$url$',
+	      'title' : '$title$',
+	      'tags' : '$tags$',
+	      'blah' : '$blah$'
+	    }$sep$,        
+	$endfor$
+]	
