@@ -7,7 +7,6 @@ import           Control.Monad (liftM)
 import           Data.Aeson
 import           GHC.Generics
 import           qualified Data.Text as T
---import      Control.Applicative
 import           qualified Data.ByteString.Lazy as B
 import           qualified Data.ByteString.Lazy.Char8 as BS
 import           Hakyll
@@ -70,8 +69,9 @@ main = hakyllWith siteConfig $ do
         compile $ do
             -- [Item a]
             (posts, count) <- partitionPosts (withLength id) . recentFirst =<< loadAll allPostsPattern
-            let ctx = jsonPostListCtx posts <> archiveCtx count <> commonCtx
-            compilerGlue emptyCompiler [searchDataTemplate] ctx
+            --let ctx = jsonPostListCtx posts <> archiveCtx count <> commonCtx
+            --compilerGlue emptyCompiler [searchDataTemplate] ctx 
+            getSearchablePosts posts
 
     create [archivePage] $ do
         route idRoute
@@ -115,7 +115,7 @@ tagsAsStringsCtx post = mconcat[
                         ]         
 
 
-data SearchablePost = SearchablePost { title:: !T.Text, tags:: !T.Text } deriving (Show, Generic)
+data SearchablePost = SearchablePost { title :: !T.Text, tags :: !T.Text, url :: !T.Text } deriving (Show, Generic)
 
 instance ToJSON SearchablePost
 
@@ -130,11 +130,25 @@ getField key item = do
 -- dumpItem :: [String] -> Item String -> Compiler String
 -- dumpItem keys item = fmap (intercalate "##") $ sequence $ map (\k -> getField k item) keys
 
+-- [Item a] -> Compiler String 
+
+createSearchablePost :: Item String -> Compiler SearchablePost
+createSearchablePost item =  do
+        _title <- getField "title" item
+        _tags <- getField "tags" item
+        fp <-  getRoute (itemIdentifier item)
+        let _url = maybe "no url" toUrl fp
+        return $ SearchablePost (T.pack _title) (T.pack _tags) (T.pack _url)
+
+getSearchablePosts :: [Item String] -> Compiler (Item String)
+getSearchablePosts items = (fmap (BS.unpack . encode) $ sequence $ map createSearchablePost items)  >>= makeItem
+
 dumpItem :: Item String -> Compiler String
 dumpItem item = do
         _title <- getField "title" item
         _tags <- getField "tags" item
-        return (BS.unpack $ encode $ SearchablePost (T.pack _title) (T.pack _tags))
+        _url <- getField "tags" item
+        return (BS.unpack $ encode $ SearchablePost (T.pack _title) (T.pack _tags) (T.pack _url) )        
 
 createField :: String -> Context String
 createField key = field key $ dumpItem
