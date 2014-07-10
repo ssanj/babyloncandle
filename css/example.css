@@ -169,9 +169,14 @@ p + p {
   border-bottom: 1px solid #ccc;
 }
 
-#scrollable-dropdown-menu .tt-dropdown-menu {
+/*#scrollable-dropdown-menu .tt-dropdown-menu {
   max-height: 150px;
   overflow-y: auto;
+}
+*/
+#remote .tt-dropdown-menu {
+    max-height: 150px;
+    overflow-y: auto;
 }
 
 #rtl-support .tt-dropdown-menu {

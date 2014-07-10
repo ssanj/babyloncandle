@@ -1,7 +1,7 @@
 ---
 title: Backup MySql Without Extended Inserts
 author: sanjiv sahayam
-tags: mysql,
+tags: mysql
 ---
 
 When you export a mysql database using the default configuration for mysqldump, it uses something called extended-insert format. What this basically means is that it bundles all the inserts for a particular table onto a single line with multiple value pairs. This is supposed to be faster when importing this exported data. Unfortunately this single insert line can grow to unmanageable lengths when you have a lot of data and lead to import errors.

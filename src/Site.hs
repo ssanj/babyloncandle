@@ -67,10 +67,7 @@ main = hakyllWith siteConfig $ do
     create [searchDataPage] $ do
         route idRoute
         compile $ do
-            -- [Item a]
-            (posts, count) <- partitionPosts (withLength id) . recentFirst =<< loadAll allPostsPattern
-            --let ctx = jsonPostListCtx posts <> archiveCtx count <> commonCtx
-            --compilerGlue emptyCompiler [searchDataTemplate] ctx 
+            posts <- recentFirst =<< loadAll allPostsPattern
             getSearchablePosts posts
 
     create [archivePage] $ do
@@ -130,14 +127,12 @@ getField key item = do
 -- dumpItem :: [String] -> Item String -> Compiler String
 -- dumpItem keys item = fmap (intercalate "##") $ sequence $ map (\k -> getField k item) keys
 
--- [Item a] -> Compiler String 
-
 createSearchablePost :: Item String -> Compiler SearchablePost
 createSearchablePost item =  do
         _title <- getField "title" item
         _tags <- getField "tags" item
         fp <-  getRoute (itemIdentifier item)
-        let _url = maybe "no url" toUrl fp
+        let _url = maybe "/" toUrl fp
         return $ SearchablePost (T.pack _title) (T.pack _tags) (T.pack _url)
 
 getSearchablePosts :: [Item String] -> Compiler (Item String)
@@ -232,7 +227,7 @@ cssPattern :: Pattern
 cssPattern = "css/*"
 
 jsPattern :: Pattern
-jsPattern = "scripts/*"
+jsPattern = "js/*"
 
 templatesPattern :: Pattern
 templatesPattern = "templates/*"
