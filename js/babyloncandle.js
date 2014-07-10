@@ -18,5 +18,5 @@ $('#remote .typeahead').typeahead(null, {
     suggestion: Handlebars.compile('<p><a href="{{url}}"><strong>{{title}}</strong></a></p>')
   }
 }).bind("typeahead:selected", function(obj, datum, name) {
-  window.location=datum.loc;
+  window.location=datum.url;
 });
