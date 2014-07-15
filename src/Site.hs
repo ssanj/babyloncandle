@@ -2,12 +2,10 @@
 {-# LANGUAGE OverloadedStrings, DeriveGeneric #-}
 import           Data.Monoid (mconcat, (<>))
 import           Data.Char (toUpper, toLower)
-import           Data.List (intercalate)
 import           Control.Monad (liftM)
 import           Data.Aeson
 import           GHC.Generics
 import           qualified Data.Text as T
-import           qualified Data.ByteString.Lazy as B
 import           qualified Data.ByteString.Lazy.Char8 as BS
 import           Hakyll
 
@@ -100,18 +98,6 @@ postCtx tags = mconcat
      defaultContext
     ]
 
-tagsAsStringsCtx :: Item String -> Context String
-tagsAsStringsCtx post = mconcat[
-                         modificationTimeField "mtime" "%U",
-                         dateField "date" "%B %e, %Y",                         
-                         commonCtx,
-                         createField "blah",
-                          --createFieldFromOther "blah" "tags",
-                         --constField "blah" (getField "title" post)
-                         defaultContext
-                        ]         
-
-
 data SearchablePost = SearchablePost { title :: !T.Text, tags :: !T.Text, url :: !T.Text } deriving (Show, Generic)
 
 instance ToJSON SearchablePost
@@ -123,9 +109,6 @@ getField key item = do
         case f of
             Just v  -> return v
             Nothing -> return ("could not find value for " ++ key)             
-
--- dumpItem :: [String] -> Item String -> Compiler String
--- dumpItem keys item = fmap (intercalate "##") $ sequence $ map (\k -> getField k item) keys
 
 createSearchablePost :: Item String -> Compiler SearchablePost
 createSearchablePost item =  do
@@ -153,10 +136,6 @@ createFieldFromOther keyn keyo = field keyn $ getField keyo
 
 postListCtx :: [Item String] -> Tags -> Context String
 postListCtx posts tags = listField "posts" (postCtx tags) (return posts)
-
-jsonPostListCtx :: [Item String] -> Context String
-jsonPostListCtx posts = listField "posts" (tagsAsStringsCtx $ head posts) (return posts)
-
 
 paperCtx :: Context String
 paperCtx = mconcat [modificationTimeField "mtime" "%U", 
