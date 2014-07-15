@@ -15,7 +15,7 @@ $('#remote .typeahead').typeahead(null, {
   source: pages.ttAdapter(),
   hint: false,
   templates:{
-    suggestion: Handlebars.compile('<p><a href="{{url}}"><strong>{{title}}</strong></a></p>')
+    suggestion: Handlebars.compile('<p class="bcandle.suggestion"><a href="{{url}}"><strong>{{title}}</strong></a></p>')
   }
 }).bind("typeahead:selected", function(obj, datum, name) {
   window.location=datum.url;

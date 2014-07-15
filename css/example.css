@@ -90,11 +90,8 @@ p + p {
 .typeahead,
 .tt-query,
 .tt-hint {
-  width: 396px;
-  height: 30px;
+  width: 132px;
   padding: 8px 12px;
-  font-size: 24px;
-  line-height: 30px;
   border: 2px solid #ccc;
   -webkit-border-radius: 8px;
      -moz-border-radius: 8px;
@@ -121,7 +118,7 @@ p + p {
 }
 
 .tt-dropdown-menu {
-  width: 422px;
+  width: 396px;  
   margin-top: 12px;
   padding: 8px 0;
   background-color: #fff;
@@ -137,8 +134,7 @@ p + p {
 
 .tt-suggestion {
   padding: 3px 20px;
-  font-size: 18px;
-  line-height: 24px;
+  font-size: 12px;
 }
 
 .tt-suggestion.tt-cursor {
@@ -169,11 +165,6 @@ p + p {
   border-bottom: 1px solid #ccc;
 }
 
-/*#scrollable-dropdown-menu .tt-dropdown-menu {
-  max-height: 150px;
-  overflow-y: auto;
-}
-*/
 #remote .tt-dropdown-menu {
     max-height: 150px;
     overflow-y: auto;
@@ -181,4 +172,12 @@ p + p {
 
 #rtl-support .tt-dropdown-menu {
   text-align: right;
+}
+
+/* the width of this matches that of .wrap in main.css */
+#remote {
+  max-width: 800px;
+  padding: 0 30px;
+  margin: 0 auto;
+  zoom: 1;
 }
