@@ -90,7 +90,7 @@ p + p {
 .typeahead,
 .tt-query,
 .tt-hint {
-  width: 132px;
+  width: 264px;
   padding: 8px 12px;
   border: 2px solid #ccc;
   -webkit-border-radius: 8px;
