@@ -330,6 +330,11 @@ a:visited { color: #205caa; }
   }
 
   .column { text-align: center; }  
+
+  img[alt=diagram] {
+    width: 300px;
+    height: 250px;
+  }
 }
 
 @media screen and (max-width: 600px) {
