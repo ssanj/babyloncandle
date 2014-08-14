@@ -65,6 +65,4 @@ That seemed really easy. :)
 
 And now for a __boxes and circles__ diagram:
 
-![](/images/liftA2_with_starship.png "liftA2 with starship")
-
 So it would seem that liftA2 (<*>) is great for applying functions nested within Applicatives.
