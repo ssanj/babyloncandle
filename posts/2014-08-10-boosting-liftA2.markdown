@@ -14,7 +14,7 @@ It basically lifts a binary function, let's call it __g__, across two Applicativ
 
 So a simple example would be something like: 
 
-```{.haskell}
+```{.haskell .scrollx}
 liftA2 (+) (Just 5) (Just 6) = Just 11 
 ```
 
@@ -26,14 +26,14 @@ Before we answer that question, let's explore the [<*>](http://hackage.haskell.o
 
 The starship operator (as I like to call it) from Applicative is defined like this: 
 
-```{.haskell}
+```{.haskell .scrollx}
 <*> :: Applicative f => f (a -> b) -> f a -> f b 
 ```
 The starship operator takes a unary function, let's call it __h__, that's within a Applicative Functor (__f (__ _a -> b_ __)__) and applies it to a value (__a__) also in an Applicative Functor (__f a__). It then returns the result of function application (__h__ _a_) in another Applicative Functor (__f b__).
 
 A simple example of its use would be something like: 
 
-```{.haskell}
+```{.haskell .scrollx}
 (Just (+5)) <*> (Just 6) = Just 11 
 ```
 
@@ -49,7 +49,7 @@ Wait ... what?
 
 Continuing with our example, say we had this:
 
-```{.haskell}
+```{.haskell .scrollx}
 let v1 = IO (Just (+5))
 let v2 = IO (Just 6)
 ```
@@ -58,7 +58,7 @@ How could we apply the nested +5 function to the nested 6 value to retrieve our 
 
 With the power of __listA2__ boosted with __starship__ power we could do:
 
-```{.haskell}
+```{.haskell .scrollx}
 liftA2 (<*>) v1 v2 = IO (Just 11)
 ```
 That seemed really easy. :)
