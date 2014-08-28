@@ -67,4 +67,4 @@ And now for a __boxes and circles__ diagram:
 
 ![diagram](/images/liftA2_with_starship.png "liftA2 with starship")
 
-So it would seem that liftA2 (<*>) is great for applying functions nested within Applicatives.
+Using liftA2 (<*>) we can simply apply functions within nested Applicatives to values also within nested Applicatives.

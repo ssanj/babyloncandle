@@ -28,7 +28,7 @@ main = hakyllWith siteConfig $ do
 
     match allPostsPattern $ do
         route $ setExtension htmlExtension
-        let precompiler = liftM (fmap demoteHeaders) (pandocCompiler >>= saveSnapshot contentSnapshot) 
+        let precompiler = liftM (fmap demoteHeaders) (pandocCompiler >>= saveSnapshot contentSnapshot)
         compile $ compilerGlue precompiler [postTemplate, defaultTemplate] (postCtx tags)
 
     match allPapersPattern $ do
@@ -80,7 +80,7 @@ main = hakyllWith siteConfig $ do
         compile $
             loadAllSnapshots allPostsPattern contentSnapshot
                 >>= fmap (take numPostsInRssFeed) . recentFirst
-                >>= renderRss feedConfig feedCtx        
+                >>= renderRss feedConfig feedCtx
 
 --------------------------------------------------------------------------------
 
@@ -105,10 +105,10 @@ instance ToJSON SearchablePost
 -- get the value of a metadata key
 getField :: String -> Item String -> Compiler String
 getField key item = do
-        f <- getMetadataField (itemIdentifier item) key 
+        f <- getMetadataField (itemIdentifier item) key
         case f of
             Just v  -> return v
-            Nothing -> return ("could not find value for " ++ key)             
+            Nothing -> return ("could not find value for " ++ key)
 
 createSearchablePost :: Item String -> Compiler SearchablePost
 createSearchablePost item =  do
@@ -126,7 +126,7 @@ dumpItem item = do
         _title <- getField "title" item
         _tags <- getField "tags" item
         _url <- getField "tags" item
-        return (BS.unpack $ encode $ SearchablePost (T.pack _title) (T.pack _tags) (T.pack _url) )        
+        return (BS.unpack $ encode $ SearchablePost (T.pack _title) (T.pack _tags) (T.pack _url) )
 
 createField :: String -> Context String
 createField key = field key $ dumpItem
@@ -138,8 +138,8 @@ postListCtx :: [Item String] -> Tags -> Context String
 postListCtx posts tags = listField "posts" (postCtx tags) (return posts)
 
 paperCtx :: Context String
-paperCtx = mconcat [modificationTimeField "mtime" "%U", 
-                    dateField "date" "%B %e, %Y", 
+paperCtx = mconcat [modificationTimeField "mtime" "%U",
+                    dateField "date" "%B %e, %Y",
                     commonCtx]
 
 paperListCtx :: [Item String] -> Int -> Context String
@@ -173,7 +173,7 @@ postCountCtx :: Int -> Context String
 postCountCtx = (constField "postCount") . show
 
 emailAddyCtx :: Context String
-emailAddyCtx =  constField "email" "sanjsmailbox@gmail.com"  
+emailAddyCtx =  constField "email" "sanjsmailbox@gmail.com"
 
 siteOwnerCtx :: Context String
 siteOwnerCtx = constField "siteOwner" "sanjiv sahayam"
@@ -266,13 +266,13 @@ htmlExtension = "html"
 -- Site configuration
 --------------------------------------------------------------------------------
 siteConfig :: Configuration
-siteConfig = defaultConfiguration { 
+siteConfig = defaultConfiguration {
                 previewPort = 9999,
                 destinationDirectory = "dist/_site",
                 storeDirectory       = "dist/_cache",
                 tmpDirectory         = "dist/_cache/tmp",
-                deployCommand = "rsync -av --checksum --delete --progress " ++ 
-                                 "--exclude-from 'excludes.txt' " ++ 
+                deployCommand = "rsync -av --checksum --delete --progress " ++
+                                 "--exclude-from 'excludes.txt' " ++
                                  "dist/_site/* $BLOG_DIR"
              }
 --------------------------------------------------------------------------------
@@ -283,10 +283,10 @@ siteConfig = defaultConfiguration {
 --- RSS Config
 --------------------------------------------------------------------------------
 feedConfig :: FeedConfiguration
-feedConfig =  FeedConfiguration { 
+feedConfig =  FeedConfiguration {
                 feedTitle = "BabylonCandle",
                 feedDescription = "The blog of Sanjiv Sahayam",
-                feedAuthorName = "sanjiv sahayam", 
+                feedAuthorName = "sanjiv sahayam",
                 feedAuthorEmail = "sanjsmailbox@gmail.com",
                 feedRoot =  "http://sanjivsahayam.com"
              }
@@ -319,7 +319,7 @@ papersTemplate :: String
 papersTemplate = "papers.html"
 
 templatesFolder :: String -> Identifier
-templatesFolder file = fromFilePath ("templates/" ++ file)                                                              
+templatesFolder file = fromFilePath ("templates/" ++ file)
 --------------------------------------------------------------------------------
 
 
@@ -340,7 +340,7 @@ numPostsInRssFeed = 10
 -- Compilers and helpers
 --------------------------------------------------------------------------------
 compilerGlue :: Compiler (Item String) -> [String] -> Context String -> Compiler (Item String)
-compilerGlue cmplr tmpls ctx = 
+compilerGlue cmplr tmpls ctx =
                 let paths = map templatesFolder tmpls in
                 foldl (\c t -> c >>= loadAndApplyTemplate t ctx) cmplr paths >>=
                     relativizeUrls

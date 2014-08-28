@@ -22,10 +22,10 @@ Executable site
   Hs-source-dirs: src
 
   build-depends:
-    base      >= 4.6    && < 4.7,
-    hakyll    >= 4.5    && < 4.6,
+    base,
+    hakyll,
     text,
     aeson,
     bytestring
-  
+
   default-language: Haskell2010
