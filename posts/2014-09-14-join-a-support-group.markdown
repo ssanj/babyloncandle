@@ -1,0 +1,11 @@
+---
+title: Join a Support Group
+author: sanjiv sahayam
+tags: life
+---
+
+Are you struggling at learning something hard? Have you thought about joining or creating a support group?
+
+Being around other beginners is a great way for you learn by osmosis.
+
+Meetup is a great place to find a group for almost anything you can think of. But your workplace, mailing lists etc are also some places to look for groups. If you can't find a group consider starting one of your own.
