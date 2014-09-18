@@ -1,12 +1,12 @@
 ---
 title: Pretotype it
 author: sanjiv sahayam
-tags: innovation
+tags: ideas
 ---
 
-A [coworker](https://twitter.com/danofhisword) introduced me to the idea of [Pretotyping](http://www.pretotyping.org). Although Pretotyping sounds like "Prototyping" it's quite different. Pretotyping is where you test out your ideas and theories for a product or service in the cheapest and quickest way possible. As the name of one of the pretotyping book's state: 
+A [coworker](https://twitter.com/danofhisword) introduced me to the idea of [Pretotyping](http://www.pretotyping.org). Although Pretotyping sounds like "Prototyping" it's quite different. Pretotyping is where you test out your ideas and theories for a product or service in the cheapest and quickest way possible. As the name of one of the pretotyping book's state:
 
-> "Building the right __it__ before you build __it__ right". 
+> "Building the right __it__ before you build __it__ right".
 
 The Pretotyping manifesto brings together some simple, yet powerful ideas which encourage pretotyping and innovation in general. I found the manifesto to be a little muddled and and I found it easier to separate it into these two groups:
 
