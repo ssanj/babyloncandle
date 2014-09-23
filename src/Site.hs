@@ -28,6 +28,10 @@ main = hakyllWith siteConfig $ do
         route idRoute
         compile copyFileCompiler
 
+    match bingAuthPattern $ do
+        route idRoute
+        compile copyFileCompiler
+
     tags <- buildTags allPostsPattern (fromCapture tagsCapturePattern)
 
     match allPostsPattern $ do
@@ -223,6 +227,9 @@ indexPagePattern = "index.html"
 
 googleAuthPattern :: Pattern
 googleAuthPattern = "googleac0741b9661397ea.html"
+
+bingAuthPattern :: Pattern
+bingAuthPattern = "BingSiteAuth.xml"
 
 aboutPagePattern :: Pattern
 aboutPagePattern = "about.markdown"
