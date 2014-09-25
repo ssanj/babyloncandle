@@ -1,6 +1,7 @@
 ---
 title: Pretotype it
 author: sanjiv sahayam
+description: Pretotype your ideas so you build the right it before building it right.
 tags: ideas
 ---
 

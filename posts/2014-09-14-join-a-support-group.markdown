@@ -1,6 +1,7 @@
 ---
 title: Join a Support Group
 author: sanjiv sahayam
+description: Surround yourself with a support group to learn something you find hard to learn.
 tags: life
 ---
 

@@ -6,19 +6,23 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>$blogTitle$ - $title$</title>
     <meta name="viewport" content="width=device-width">
+    $if(description)$
+    <meta name="description" content="$description$">
+    $else$
     <meta name="description" content="$siteSEO$">
+    $endif$
     <link rel="canonical" href="http://yourdomain.com/2013/10/28/git-fetch-prune/">
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/syntax.css">
-    <link rel="stylesheet" type="text/css" href="/css/example.css">       
+    <link rel="stylesheet" type="text/css" href="/css/example.css">
   </head>
 
     <body>
       <header class="site-header">
         <div class="wrap">
-          <a class="site-title" href="/">$blogTitle$</a>          
+          <a class="site-title" href="/">$blogTitle$</a>
           <nav class="site-nav">
             <a href="#" class="menu-icon">
               <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
@@ -31,11 +35,11 @@
                 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
               </svg>
             </a>
-            <div class="trigger">                    
+            <div class="trigger">
               <a class="page-link" href="/index.html">Home</a>
               <a class="page-link" href="/archive.html">Archive</a>
               <a class="page-link" href="/papers.html">Papers</a>
-              <a class="page-link" href="/about.html">About</a>              
+              <a class="page-link" href="/about.html">About</a>
             </div>
           </nav>
         </div>
@@ -45,9 +49,9 @@
       </header>
       $body$
       $partial("templates/footer.html")$
-    </body>    
+    </body>
     <script src="/js/jquery-1.11.1.min.js"></script>
-    <script src="/js/typeahead.bundle.min.js"></script> 
+    <script src="/js/typeahead.bundle.min.js"></script>
     <script src="/js/handlebars-v1.3.0.js"></script>
     <script src="/js/babyloncandle.js"></script>
 </html>

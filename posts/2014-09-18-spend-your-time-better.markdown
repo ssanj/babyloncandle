@@ -1,6 +1,7 @@
 ---
 title: Spend your Time Better
 author: sanjiv sahayam
+description: We all have limited time. Do what is most important to you. Spend it wisely.
 tags: ideas
 ---
 

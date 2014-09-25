@@ -1,6 +1,7 @@
 ---
 title: Trying to Wrap a Function with a Datatype
 author: sanjiv sahayam
+description: Using fmap to refactor the Hakyll renderTagCloudWith function.
 tags: haskell, hakyll
 comments: true
 ---
@@ -28,7 +29,7 @@ The first function, which I will refer to as __renderSingleLink__, had 7 types:
 ```{.haskell}
 (Double -> Double -> String -> String -> Int -> Int -> Int -> String)
 ```
- 
+
  I wasn't sure what each input value represented. After some trial and error I figured out what each of the values where. The input values and output are explained below:
 
 ``` {.haskell}
@@ -53,7 +54,7 @@ data TagInfo = TagInfo {
                     tagName :: String,
                     tagUrl  :: String,
                     tagMax  :: Int,
-                    tagMin  :: Int,                    
+                    tagMin  :: Int,
                     maxUseCount :: Int
                }
 ```
@@ -105,7 +106,7 @@ Expected type: Double -> TagInfo
 In the second argument of `(.)', namely `TagInfo'
 In the expression: showTag . TagInfo
 ```
-Unfortunately that didn't work. It seemed so neat to be able to use the __TagInfo__ constructor with __showTag__ to give back the __renderSingleLink__ definition to __renderTagCloudWith__. 
+Unfortunately that didn't work. It seemed so neat to be able to use the __TagInfo__ constructor with __showTag__ to give back the __renderSingleLink__ definition to __renderTagCloudWith__.
 
 This got me thinking about Scala's [andThen](https://github.com/scala/scala/blob/v2.11.1/src/library/scala/Function1.scala) function which is the opposite of compose:
 
@@ -113,7 +114,7 @@ This got me thinking about Scala's [andThen](https://github.com/scala/scala/blob
 trait Function1[-T1, +R] extends AnyRef { self =>
   ...
   def andThen[A](g: R => A): T1 => A = { x => g(apply(x)) }
-}  
+}
 ```
 
 In Haskell that would be something like:
@@ -138,7 +139,7 @@ Now I could do this:
 ```
 
 Now the type signature produced in the above matches that required by the __renderSingleLink__ function
-to __renderTagCloudWith__. 
+to __renderTagCloudWith__.
 
 This is obviously a pretty bad solution. I asked around for a better solution from guys in the [BFPG](http://www.meetup.com/Brisbane-Functional-Programming-Group) and [Mark Hibberd](https://twitter.com/markhibberd) came up with _a nested compose_ as a possible solution (1):
 

@@ -1,6 +1,7 @@
 ---
 title: Do less. Achieve More.
 author: sanjiv sahayam
+description: Turn down the noise in your life. Do less. Achieve more.
 tags: life
 ---
 

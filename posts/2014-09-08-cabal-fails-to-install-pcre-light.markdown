@@ -1,6 +1,7 @@
 ---
 title: Cabal Fails to Install PCRE-Light on Macosx
 author: sanjiv sahayam
+description: Installing PCRE-Light through Cabal on Macosx.
 tags: haskell, cabal
 ---
 

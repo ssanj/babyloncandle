@@ -1,6 +1,7 @@
 ---
 title: Define your Success Criteria First
 author: sanjiv sahayam
+description: Define what you see as success before you start.
 tags: ideas
 ---
 

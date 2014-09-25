@@ -1,6 +1,7 @@
 ---
 title: The Simplest thing that Works
 author: sanjiv sahayam
+description: Start with the simplest thing that works. Learn as you go. Build on previous successes.
 tags: ideas
 ---
 
