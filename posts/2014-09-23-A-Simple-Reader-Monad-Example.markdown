@@ -19,7 +19,7 @@ type Reader r = ReaderT r Identity
 
 One of the time-consuming things about learning the Reader Monad is that it is defined in terms of the ReaderT transformer (which is also a Monad). So now you have to learn multiple monads just to understand the Reader Monad. Annoying.
 
-Let's ignore the ReaderT transformer for now and assume that Reader is of the form:
+Let's ignore the ReaderT transformer for now and assume that Reader is defined as:
 
 ```{.haskell}
 Reader r a
@@ -62,7 +62,7 @@ So __runReader__ takes in a Reader and an environment (__r__) and returns a valu
 
 _Now notice that we didn't really do anything with the environment supplied to us._
 
-What if we had a bunch of Readers and we wanted to bind across them?
+What if we had a bunch of Readers and we wanted to __bind__ across them?
 
 ```{.haskell .scrollx}
 import Control.Monad.Reader
@@ -87,13 +87,19 @@ runJerryRun :: String
 runJerryRun = (runReader tomAndJerry) "Who is this?"
 ```
 
-The ask function is defined as on [MonadReader](http://hackage.haskell.org/package/mtl-2.2.1/docs/Control-Monad-Reader.html#t:MonadReader) as:
+The ask function is defined on [MonadReader](http://hackage.haskell.org/package/mtl-2.2.1/docs/Control-Monad-Reader.html#t:MonadReader).
+
+```{.haskell .scrollx}
+class Monad m => MonadReader r m | m -> r where
+```
+
+Let's ignore MonadReader for now and focus on the definition of the ask function:
 
 ```{.haskell}
 ask :: m r
 ```
 
-Basically the above gives you a Reader with the environment in it. So if you need access to the environment you ask for it. :)
+Basically the above gives you a Reader Monad with the environment in it. So if you need access to the environment you ask for it. :)
 
 In the __tom__, __jerry__ and __tomAndJerry__ functions, we are working within the context of the Reader Monad. That allows us to __bind__ to the environment within the Reader. It also means that we need to __return__ all values within a new Reader as well.
 
