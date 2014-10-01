@@ -90,18 +90,39 @@ main = hakyllWith siteConfig $ do
                 >>= fmap (take numPostsInRssFeed) . recentFirst
                 >>= renderRss feedConfig feedCtx
 
+    create [sitemapPage] $ do
+        route idRoute
+        compile $ do
+             posts <- recentFirst =<< loadAllSnapshots allPostsPattern contentSnapshot
+             let ctx = postListCtx posts tags <> commonCtx
+             compilerGlue emptyCompiler [sitemapTemplate] ctx
+
+-- String -> Compiler (Item String)
 --------------------------------------------------------------------------------
 
 
+--renderSitemap :: FeedConfiguration       -- ^ Feed configuration
+--              -> Context String          -- ^ Item context
+--              -> [Item String]           -- ^ Feed items
+--              -> Compiler (Item String)  -- ^ Resulting feed
+--renderSitemap config context = renderFeed
+--    "templates/sitemap.xml" "templates/sitemap-item.xml" config
+--    (makeItemContext "%Y-%m-%d" context)
+
+-- | Copies @$updated$@ from @$published$@ if it is not already set.
+makeItemContext :: String -> Context a -> Context a
+makeItemContext fmt context = mconcat
+    [dateField "published" fmt, context, dateField "updated" fmt]
 
 --------------------------------------------------------------------------------
 -- Contexts
 --------------------------------------------------------------------------------
 postCtx :: Tags -> Context String
 postCtx tags = mconcat
-    [modificationTimeField "mtime" "%U",
+    [modificationTimeField "updated" "%Y-%m-%d",
      dateField "date" "%B %e, %Y",
      tagsField "tags" tags,
+     constField "root" (feedRoot feedConfig),
      commonCtx,
      defaultContext
     ]
@@ -258,6 +279,9 @@ archivePage = "archive.html"
 rssFeedPage :: Identifier
 rssFeedPage = "feed.xml"
 
+sitemapPage :: Identifier
+sitemapPage = "sitemap.xml"
+
 papersPage :: Identifier
 papersPage = "papers.html"
 
@@ -302,7 +326,7 @@ feedConfig =  FeedConfiguration {
                 feedDescription = "The blog of Sanjiv Sahayam",
                 feedAuthorName = "sanjiv sahayam",
                 feedAuthorEmail = "sanjsmailbox@gmail.com",
-                feedRoot =  "http://sanjivsahayam.com"
+                feedRoot =  "http://blog.ssanj.net"
              }
 --------------------------------------------------------------------------------
 
@@ -331,6 +355,12 @@ postsTemplate = "posts.html"
 
 papersTemplate :: String
 papersTemplate = "papers.html"
+
+sitemapItemTemplate :: String
+sitemapItemTemplate = "sitemap-item.xml"
+
+sitemapTemplate :: String
+sitemapTemplate = "sitemap.xml"
 
 templatesFolder :: String -> Identifier
 templatesFolder file = fromFilePath ("templates/" ++ file)
