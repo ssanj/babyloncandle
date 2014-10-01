@@ -3,15 +3,15 @@
         <div class="home">
 
           <h1>$postTitle$<span class="brace">|</span><span class="post-count">$postCount$</span></h1>
-          
+
           <ul class="posts">
             $for(posts)$
             <li>
               <span class="post-date">$date$</span>
               <a class="post-link" href="$url$">$title$</a>
               <div>$tags$</div>
-            </li>   
-            $endfor$  
+            </li>
+            $endfor$
           </ul>
 
           <p class="rss-subscribe">subscribe <a href="/feed.xml">via RSS</a></p>
