@@ -1,7 +1,7 @@
 ---
 title: Trying to Wrap a Function with a Datatype
 author: sanjiv sahayam
-description: Using fmap to refactor the Hakyll renderTagCloudWith function.
+description: An attempt and using partial function application to simplify a data constructor in the Hakyll library.
 tags: haskell, hakyll
 comments: true
 ---

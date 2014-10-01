@@ -1,7 +1,7 @@
 ---
 title: Boosting liftA2
 author: sanjiv sahayam
-description: Understanding how liftA2 in Haskell works.
+description: A simple explanation of liftA2 with some basic examples and the odd diagram.
 tags: haskell
 ---
 

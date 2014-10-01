@@ -1,6 +1,6 @@
 ---
 title: A Simple Reader Monad Example
-description: A simple Reader Monad example in Haskell to get you started.
+description: If you are looking for a simple Reader Monad example, then look no further.
 author: sanjiv sahayam
 tags: haskell
 ---

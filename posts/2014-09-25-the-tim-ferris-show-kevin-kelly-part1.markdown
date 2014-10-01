@@ -1,7 +1,7 @@
 ---
 title: The Tim Ferriss Show Interviews Kevin Kelly - Part1
 author: sanjiv sahayam
-description: Some interesting ideas I came across while I listened to The Tim Ferris Show with Kevin Kelly. This is part 1 of 3.
+description: Kevin Kelly shares some interesting insights with Tim Ferriss in part 1 of this Podcast.
 tags: ideas
 ---
 

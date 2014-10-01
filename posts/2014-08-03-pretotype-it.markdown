@@ -1,7 +1,7 @@
 ---
 title: Pretotype it
 author: sanjiv sahayam
-description: Pretotype your ideas so you build the right it before building it right.
+description: Testing out your your ideas before you build them. Pretotyping allows you build the right it before building it right.
 tags: ideas
 ---
 
