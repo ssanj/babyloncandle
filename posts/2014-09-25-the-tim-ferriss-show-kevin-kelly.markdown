@@ -1,11 +1,11 @@
 ---
-title: The Tim Ferriss Show Interviews Kevin Kelly - Part1
+title: The Tim Ferriss Show Interviews Kevin Kelly
 author: sanjiv sahayam
-description: Kevin Kelly shares some interesting insights with Tim Ferriss in part 1 of this Podcast.
+description: Kevin Kelly shares some interesting insights on The Tim Ferriss Show.
 tags: ideas
 ---
 
-Some interesting ideas from [The Tim Ferriss Show](http://fourhourworkweek.com/blog) interview with [Kevin Kelly](http://kk.org) (part 1):
+Some interesting ideas from [The Tim Ferriss Show's](http://fourhourworkweek.com/blog) interview with [Kevin Kelly](http://kk.org):
 
 1. Find out what you think by writing as opposed to thinking about something and then writing it down.
 2. Find your "voice" by writing like you would an email to a friend.

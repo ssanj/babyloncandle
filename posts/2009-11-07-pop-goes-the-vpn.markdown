@@ -1,6 +1,7 @@
 ---
 title: Pop goes the VPN
 author: sanjiv sahayam
+description: If your vpnc stops working have a look at your dns resolution.
 tags: linux, ubuntu, vpn
 ---
 

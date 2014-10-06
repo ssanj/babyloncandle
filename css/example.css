@@ -118,7 +118,7 @@ p + p {
 }
 
 .tt-dropdown-menu {
-  width: 396px;  
+  width: 396px;
   margin-top: 12px;
   padding: 8px 0;
   background-color: #fff;
@@ -180,4 +180,10 @@ p + p {
   padding: 0 30px;
   margin: 0 auto;
   zoom: 1;
+}
+
+@media screen and (max-width: 750px) {
+  #remote {
+    padding: 0 12px;
+  }
 }
