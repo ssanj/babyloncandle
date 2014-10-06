@@ -1,6 +1,7 @@
 ---
 title: Feedback on Scala's Alternatives to Exceptions
 author: sanjiv sahayam
+description: Some useful feedback on my presentation on Exceptions.
 tags: scala, fp
 ---
 
@@ -21,16 +22,16 @@ type PersistentOutcome = Either[String, Unit]
 > Alternatively, you could achieve the same thing using an implicit def, so that the pattern matching is done in one place and whenever you see a PersistentOutcome, you can treat it as an Either[String, Unit]:
 
 ```{.scala}
-implicit def poToStringUnit(po:PersistentOutcome):Either[String,Unit] = po match {  
-  case Failure(x) => Left(x)  
-  case Success => Right(())  
+implicit def poToStringUnit(po:PersistentOutcome):Either[String,Unit] = po match {
+  case Failure(x) => Left(x)
+  case Success => Right(())
 }
 ```
 
 > note that you've started to go down the latter path in the reloaded example. The above gives you something you can re-use anywhere. Once you've got Either[String,Unit], it's only one left-map away from becoming Either[Exception,Unit]:
 
 ```{.scala .scrollx}
-def stringUnitToExUnit(e:Either[String,Unit]):Either[Exception,Unit] = e.left.map(new Exception(_))  
+def stringUnitToExUnit(e:Either[String,Unit]):Either[Exception,Unit] = e.left.map(new Exception(_))
 ```
 
 > Now we're dealing with more consistent types throughout the execution (Either[Exception,_]), and the addSpends function can be reduced to:
@@ -49,10 +50,10 @@ def addSpends(date:Sdate, f:(DailySpend) => Unit):Either[Exception, Unit] =
 ```{.scala}
 def addSpends(date:Sdate, f:(DailySpend) => Unit):Either[Exception, Unit] = {
     val eds:Either[Exception,DailySpend] = spender < date
-    val epo:Either[Exception,PersistentOutcome] = 
+    val epo:Either[Exception,PersistentOutcome] =
         eds.right.flatMap(ds => {f(ds); spender > ds})
     val esu:Either[Exception,Either[String,Unit]] = epo
-    val eeu:Either[Exception,Either[Exception,Unit]] = 
+    val eeu:Either[Exception,Either[Exception,Unit]] =
         esu.right.map(stringUnitToExUnit)
     val eu:Either[Exception,Unit] = Either.joinRight(eeu)
     eu
@@ -63,10 +64,10 @@ def addSpends(date:Sdate, f:(DailySpend) => Unit):Either[Exception, Unit] = {
 
 ```{.scala}
 def main(args: Array[String]) {
-  import Function.const  
-  addSpends(yesterday, addItems1).right.flatMap(  
-  const(addSpends(today, addItems2))).fold(  
-  printError, const(printAllSpends))  
+  import Function.const
+  addSpends(yesterday, addItems1).right.flatMap(
+  const(addSpends(today, addItems2))).fold(
+  printError, const(printAllSpends))
 }
 ```
 
@@ -74,12 +75,12 @@ def main(args: Array[String]) {
 
 ```{.scala}
 def main(args: Array[String]) {
-  val eu1:Either[Exception,Unit] = addSpends(yesterday, addItems1)  
-  val eu2:Either[Exception,Unit] =  
-  eu1.right.flatMap(_ => addSpends(today, addItems2))  
-  val u:Unit = eu2.fold(e => printError(e), _ => printAllSpends)  
-  u  
-} 
+  val eu1:Either[Exception,Unit] = addSpends(yesterday, addItems1)
+  val eu2:Either[Exception,Unit] =
+  eu1.right.flatMap(_ => addSpends(today, addItems2))
+  val u:Unit = eu2.fold(e => printError(e), _ => printAllSpends)
+  u
+}
 ```
 
 > I hope this gives some food for thought and I haven't misinterpreted what you are trying to achieve!
@@ -120,12 +121,12 @@ val params = List((yesterday, addItems1), (today, addItems2). ...)
 > But if you are just using it as a language feature, then there is something already there for you. First I will write out the long-hand version:
 
 ```{.scala}
-addSpends(yesterday, addItems1).right.flatMap(  
-    r1 => addSpends(today, addItems2)).right.flatMap(  
-    r2 => addSpends(SomeDay(18, February(), 2010), addItems2)).right.flatMap(  
-    r3 => addSpends(SomeDay(19, February(), 2010), addItems1)).right.flatMap(  
-    r4 => addSpends(SomeDay(20, February(), 2010), addItems1)))).  
-        fold(ex => printError(ex), r5 => printAllSpends)  
+addSpends(yesterday, addItems1).right.flatMap(
+    r1 => addSpends(today, addItems2)).right.flatMap(
+    r2 => addSpends(SomeDay(18, February(), 2010), addItems2)).right.flatMap(
+    r3 => addSpends(SomeDay(19, February(), 2010), addItems1)).right.flatMap(
+    r4 => addSpends(SomeDay(20, February(), 2010), addItems1)))).
+        fold(ex => printError(ex), r5 => printAllSpends)
 }
 ```
 
@@ -133,12 +134,12 @@ addSpends(yesterday, addItems1).right.flatMap(
 
 ```{.scala}
 def main(args: Array[String]) {
-   for (r1 <- addSpends(yesterday, addItems1).right;           
-        r2 <- addSpends(today, addItems2)).right;           
-        r3 <- addSpends(SomeDay(18, February(), 2010), addItems2).right;           
-        r4 <- addSpends(SomeDay(19, February(), 2010), addItems1).right;           
-        r5 <- addSpends(SomeDay(20, February(), 2010), addItems1).right)       
-   yield ()).fold(ex => printError(ex), r => printAllSpends)  
+   for (r1 <- addSpends(yesterday, addItems1).right;
+        r2 <- addSpends(today, addItems2)).right;
+        r3 <- addSpends(SomeDay(18, February(), 2010), addItems2).right;
+        r4 <- addSpends(SomeDay(19, February(), 2010), addItems1).right;
+        r5 <- addSpends(SomeDay(20, February(), 2010), addItems1).right)
+   yield ()).fold(ex => printError(ex), r => printAllSpends)
 }
 ```
 
@@ -146,15 +147,15 @@ def main(args: Array[String]) {
 
 ```{.scala}
 def main(args: Array[String]) {
-implicit def EtoRP[A,B](e:Either[A,B]) = e.right  
-Either.merge(  
-  for (_ <- addSpends(yesterday, addItems1);             
-       _ <- addSpends(today, addItems2);             
-       _ <- addSpends(SomeDay(18, February(), 2010), addItems2);             
-       _ <- addSpends(SomeDay(19, February(), 2010), addItems1);             
-       _ <- addSpends(SomeDay(20, February(), 2010), addItems1))         
-  yield (printAllSpends)).left.map(printError))   
-} 
+implicit def EtoRP[A,B](e:Either[A,B]) = e.right
+Either.merge(
+  for (_ <- addSpends(yesterday, addItems1);
+       _ <- addSpends(today, addItems2);
+       _ <- addSpends(SomeDay(18, February(), 2010), addItems2);
+       _ <- addSpends(SomeDay(19, February(), 2010), addItems1);
+       _ <- addSpends(SomeDay(20, February(), 2010), addItems1))
+  yield (printAllSpends)).left.map(printError))
+}
 ```
 
 > The Either[A,A] type I mentioned is what you need to use Either.merge. In the previous case, it is obtained by calling left.map to convert Either[Exception,Unit] to Either[Unit,Unit].
@@ -167,19 +168,19 @@ Either.merge(
 Given all the great solutions given by Kristian above I decided to go with the following:
 
 ```{.scala .scrollx}
-type Result = Either[Exception, Unit]  
-def addSpends(date:Sdate, f:(DailySpend) => Result) : Result  
-  
-  ...  
-  
-  type AddByDate = Tuple2[Sdate, Function1[DailySpend, Result]]  
-  val params = List[AddByDate](  
-                    (SomeDay(16, February(), 2010), addItems1),  
-                    (SomeDay(17, February(), 2010), addItems2),  
-                    (SomeDay(18, February(), 2010), addItems2),  
-                    (SomeDay(19, February(), 2010), addItems1),  
-                    (SomeDay(20, February(), 2010), addItems1))  
-   params.foldLeft(Right():Result)((r, p) => r.right.flatMap(r1 => addSpends(p._1, p._2))).  
+type Result = Either[Exception, Unit]
+def addSpends(date:Sdate, f:(DailySpend) => Result) : Result
+
+  ...
+
+  type AddByDate = Tuple2[Sdate, Function1[DailySpend, Result]]
+  val params = List[AddByDate](
+                    (SomeDay(16, February(), 2010), addItems1),
+                    (SomeDay(17, February(), 2010), addItems2),
+                    (SomeDay(18, February(), 2010), addItems2),
+                    (SomeDay(19, February(), 2010), addItems1),
+                    (SomeDay(20, February(), 2010), addItems1))
+   params.foldLeft(Right():Result)((r, p) => r.right.flatMap(r1 => addSpends(p._1, p._2))).
            fold(ex => printError(ex), r => printAllSpends)
 ```
 

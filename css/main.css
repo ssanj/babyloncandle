@@ -350,15 +350,17 @@ img {
     height: 186px;
   }
 
-  img[alt="screenshot of ensime's autocomplete feature"] {
+  img[alt^="screenshot of ensime"] {
     width: 300px;
     height: 121px;
+  }
+
+ #remote, .wrap {
+    padding: 0 12px;
   }
 }
 
 @media screen and (max-width: 600px) {
-
-  .wrap { padding: 0 12px; }
 
   .site-nav {
     position: fixed;

@@ -1,6 +1,7 @@
 ---
 title: Project Euler Problem 1
 author: sanjiv sahayam
+description: Some attempts at solving Euler problem 1 in Scala.
 tags: scala
 ---
 
@@ -10,15 +11,15 @@ tags: scala
 >
 > Find the sum of all the multiples of 3 or 5 below 1000.
 
-This was my first solution:	
+This was my first solution:
 
 ```{.scala .scrollx}
 def getTotal(upper:Int) : Int = multiplesBelow(upper - 1)
 
  def multiplesBelow(start:Int) : Int = {
-   if (start <= 0) return 0     
-   if (isMultiple(start)) start + multiplesBelow(start-1) else multiplesBelow(start - 1)   
- } 
+   if (start <= 0) return 0
+   if (isMultiple(start)) start + multiplesBelow(start-1) else multiplesBelow(start - 1)
+ }
 
 def isMultiple(number:Int) : Boolean = (number != 0) && ((number % 3 == 0) || (number % 5 == 0))
 ```
@@ -35,6 +36,6 @@ I like the above solution because it is succinct and "simple". I also came up wi
 def getTotal3(upper:Int) : Int = (1 until upper).map(a => if (a % 3 == 0 || a % 5 == 0) a else 0).foldLeft(0)(_ + _)
 ```
 
-The above solution has an extra step of mapping the function across the values and then folding it.  
+The above solution has an extra step of mapping the function across the values and then folding it.
 
 And there you have the solution to problem 1. I'm sure there are much neater solutions to problem than those above. Please feel free to comment if you have a better solution and/or comments.
