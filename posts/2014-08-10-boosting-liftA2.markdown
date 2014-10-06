@@ -66,6 +66,6 @@ That seemed really easy. :)
 
 And now for a __boxes and circles__ diagram:
 
-![diagram](/images/liftA2_with_starship.png "liftA2 with starship")
+![diagram of how liftA2 works with the starship operator](/images/diagram_of_how_liftA2_works_with_the_startship_operator.png)
 
 Using liftA2 (<*>) we can simply apply functions within nested Applicatives to values also within nested Applicatives.

@@ -11,7 +11,7 @@ Here are the minimum requrements as stated on the Ensime user [manual](http://ae
 1.Unix(y) or Windows OS
 2.JVM Version 6
 3.Scala 2.8.1 compatible source and libraries
-4.Emacs 22 or later (23 is recommended)	
+4.Emacs 22 or later (23 is recommended)
 
 
 __Configuring Emacs for Scala__
@@ -75,13 +75,13 @@ Eg. ~/opt/ensime
 ;; Load the ensime lisp code...
 (add-to-list 'load-path "ENSIME_ROOT/elisp/")
 (require 'ensime)
- 
+
 ;; This step causes the ensime-mode to be started whenever
 ;; scala-mode is started for a buffer. You may have to customize this step
 ;; if you're not using the standard scala mode.
 (add-hook 'scala-mode-hook 'ensime-scala-mode-hook)
- 
-;; MINI HOWTO: 
+
+;; MINI HOWTO:
 ;; Open .scala file. M-x ensime (once per project)
 ```
 
@@ -90,17 +90,17 @@ Your complete .emacs files should look something like:
 ```
 (add-to-list 'load-path "~/scalaemacs")
 (require 'scala-mode-auto)
- 
+
 ;; Load the ensime lisp code...
 (add-to-list 'load-path "~/opt/ensime/elisp/")
 (require 'ensime)
- 
+
 ;; This step causes the ensime-mode to be started whenever
 ;; scala-mode is started for a buffer. You may have to customize this step
 ;; if you're not using the standard scala mode.
 (add-hook 'scala-mode-hook 'ensime-scala-mode-hook)
- 
-;; MINI HOWTO: 
+
+;; MINI HOWTO:
 ;; Open .scala file. M-x ensime (once per project)
 ```
 
@@ -111,9 +111,9 @@ You need to create an Ensime project for each project you want to use with Ensim
 The following is how to create a project for an existing SBT project:
 
 1. Launch emacs
-2. Type M-x to open the mini-buffer and then type: __ensime-generate-ensime-config-gen__. 
+2. Type M-x to open the mini-buffer and then type: __ensime-generate-ensime-config-gen__.
 A note on the Meta key (or M-) combinations: On linux M-x is Alt+x, while on the Mac it's Esc+x. Play around until you find which meta key is used on your flavour of OS.
-3. Specify the root of your project. 
+3. Specify the root of your project.
 4. If your project is an SBT project, it automatically detects most settings and you should see a message like:
 "Your project seems to be of type 'sbt', continue with this assumption? (yes or no)". Choose yes.
 5. Enter all the other information requested.
@@ -135,4 +135,4 @@ __Neat Features__
 
 For a full list have a look at the online Ensime user [manual](http://aemon.com/file_dump/ensime_manual.html).
 
-![](/images/EnsimeAutoComplete.png "autocomplete")
+![screenshot of ensime's autocomplete feature](/images/ensime_autocomplete.jpg)
