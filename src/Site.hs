@@ -54,7 +54,7 @@ main = hakyllWith siteConfig $ do
         route idRoute
         compile $ do
             (posts, count) <- partitionPosts (withLength $ take numPostsOnHomePage) . recentFirst =<< loadAll allPostsPattern
-            let ctx = postListCtx posts tags <> homepageCtx count <> commonCtx
+            let ctx = postListCtx posts tags <> homepageCtx count <> commonCtxWithDescription indexPageDescription
             compilerGlue (getResourceBody >>= applyAsTemplate ctx) [defaultTemplate] ctx
 
     match templatesPattern $ compile templateCompiler
@@ -67,7 +67,7 @@ main = hakyllWith siteConfig $ do
         route idRoute
         compile $ do
             (papers, count) <- partitionPosts (withLength id) . recentFirst =<< loadAllSnapshots allPapersPattern paperSnapshot
-            let ctx = paperListCtx papers count <> commonCtx
+            let ctx = paperListCtx papers count <> commonCtxWithDescription papersPageDescription
             compilerGlue emptyCompiler [papersTemplate, defaultTemplate] ctx
 
     create [searchDataPage] $ do
@@ -80,7 +80,7 @@ main = hakyllWith siteConfig $ do
         route idRoute
         compile $ do
             (posts, count) <- partitionPosts (withLength id) . recentFirst =<< loadAll allPostsPattern
-            let ctx = postListCtx posts tags <> archiveCtx count <> commonCtx
+            let ctx = postListCtx posts tags <> archiveCtx count <> commonCtxWithDescription archivePageDescription
             compilerGlue emptyCompiler [archiveTemplate, defaultTemplate] ctx
 
     create [rssFeedPage] $ do
@@ -97,22 +97,9 @@ main = hakyllWith siteConfig $ do
              let ctx = postListCtx posts tags <> commonCtx
              compilerGlue emptyCompiler [sitemapTemplate] ctx
 
--- String -> Compiler (Item String)
 --------------------------------------------------------------------------------
 
 
---renderSitemap :: FeedConfiguration       -- ^ Feed configuration
---              -> Context String          -- ^ Item context
---              -> [Item String]           -- ^ Feed items
---              -> Compiler (Item String)  -- ^ Resulting feed
---renderSitemap config context = renderFeed
---    "templates/sitemap.xml" "templates/sitemap-item.xml" config
---    (makeItemContext "%Y-%m-%d" context)
-
--- | Copies @$updated$@ from @$published$@ if it is not already set.
-makeItemContext :: String -> Context a -> Context a
-makeItemContext fmt context = mconcat
-    [dateField "published" fmt, context, dateField "updated" fmt]
 
 --------------------------------------------------------------------------------
 -- Contexts
@@ -174,6 +161,9 @@ paperCtx = mconcat [modificationTimeField "mtime" "%U",
 paperListCtx :: [Item String] -> Int -> Context String
 paperListCtx papers paperCount = mconcat [listField "papers" paperCtx (return papers), postCountCtx  paperCount]
 
+commonCtxWithDescription :: String -> Context String
+commonCtxWithDescription description = constField "description" description <> commonCtx
+
 commonCtx :: Context String
 commonCtx = mconcat [blogTitleCtx, emailAddyCtx, siteOwnerCtx, sitDesciptionCtx, siteSEOCtx, defaultContext]
 
@@ -181,7 +171,8 @@ tagNameCtx :: String -> Int -> Context String
 tagNameCtx tn tagCount = mconcat [tagTitleCtx tn, postCountCtx tagCount]
 
 tagTitleCtx :: String -> Context String
-tagTitleCtx tn = constField "postTitle" (titleCase tn ++ " Posts")
+tagTitleCtx tn = mconcat [constField "postTitle" (titleCase tn ++ " Posts"),
+                          constField "description" ("Posts tagged as " ++ tn)]
 
 archiveCtx :: Int -> Context String
 archiveCtx postCount = mconcat [archiveTitleCtx, postCountCtx postCount]
@@ -407,6 +398,24 @@ withLength f xs = let r = f xs in (r, length r)
 titleCase :: String -> String
 titleCase [] = []
 titleCase (x:xs) = toUpper x : map toLower xs
+
+-- | Copies @$updated$@ from @$published$@ if it is not already set.
+makeItemContext :: String -> Context a -> Context a
+makeItemContext fmt context = mconcat
+    [dateField "published" fmt, context, dateField "updated" fmt]
+
 --------------------------------------------------------------------------------
 
 
+
+--------------------------------------------------------------------------------
+-- SEO
+--------------------------------------------------------------------------------
+archivePageDescription :: String
+archivePageDescription = "A collection of all the posts across this site in order from newest to oldest."
+
+indexPageDescription :: String
+indexPageDescription = "Welcome to Sanj's blog. Have a read of my latest posts."
+
+papersPageDescription :: String
+papersPageDescription = "A collection technical papers I have read or want to read."
