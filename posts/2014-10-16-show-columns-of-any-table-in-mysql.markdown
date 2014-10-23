@@ -9,7 +9,7 @@ Frequently I need to look up some information about the columns of a given datab
 
 The general syntax is:
 
-    show columns from __table__ from __db__
+show columns from __table__ from __db__
 
 Here's a simple example:
 
