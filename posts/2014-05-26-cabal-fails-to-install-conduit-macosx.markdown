@@ -2,7 +2,7 @@
 title: Cabal Fails to Install Conduit on Macosx
 author: sanjiv sahayam
 description: You may need alternate GCC to compile the conduit library.
-tags: haskell, cabal
+tags: haskell, cabal, macosx
 ---
 
 When trying to install [Hakyll](http://jaspervdj.be/hakyll) on GHC 7.6.3 with cabal 1.20.0.0 on Mac OSX 10.9.2 the __conduit__ dependency failed with the following error:

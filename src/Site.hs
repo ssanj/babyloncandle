@@ -296,7 +296,7 @@ htmlExtension = "html"
 --------------------------------------------------------------------------------
 siteConfig :: Configuration
 siteConfig = defaultConfiguration {
-                previewPort = 9999
+                previewPort = 9999,
                 destinationDirectory = "dist/_site",
                 storeDirectory       = "dist/_cache",
                 tmpDirectory         = "dist/_cache/tmp",
