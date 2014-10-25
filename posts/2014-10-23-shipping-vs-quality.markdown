@@ -6,7 +6,7 @@ tags: ideas
 comments: true
 ---
 
-Say you had two application. One that is of high "quality", but doesn't ship. The other is of low "quality", but ships. Which application do you reckon would bring you the most business benefit?
+Say you had two applications. One that is of high "quality", but doesn't ship. The other is of low "quality", but ships. Which application do you reckon would bring you the most business benefit?
 
 If you were funding a startup your choice would be very clear. You'd want something to bring in business value ASAP. The low quality application that shipped would be the winner.
 

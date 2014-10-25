@@ -2,7 +2,7 @@
 title: Cabal Fails to Install PCRE-Light on Macosx
 author: sanjiv sahayam
 description: If your cabal installation of mysql-simple is failing on PCRE-Light, you may want to install the PCRE library on macosx.
-tags: haskell, cabal, macosx
+tags: cabal, haskell, macosx
 ---
 
 When trying to install [mysql-simple](http://hackage.haskell.org/package/mysql-simple-0.2.1.1) on GHC 7.8.3 with cabal 1.18.1.4 on Mac OSX 10.9.4, the [pcre-light](https://hackage.haskell.org/package/pcre-light) dependency failed with the following error:

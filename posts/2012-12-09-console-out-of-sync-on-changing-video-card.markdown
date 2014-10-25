@@ -1,7 +1,7 @@
 ---
 title: Console Out of Sync on Changing Video Card
 author: sanjiv sahayam
-tags: ubuntu, linux
+tags: linux, ubuntu
 ---
 
 I have a Ubuntu 12.04 server box running with an nVidia 8800GT video card. I decided to replace it with a nVidia 520GT which uses a fraction of the power.
@@ -35,5 +35,5 @@ If all went well you should have a working console again!
 
 The __nomodeset__ option prevents the kernel from loading graphic drivers. Apparently there are incompatibilities with some older video cards that do not support this fully. Read more about it [here](http://ubuntuforums.org/showthread.php?t=1613132).
 
-__Update:__ Unfortunately adding __nomodeset__ breaks the ability to resume the server from suspend! Read more about it [here](https://bugs.launchpad.net/ubuntu/+source/linux/+bug/960920). For now I've gone back to the hazy console login screen which does not really affect me because I ssh into this server. I hope this bug is fixed soon.    
+__Update:__ Unfortunately adding __nomodeset__ breaks the ability to resume the server from suspend! Read more about it [here](https://bugs.launchpad.net/ubuntu/+source/linux/+bug/960920). For now I've gone back to the hazy console login screen which does not really affect me because I ssh into this server. I hope this bug is fixed soon.
 

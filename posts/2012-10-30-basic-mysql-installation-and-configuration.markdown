@@ -1,7 +1,7 @@
 ---
 title: Basic Mysql Installation and Configuration
 author: sanjiv sahayam
-tags: ubuntu, linux, mysql
+tags: linux, mysql, ubuntu
 ---
 
 Here are some basic installation and configuration options for mysql on Ubuntu.

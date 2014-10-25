@@ -1,7 +1,7 @@
 ---
 title: Firewall configuration with iptables
 author: sanjiv sahayam
-tags: ubuntu, linux, security
+tags: linux, security, ubuntu
 ---
 
 Recently I had the seemingly "daunting" task of adding firewall rules through the iptables command. Here are some of my findings.
@@ -19,10 +19,10 @@ If you have no rules in your iptables you should see something like this:
 ```
 Chain INPUT (policy ACCEPT)
 target     prot opt source               destination
- 
+
 Chain FORWARD (policy ACCEPT)
 target     prot opt source               destination
- 
+
 Chain OUTPUT (policy ACCEPT)
 target     prot opt source               destination
 ```
@@ -65,16 +65,16 @@ Your iptables should look similar to this:
 
 ```{.scrollx}
 Chain INPUT (policy DROP 0 packets, 0 bytes)
-num   pkts bytes target     prot opt in     out     source               destination         
-1        0     0 ACCEPT     all  --  any    any     anywhere             anywhere            ctstate RELATED,ESTABLISHED 
-2        0     0 ACCEPT     tcp  --  any    any     anywhere             anywhere            tcp dpt:ssh 
-3        0     0 ACCEPT     udp  --  any    any     anywhere             anywhere            udp dpt:domain 
-4        0     0 ACCEPT     tcp  --  any    any     anywhere             anywhere            tcp dpt:www 
-5        0     0 ACCEPT     tcp  --  any    any     anywhere             anywhere            tcp dpt:https 
- 
+num   pkts bytes target     prot opt in     out     source               destination
+1        0     0 ACCEPT     all  --  any    any     anywhere             anywhere            ctstate RELATED,ESTABLISHED
+2        0     0 ACCEPT     tcp  --  any    any     anywhere             anywhere            tcp dpt:ssh
+3        0     0 ACCEPT     udp  --  any    any     anywhere             anywhere            udp dpt:domain
+4        0     0 ACCEPT     tcp  --  any    any     anywhere             anywhere            tcp dpt:www
+5        0     0 ACCEPT     tcp  --  any    any     anywhere             anywhere            tcp dpt:https
+
 Chain FORWARD (policy ACCEPT 0 packets, 0 bytes)
-num   pkts bytes target     prot opt in     out     source               destination         
- 
+num   pkts bytes target     prot opt in     out     source               destination
+
 Chain OUTPUT (policy ACCEPT 0 packets, 0 bytes)
 num   pkts bytes target     prot opt in     out     source               destination
 ```

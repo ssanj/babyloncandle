@@ -2,7 +2,7 @@
 title: Cabal Fails to Install MySQL Linux Driver
 author: sanjiv sahayam
 description: If your cabal installation of mysql-simple is failing on mysql, you may want to install the mysql-client library on linux.
-tags: haskell, cabal, linux
+tags: cabal, haskell, linux
 ---
 When trying to install [mysql-simple](http://hackage.haskell.org/package/mysql-simple-0.2.2.4) on GHC 7.8.3 with cabal 1.18.1.3 on Ubuntu Linux 12.04, the [mysql](https://hackage.haskell.org/package/mysql) dependency failed with the following error:
 

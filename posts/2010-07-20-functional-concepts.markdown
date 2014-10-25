@@ -1,7 +1,7 @@
 ---
 title: Functional Concepts
 author: sanjiv sahayam
-tags: scala, fp
+tags: fp, scala
 ---
 
 One of the biggest hurdles I've come across while learning scala, are all the new functional concepts used - most of which I know nothing about! I've also found it rather to hard to find any succinct information on these concepts, except for Haskell code and mathematical equations. While these are great for those who know Haskell and/or are proficient in mathematics it may not be the easiest thing for a simple programmer (such as myself) to understand.

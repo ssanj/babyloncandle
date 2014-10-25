@@ -1,7 +1,7 @@
 ---
 title: Semigroup
 author: sanjiv sahayam
-tags: scala, fp
+tags: fp, scala
 ---
 
 I recently came across something called a "Semigroup" while browsing [scalaz](http://github.com/nkpart/scalaz) code. I was actually looking for an example of a Monoid, but found that the scalaz implementation used Semigroup in the implementation of Monoids.
@@ -41,7 +41,7 @@ Here's an implementation of the plus operator:
 trait Semigroup[T] {
   def op(t1:T, t2:T) : T
 }
- 
+
 def plus = new Semigroup[Int] { def op(t1:Int, t2:Int) = t1 + t2 }
 }
 ```

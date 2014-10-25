@@ -1,7 +1,7 @@
 ---
 title: Disable MySql History
 author: sanjiv sahayam
-tags: mysql,
+tags: mysql
 ---
 
 Sometimes it's a good idea to prevent mysql from writing a history file. The mysql history file contains all the commands you type across all sessions.

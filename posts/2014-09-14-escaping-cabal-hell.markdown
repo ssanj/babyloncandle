@@ -2,7 +2,7 @@
 title: Escaping Cabal Hell
 author: sanjiv sahayam
 description: Some simple steps to escaping Cabal Hell and reach Cabal Heaven.
-tags: haskell, cabal
+tags: cabal, haskell
 ---
 
 Cabal. What a nightmare. Right? That was the view I had on it until recently. I had just upgraded to GCH 7.8.3 and almost none of my projects built with Cabal anymore. Hell. So I decided it was time to learn to use Cabal properly. In my research I came across the extremely useful [Cabal Survival Guide](http://www.haskell.org/haskellwiki/Cabal/Survival) which had many great pointers. So have a read of it if your Cabal project fails to build.

@@ -1,7 +1,7 @@
 ---
 title: Hello World Lift
 author: sanjiv sahayam
-tags: scala, sbt, lift
+tags: lift, sbt, scala
 ---
 
 Recently I've been trying to get into [Lift](http://liftweb.net). While there's a lot of information out there there's nothing that really lets a beginner start with the basics.
@@ -48,17 +48,17 @@ With the structure out of the way, lets focus on the LiftProject file for SBT:
 
 ```{.scala}
 import sbt._
- 
+
 class LiftProject(info: ProjectInfo) extends DefaultWebProject(info) {
 val liftVersion = "2.1-RC2"
- 
+
 override def libraryDependencies = Set(
 "net.liftweb" %% "lift-webkit" % liftVersion % "compile->default",
 "net.liftweb" %% "lift-common" % liftVersion % "compile->default",
 "net.liftweb" %% "lift-mapper" % liftVersion % "compile->default",
 "org.mortbay.jetty" % "jetty" % "6.1.22" % "test->default"
 ) ++ super.libraryDependencies
- 
+
 }
 ```
 
@@ -86,12 +86,12 @@ Boot.scala has the following contents:
 
 ```{.scala}
 package bootstrap.liftweb
- 
+
 import net.liftweb.http.LiftRules
 import net.liftweb.sitemap.{SiteMap, Menu}
- 
+
 class Boot {
- 
+
   def boot {
     LiftRules.addToPackages("au.com.testlift")
     LiftRules.setSiteMap(SiteMap(Menu("Home") / "index"))
@@ -110,7 +110,7 @@ We create a HelloWorld class in the __au.com.testlift.snippet__ package with the
 
 ```{.scala}
 package au.com.testlift.snippet
- 
+
 class HelloWorld {
   def howdy = <span>World!! The current date is: {new java.util.Date}</span>
 }
@@ -141,7 +141,7 @@ The contents of the default.html file are as follows:
 </head>
 <body>
     <lift:bind name="content" />
-    <lift:Menu.builder />    
+    <lift:Menu.builder />
 </body>
 </html>
 ```

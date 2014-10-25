@@ -1,7 +1,7 @@
 ---
 title: Functor
 author: sanjiv sahayam
-tags: scala, fp
+tags: fp, scala
 ---
 
 # What is a Functor?
@@ -113,10 +113,10 @@ Let's see if HolderFunctor obeys these 2 laws:
 ```{.scala}
 new HolderFunctor().fmap(identity(_:Int), Holder(5)) == Holder(5)
 res11: Boolean = true
- 
+
 def giveMe: Int => String = n => "Give me " + n.toString
 def strLength: String => Int = str => str.length
- 
+
 new HolderFunctor().fmap(strLength compose giveMe, Holder(5)) ==
 new HolderFunctor().fmap(strLength, new HolderFunctor().fmap(giveMe, Holder(5)))
 res13: Boolean = true
@@ -151,7 +151,7 @@ res23: Holder[String] = Holder(Harry Potter)
 Let's try and use it with Functor[List]:
 
 ```{.scala}
-fmap("|" + (_:Int).toString + "|", List(1,2,3,4)) 
+fmap("|" + (_:Int).toString + "|", List(1,2,3,4))
 12: error: could not find implicit value for parameter functor: Functor[List]
 ```
 
@@ -159,7 +159,7 @@ Let's create an implicit Functor[List]:
 
 ```{.scala}
 implicit def listFunctor: Functor[List] = new ListFunctor()
-fmap("|" + (_:Int).toString + "|", List(1,2,3,4)) 
+fmap("|" + (_:Int).toString + "|", List(1,2,3,4))
 res28: List[java.lang.String] = List(|1|, |2|, |3|, |4|)
 ```
 
@@ -167,7 +167,7 @@ What if we want to use it with Option? We simply create an implicit Functor[Opti
 
 ```{.scala}
 implicit def optionFunctor: Functor[Option] = new Functor[Option] {
- def fmap[A,B](f: A => B, fa:Option[A]): Option[B] = fa map (f)    
+ def fmap[A,B](f: A => B, fa:Option[A]): Option[B] = fa map (f)
 }
 ```
 
@@ -183,14 +183,14 @@ Verifying the laws for Functor[Option]:
 ```{.scala .scrollx}
 optionFunctor.fmap(identity(_:Int), Some(6)) == Some(6)
 res17: Boolean = true
- 
-optionFunctor.fmap(identity(_:Int), None) == None     
+
+optionFunctor.fmap(identity(_:Int), None) == None
 res18: Boolean = true
- 
+
 optionFunctor.fmap(strLength compose giveMe, Some(6)) == optionFunctor.fmap(strLength, optionFunctor.fmap(giveMe, Some(6)))
 res19: Boolean = true
- 
-optionFunctor.fmap(strLength compose giveMe, None) == optionFunctor.fmap(strLength, optionFunctor.fmap(giveMe, None))     
+
+optionFunctor.fmap(strLength compose giveMe, None) == optionFunctor.fmap(strLength, optionFunctor.fmap(giveMe, None))
 res20: Boolean = true
 ```
 
@@ -206,58 +206,58 @@ Here's a listing of the snippets:
 
 ```{.scala .scrollx}
 List("one", "two", "three") map (_.length)
- 
+
 trait Functor[F[_]] {
  def fmap[A,B](f: A => B, fa:F[A]): F[B]
 }
- 
+
 class ListFunctor extends Functor[List] {
   def fmap[A,B](f: A => B, fa:List[A]): List[B] = fa match {
     case Nil => Nil
     case x::xs => f(x) :: fmap(f, xs)
   }
 }
- 
+
 new ListFunctor().fmap((_:String).length, List("one", "two", "three"))
- 
+
 case class Holder[T](value:T)
- 
+
 class HolderFunctor extends Functor[Holder] {
  def fmap[A,B](f: A => B, fa:Holder[A]): Holder[B] = Holder(f(fa.value))
 }
- 
+
 new HolderFunctor().fmap("Give me " + (_:Int).toString, Holder(5))
 new HolderFunctor().fmap(identity(_:Int), Holder(5)) == Holder(5)
- 
+
 def giveMe: Int => String = n => "Give me " + n.toString
 def strLength: String => Int = str => str.length
- 
+
 new HolderFunctor().fmap(strLength compose giveMe, Holder(5)) ==
 new HolderFunctor().fmap(strLength, new HolderFunctor().fmap(giveMe, Holder(5)))
- 
- 
+
+
 def fmap[F[_], A, B](f: A => B, fa: F[A])(implicit functor:Functor[F]): F[B] = functor.fmap(f, fa)
- 
+
 case class Person(name:String)
- 
+
 implicit def holderFunctor: Functor[Holder] = new HolderFunctor()
 fmap((_:Person).name, Holder(Person("Harry Potter")))
- 
+
 implicit def listFunctor: Functor[List] = new ListFunctor()
-fmap("|" + (_:Int).toString + "|", List(1,2,3,4)) 
- 
+fmap("|" + (_:Int).toString + "|", List(1,2,3,4))
+
 implicit def optionFunctor: Functor[Option] = new Functor[Option] {
- def fmap[A,B](f: A => B, fa:Option[A]): Option[B] = fa map (f)    
+ def fmap[A,B](f: A => B, fa:Option[A]): Option[B] = fa map (f)
 }
- 
+
 fmap((_:Int).toString + " optional", Some(123):Option[Int])
- 
- 
+
+
 optionFunctor.fmap(identity(_:Int), Some(6)) == Some(6)
 optionFunctor.fmap(identity(_:Int), None) == None
- 
+
 optionFunctor.fmap(strLength compose giveMe, Some(6)) == optionFunctor.fmap(strLength, optionFunctor.fmap(giveMe, Some(6)))
 optionFunctor.fmap(strLength compose giveMe, None) == optionFunctor.fmap(strLength, optionFunctor.fmap(giveMe, None))
- 
+
 def fmap2[F[_] : Functor, A, B](f: A => B, fa: F[A]): F[B] = implicitly[Functor[F]].fmap(f, fa)
 ```

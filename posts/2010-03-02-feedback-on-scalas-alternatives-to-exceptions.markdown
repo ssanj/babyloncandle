@@ -2,7 +2,7 @@
 title: Feedback on Scala's Alternatives to Exceptions
 author: sanjiv sahayam
 description: Some useful feedback on my presentation on Exceptions.
-tags: scala, fp
+tags: fp, scala
 ---
 
 Here is some of the feedback I received on the questions posed and the solutions provided in my [Scala's Alternatives to Exceptions](http://files.meetup.com/1443989/Scala%27s%20Alternatives%20to%20Exceptions.zip) presentation at the [BFPG](http://www.meetup.com/Brisbane-Functional-Programming-Group-BFG) by [Kristian Domagala](http://kristian-domagala.blogspot.com):

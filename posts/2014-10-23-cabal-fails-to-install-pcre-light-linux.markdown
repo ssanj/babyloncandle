@@ -2,7 +2,7 @@
 title: Cabal Fails to Install PCRE-Light on Linux
 author: sanjiv sahayam
 description: If your cabal installation of mysql-simple is failing on PCRE-Light, you may want to install the PCRE library on linux.
-tags: haskell, cabal, linux
+tags: cabal, haskell, linux
 ---
 When trying to install [mysql-simple](http://hackage.haskell.org/package/mysql-simple-0.2.2.4) on GHC 7.8.3 with cabal 1.18.1.3 on Ubuntu Linux 12.04, the [pcre-light](https://hackage.haskell.org/package/pcre-light) dependency failed with the following error:
 
