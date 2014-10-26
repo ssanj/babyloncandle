@@ -4,7 +4,7 @@ author: sanjiv sahayam
 description: Some details about me and why I started this blog.
 ---
 
-![picture of sanjiv sahayam](/images/sanjiv_sahayam_640.jpg)
+![picture of sanjiv sahayam](/images/sanjiv_sahayam_320.jpg)
 
 Welcome to my personal blog. I'm a software developer by day. I work mostly with JVM-based languages like Java and Scala. I dabble in some Haskell and functional programming during my leisure.
 
