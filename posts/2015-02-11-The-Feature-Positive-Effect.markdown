@@ -25,7 +25,7 @@ Think about the following when faced with a dilemma:
 
 * What is present? What is absent?
 * What have you been shown? What have you not been shown?
-* What are it's positive effects? What are it's negative effects?
+* What are its positive effects? What are its negative effects?
 * What have you been told? What have you not been told?
 
 
