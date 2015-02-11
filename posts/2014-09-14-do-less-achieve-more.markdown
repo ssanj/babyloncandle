@@ -2,7 +2,7 @@
 title: Do less. Achieve More.
 author: sanjiv sahayam
 description: Turn down the noise in your life. Subtract. Gain more freedom.
-tags: life
+tags: ideas
 ---
 
 We are constantly bombarded with messages from multiple sources in our daily lives. Social media is the main culprit these days. I used to spend a lot of time on Facebook. I gave that up about 6 years ago and headed for Twitter. I never looked back and never missed it. More recently after 6 years on Twitter, I've decided to give abstaining from it a go.
