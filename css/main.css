@@ -319,6 +319,20 @@ img {
   text-align: center;
 }
 
+.quote {
+  font-size: 250%;
+  text-align: center;
+}
+
+.quote::before {
+  content: open-quote;
+}
+
+.quote::after {
+  content: close-quote;
+}
+
+
 /* media queries */
 /* ----------------------------------------------------------*/
 

@@ -2,7 +2,7 @@
 title: Tim Brown on Thinking Big
 author: sanjiv sahayam
 description: Tim Brown shares some ideas on how to think big.
-tags: ideas
+tags: ideas, link
 ---
 
 Some interesting ideas from Tim Brown's Ted Talk: [Designers - Think Big](http://www.ted.com/talks/tim_brown_urges_designers_to_think_big):

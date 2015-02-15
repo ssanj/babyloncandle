@@ -2,7 +2,7 @@
 title: The Obstacle is the Way - Ryan Holiday
 author: sanjiv sahayam
 description: Ideas from the book: The Obstacle is the Way - The timeless art of turning trials into triumphs - Ryan Holiday
-tags: ideas
+tags: book, ideas
 ---
 
 Ideas from the book [The Obstacle is the Way by Ryan Holiday](http://www.amazon.com/The-Obstacle-Is-Way-Timeless/dp/1591846358)
