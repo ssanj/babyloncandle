@@ -378,8 +378,9 @@ img {
     height: 304px;
   }
 
-  iframe#xxx {
+  iframe#movie1 {
     width: 300px;
+    height: 188px;
   }
 }
 
