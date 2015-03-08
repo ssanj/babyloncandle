@@ -53,22 +53,22 @@ main = hakyllWith siteConfig $ do
     match indexPagePattern $ do
         route idRoute
         compile $ do
-            (posts, count) <- partitionPosts (withLength $ take numPostsOnHomePage) . recentFirst =<< loadAll allPostsPattern
+            (posts, count) <- partitionPosts (\xs -> (take numPostsOnHomePage xs, length xs)) . recentFirst =<< loadAll allPostsPattern
             let ctx = postListCtx posts tags <> homepageCtx count <> commonCtxWithDescription indexPageDescription
             compilerGlue (getResourceBody >>= applyAsTemplate ctx) [defaultTemplate] ctx
 
     match templatesPattern $ compile templateCompiler
 
-    match aboutPagePattern $ do
-        route $ setExtension htmlExtension
-        compile $ compilerGlue pandocCompiler [aboutTemplate, defaultTemplate] commonCtx
+    -- match aboutPagePattern $ do
+    --     route $ setExtension htmlExtension
+    --     compile $ compilerGlue pandocCompiler [aboutTemplate, defaultTemplate] commonCtx
 
-    create [papersPage] $ do
-        route idRoute
-        compile $ do
-            (papers, count) <- partitionPosts (withLength id) . recentFirst =<< loadAllSnapshots allPapersPattern paperSnapshot
-            let ctx = paperListCtx papers count <> commonCtxWithDescription papersPageDescription
-            compilerGlue emptyCompiler [papersTemplate, defaultTemplate] ctx
+    -- create [papersPage] $ do
+    --     route idRoute
+    --     compile $ do
+    --         (papers, count) <- partitionPosts (withLength id) . recentFirst =<< loadAllSnapshots allPapersPattern paperSnapshot
+    --         let ctx = paperListCtx papers count <> commonCtxWithDescription papersPageDescription
+    --         compilerGlue emptyCompiler [papersTemplate, defaultTemplate] ctx
 
     create [searchDataPage] $ do
         route idRoute
