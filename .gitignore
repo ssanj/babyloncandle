@@ -5,3 +5,4 @@ site.hi
 site.o
 dist
 hakyllsrc
+.cabal-sandbox/
