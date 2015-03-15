@@ -2,11 +2,8 @@
 title: You are what you Practice Everyday
 author: sanjiv sahayam
 description: Excellence is a habit.
-tags: ideas
+tags: ideas, quotes
 ---
 
-Artistole said:
 
-  > We are what we repeatedly do. Excellence, then, is not an act, but a habit.
-
-Do your best work every day.
+<p class="quote">We are what we repeatedly do. Excellence, then, is not an act, but a habit.<span class="attribution">Artistole</span></p>

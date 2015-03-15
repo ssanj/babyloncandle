@@ -354,6 +354,14 @@ img {
   content: close-quote;
 }
 
+.attribution:before {
+  content: "\2014";
+}
+
+.attribution {
+  font-size: 50%;
+}
+
 
 /* media queries */
 /* ----------------------------------------------------------*/
