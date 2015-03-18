@@ -1,7 +1,7 @@
 ---
-title: You are what you Practice Everyday
+title: Excellence is a Habit
 author: sanjiv sahayam
-description: Excellence is a habit.
+description: A quote from Aristole about excellence being a habit.
 tags: ideas, quotes
 ---
 
