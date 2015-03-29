@@ -1,5 +1,5 @@
 ---
-title: Future Execution
+title: Future Execution Order
 author: sanjiv sahayam
 description: An experiment to determine two things: 1. When does a Future execute. 2. The order of Future execution within a for-comprehension.
 tags: future,scala
@@ -10,7 +10,7 @@ Futures had me confused. For some reason I had assumed that the execution of Fut
 Defining Futures outside a for-comprehension
 --------------------------------------------
 
-Let's take a simple example. First I define an __iterate__ method, that takes in a name and a number. The name is used to track the future that is iterating. The method basically loops form 1 to the number passed in while printing out its current iteration. It then sleeps for 250 ms. It prints out when it is done at the end. All very simple.
+Let's take a simple example. First I define an __iterate__ method that takes in a name and a number. The name is used to track the Future that is iterating. The method basically loops form 1 to the number passed in while printing out its current iteration. It then sleeps for 250 ms. It prints out when it is done at the end. All very simple.
 
 ```{.scala .scrollx}
 
@@ -137,7 +137,7 @@ f3 done
 done with 12
 ```
 
-We can see that Future: __f1__, starts executing only after the for-comprehension defined. We can also see that the main thread of execution does not block on the for-comprehension and continues executing. We also see that __f2__ has not started executing at all. It is only once __f1__ completes that __f2__ starts executing. We now have synchronous execution as opposed to asynchronous execution of __f1__ and __f2__. No concurrency here. Once __f2__ completes, __f3__ finishes straight after and we are done.
+We can see that Future: __f1__, starts executing only after the for-comprehension defined. We can see that the main thread of execution does not block on the for-comprehension and continues executing. __f2__ has not started executing at all. It is only once __f1__ completes that __f2__ starts executing. We now have synchronous execution as opposed to asynchronous execution of __f1__ and __f2__. No concurrency here. Once __f2__ completes, __f3__ finishes straight after and we are done.
 
 So it looks like these are the general rules of Future execution:
 
@@ -320,13 +320,13 @@ f4 done
 done with 17
 ```
 
-So where should I define Futures?
----------------------------------
+Where should we Define Futures?
+-------------------------------
 
-Yikes. What a mine field. So the rules seem to be:
+Yikes. What a minefield. So the rules seem to be:
 
 1. If you defined Futures outside a for-comprehension they will run immediately and concurrently.
-2. a) If you define Futures inside a for-comprehension they will run sequentially.
-   a) Unless you zip them in the first step, in which case they will run immediately and concurrently.
+2. If you define Futures inside a for-comprehension they will run sequentially (if not zipped).
+3. If you zip Futures in the first step of the for-comprehension they will run immediately and concurrently.
 
-The source code for the above scenarios can be found on [github](https://github.com/ssanj/)
+The source code for the above scenarios can be found on [github](https://github.com/ssanj/future-execution-order-blogpost-example)
