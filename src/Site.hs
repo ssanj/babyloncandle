@@ -168,23 +168,35 @@ commonCtx :: Context String
 commonCtx = mconcat [blogTitleCtx, emailAddyCtx, siteOwnerCtx, sitDesciptionCtx, siteSEOCtx, defaultContext]
 
 tagNameCtx :: String -> Int -> Context String
-tagNameCtx tn tagCount = mconcat [tagTitleCtx tn, postCountCtx tagCount]
+tagNameCtx tn tagCount = mconcat [tagTitleCtx tn, postCountCtx tagCount, showSiteHeaderAndSearchBoxCtx]
 
 tagTitleCtx :: String -> Context String
 tagTitleCtx tn = mconcat [constField "postTitle" (titleCase tn ++ " Posts"),
                           constField "description" ("Posts tagged as " ++ tn)]
 
 archiveCtx :: Int -> Context String
-archiveCtx postCount = mconcat [archiveTitleCtx, postCountCtx postCount]
+archiveCtx postCount = mconcat [archiveTitleCtx, postCountCtx postCount, showSiteHeaderAndSearchBoxCtx]
+
+showSiteHeaderAndSearchBoxCtx :: Context String
+showSiteHeaderAndSearchBoxCtx = mconcat  [showSiteHeaderCtx, showSearchBoxCtx]
 
 blogTitleCtx :: Context String
 blogTitleCtx =  constField "blogTitle" "BabylonCandle"
 
 homepageCtx :: Int -> Context String
-homepageCtx postCount = mconcat [homepageTitleCtx, postCountCtx postCount]
+homepageCtx postCount = mconcat [homepageTitleCtx, postCountCtx postCount, showSearchBoxCtx, showSiteHeaderCtx, showSiteFooterCtx]
 
 homepageTitleCtx :: Context String
 homepageTitleCtx = mconcat [constField "title" "Home", constField "postTitle" "Posts"]
+
+showSearchBoxCtx :: Context String
+showSearchBoxCtx = constField "showSearchBox" "true"
+
+showSiteHeaderCtx :: Context String
+showSiteHeaderCtx = constField "showSiteHeader" "true"
+
+showSiteFooterCtx :: Context String
+showSiteFooterCtx = constField "showSiteFooter" "true"
 
 archiveTitleCtx :: Context String
 archiveTitleCtx = constField "postTitle" "Archive"

@@ -21,6 +21,7 @@
   </head>
 
     <body>
+      $if(showSiteHeader)$
       <header class="site-header">
         <div class="wrap">
           <a class="site-title" href="/">$blogTitle$</a>
@@ -40,12 +41,17 @@
             </div>
           </nav>
         </div>
+        $if(showSearchBox)$
         <div id="remote">
           <input class="typeahead" type="text" placeholder="search">
         </div>
+        $endif$
       </header>
+      $endif$
       $body$
-      $partial("templates/footer.html")$
+      $if(showSiteFooter)$
+        $partial("templates/footer.html")$
+      $endif$
     </body>
     <script src="/js/jquery-1.11.1.min.js"></script>
     <script src="/js/typeahead.bundle.min.js"></script>

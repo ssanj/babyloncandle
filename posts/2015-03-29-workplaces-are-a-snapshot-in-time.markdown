@@ -9,4 +9,4 @@ Work places are like a snapshot in time. The people, the culture, the technology
 
 I had the recent good fortune to go back to one of my previous work places. I had worked there six years prior and had left swearing never to return. I had since heard good things and had returned. The place had almost completely changed. Sure, there were pockets of "old" behaviour lying around but for the most part it was a completely different organisation. Different people, technologies, methodologies, philosophies - you name it.
 
-Whenever you work somewhere try and soak it all in. Chances are that the exact combination of everything around you will never be the same as it is now. Enjoy the uniqueness of the present.
+Whenever you work somewhere try and soak it all in. Chances are that the exact combination of things around you will never be the same. Enjoy the uniqueness of the present.
