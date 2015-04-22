@@ -1,0 +1,10 @@
+---
+title: Banishing Multitasking from our Repertoire
+author: sanjiv sahayam
+description: Chapter summary of "Banishing Multitasking from our Repertoire" by Christian Jarrett
+tags: chapter, ideas
+---
+Ideas from the chapter "Banishing Multitasking from our Repertoire" from the book [Manage Your Day-To-Day](http://99u.com/book/manage-your-day-to-day-2) by Christian Jarrett.
+
+1. Switching tasks sends us down a rabbit hole, pulling our attention away from our priority work for much longer than we anticipate.
+2. It's best to find a good stopping point on a project - one that frees your mind from nagging questions, before moving onto another task. That way you'll find it easier to achieve mental closure and apply all your energy to the next challenge.
