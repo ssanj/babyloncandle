@@ -13,14 +13,20 @@ There are several variants:
 
 Perform a dry run to display which files will be deleted:
 
-```git clean -dn```
+```{.command}
+git clean -dn
+```
 
 Once you are satisfied with the output then run:
 
-```git clean -df```
+```{.command}
+git clean -df
+```
 
 This will remove all files and directories that are not tracked.
 
 If you would like to perform an interactive removal of files and directories then use:
 
-```git clean -di```
+```{.command}
+git clean -di
+```
