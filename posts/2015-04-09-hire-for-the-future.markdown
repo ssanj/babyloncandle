@@ -2,7 +2,7 @@
 title: Hire for the Future
 author: sanjiv sahayam
 description: Thoughts on hiring.
-tags: ideas
+tags: culture, ideas
 ---
 
 First of all, hire only the best people for your company. If you can't find good people, then use your money elsewhere.

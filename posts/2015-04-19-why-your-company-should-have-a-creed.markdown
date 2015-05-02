@@ -2,7 +2,7 @@
 title: Why Your Company should have a Creed
 author: sanjiv sahayam
 description: How Automattic codified their company values in a creed.
-tags: ideas
+tags: culture, ideas
 ---
 
 [Automattic](http://automattic.com) is a company founded by Matt Mullenweg. He also developed [Wordpress](https://en-au.wordpress.org) ten years ago. He talks of the notion of a "company creed" which codifies the culture and values of a company. Here's the Autommatic creed (as of September 19th, 2011):
