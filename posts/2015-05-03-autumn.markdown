@@ -1,0 +1,10 @@
+---
+title: Autumn
+author: sanjiv sahayam
+description: Haiku about Autumn
+tags: haiku
+---
+
+<div class="haiku">It's cold outside</div>
+<div class="haiku">the kettle boils</div>
+<div class="haiku">the cup awaits</div>

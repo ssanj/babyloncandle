@@ -404,6 +404,10 @@ img {
   margin-top: 3px;
 }
 
+div.haiku {
+  text-align: center;
+}
+
 
 /* media queries */
 /* ----------------------------------------------------------*/
