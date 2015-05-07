@@ -2,7 +2,7 @@
 title: Workplaces are a Snapshot in Time
 author: sanjiv sahayam
 description: The unique combination that is your workplace will probably never exist again.
-tags: ideas
+tags: work
 ---
 
 Work places are like a snapshot in time. The people, the culture, the technology etc are in a constant state of flux. Some people leave. Others join. Technology is replaced frequently. Methodologies change. Fortunes are made and lost.

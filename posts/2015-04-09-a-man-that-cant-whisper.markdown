@@ -2,7 +2,7 @@
 title: A Man that can't Whisper
 author: sanjiv sahayam
 description: Comedian Danny Bhoy lays down some profound advice.
-tags: ideas
+tags: life
 ---
 
 [Danny Bhoy](http://www.dannybhoy.com) is a very funny Scottish-Indian comedian. He has toured Australia many times and I've had the pleasure of attending some of his gigs.

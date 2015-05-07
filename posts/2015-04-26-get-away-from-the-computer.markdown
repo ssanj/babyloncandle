@@ -2,7 +2,7 @@
 title: Get Away from the Computer
 author: sanjiv sahayam
 description: Take a break from computer to get brilliant insights.
-tags: ideas
+tags: life, work
 ---
 
 For most programmers, programming is usually our day job as well as our hobby. But "working" all the time dulls our intuition.

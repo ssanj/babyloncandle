@@ -2,7 +2,7 @@
 title: Calculated Risks have a Critical Mass
 author: sanjiv sahayam
 description: The cumulative effects of technical debt are unforeseeable.
-tags: ideas
+tags: ideas, work
 ---
 
 We all need to work very fast these days. Bugs in production are costing us money on an hourly basis. We may have a gaping security hole. We don't have the capacity to service all our current clients. We have to solve these problems ASAP. Or do we?
