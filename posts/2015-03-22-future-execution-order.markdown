@@ -56,7 +56,7 @@ Let's take Scenario 1. This scenario creates two Futures: __f1__ and __f2__ with
 
 What is the output of the above program?
 
-```{.bash}
+```{.terminal}
 defining f1
 defining f2
 f2 sleeping for item: 1
@@ -112,7 +112,7 @@ Let's look at Scenario 2. This scenario basically creates two Futures within the
 
 What is the output of the above program?
 
-```{.bash}
+```{.terminal}
 before comprehension
 f1 ->
 after comprehension
@@ -168,7 +168,7 @@ Just when we had everything nice and tidy I came across the __zip__ method on [s
 
 What is the output of the above program?
 
-```{.bash}
+```{.terminal}
 before comprehension
 f1 ->
 f2 ->
@@ -239,7 +239,7 @@ So if I wrote function:  __zip2__ that took __that__ as a function we should see
 
 We can see that __f1__ has to complete before __f2__:
 
-```{.bash}
+```{.terminal}
 before comprehension
 f1 ->
 defining f1
@@ -287,7 +287,7 @@ If we __zip__ within a for-comprehension, then Futures run concurrently right? T
 If we look at the output, we see that __f1__ has to complete before __f2__ and __f3__ start executing concurrently.
 
 
-```{.bash}
+```{.terminal}
 before comprehension
 f1 ->
 after comprehension

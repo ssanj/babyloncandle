@@ -16,3 +16,32 @@ td.sourceCode { padding-left: 5px; }
 .sourceCode span.fu { color: #06287e; }
 .sourceCode span.re { }
 .sourceCode span.er { color: red; font-weight: bold; }
+
+.post pre.sourceCode.scala, .post code.sourceCode.scala {
+    background-color: black;
+}
+
+.post code.sourceCode.scala span.kw {
+    color: orange;
+}
+
+.post code.sourceCode.scala span.fu {
+    color: #60a0b0;
+}
+
+.post code.sourceCode.scala span.dv {
+    color: teal;
+}
+
+.post code.sourceCode.scala span.st {
+    color: greenyellow;
+}
+
+.post code.sourceCode.scala span.co {
+    color: darkgray;
+}
+
+
+.post code.sourceCode.scala {
+    color: white;
+}
