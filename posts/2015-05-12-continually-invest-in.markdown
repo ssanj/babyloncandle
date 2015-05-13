@@ -1,7 +1,7 @@
 ---
 title: Continually Invest in ...
 author: sanjiv sahayam
-description: Quote on success by James Altucher
+description: Quote on success by Chris Hadfield
 tags: quotes
 ---
 
@@ -9,5 +9,5 @@ tags: quotes
 <div class="quote">
 Continually investing in the success of others is what will eventually lead to success for yourself.
 </div>
-<div class="attribution">James Altucher</div>
+<div class="attribution">Chris Hadfield</div>
 <div>
