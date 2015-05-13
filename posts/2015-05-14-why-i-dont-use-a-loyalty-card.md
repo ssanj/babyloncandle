@@ -1,0 +1,15 @@
+---
+title: Why I don't use a Loyalty Card
+author: sanjiv sahayam
+description: .
+tags: ideas, life
+comments: true
+---
+
+Loyalty cards. They are the GO cards of the retail world. By name they seem to imply some kind of loyalty which I doubt exists.
+
+I have my coffee at an [awesome coffee shop](http://www.coffeeanthology.com.au) everyday. I don't keep going back because I can get one free coffee for every nine I buy. Quite the contrary. I find getting your loyalty card stamped or lining up your phone with some app to register your purchase quite annoying.
+
+I go there because the coffee is good and it is reasonably priced. If the coffee stops being good or if the price rises exponentially, no amount of "loyalty" is going to get me to go back there.
+
+Also, I like knowing that when I buy my tenth coffee, the owners of the coffee shop, a small business, don't have to lose some of their profits just to keep me "loyal".
