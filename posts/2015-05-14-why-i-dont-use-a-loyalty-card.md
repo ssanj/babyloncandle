@@ -3,7 +3,6 @@ title: Why I don't use a Loyalty Card
 author: sanjiv sahayam
 description: .
 tags: ideas, life
-comments: true
 ---
 
 Loyalty cards. They are the GO cards of the retail world. By name they seem to imply some kind of loyalty which I doubt exists.
