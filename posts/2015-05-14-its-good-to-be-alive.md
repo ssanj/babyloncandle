@@ -1,5 +1,5 @@
 ---
-title: It's Good to be Alive
+title: It&apos;s Good to be Alive
 author: sanjiv sahayam
 description: Be thankful for another day.
 tags: ideas, life

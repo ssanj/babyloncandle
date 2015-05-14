@@ -1,5 +1,5 @@
 ---
-title: Don't Wait for Moods
+title: Don&apos;t Wait for Moods
 author: sanjiv sahayam
 description: quote about not waiting for moods to do your work by Peal S. Buck
 tags: ideas, quotes

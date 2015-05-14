@@ -1,5 +1,5 @@
 ---
-title: A Man that can't Whisper
+title: A Man that can&apos;t Whisper
 author: sanjiv sahayam
 description: Comedian Danny Bhoy lays down some profound advice.
 tags: life

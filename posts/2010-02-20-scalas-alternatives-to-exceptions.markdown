@@ -1,5 +1,5 @@
 ---
-title: Scala's alternatives to Exceptions
+title: Scala&apos;s alternatives to Exceptions
 author: sanjiv sahayam
 description: My presentation on how to handle Exceptions differently in Scala to that of Java.
 tags: fp, presentation, scala

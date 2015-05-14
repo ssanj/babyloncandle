@@ -1,5 +1,5 @@
 ---
-title: Feedback on Scala's Alternatives to Exceptions
+title: Feedback on Scala&apos;s Alternatives to Exceptions
 author: sanjiv sahayam
 description: Some useful feedback on my presentation on Exceptions.
 tags: fp, scala
