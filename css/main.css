@@ -1,5 +1,6 @@
-/* Base */
-/* ----------------------------------------------------------*/
+/*------------------------------------*\
+    BASE
+\*------------------------------------*/
 
 * {
   margin: 0;
@@ -13,23 +14,25 @@ body {
   font-size: 16px;
   line-height: 1.5;
   font-weight: 300;
-  background-color: #fdfdfd;
+  background-color: #FDFDFD;
 }
-
-h1, h2, h3, h4, h5, h6 { /*font-size: 100%; font-weight: 400;*/ }
 
 h1 {
   font-size: 2em;
 }
 
-a         { color: #2a7ae2; text-decoration: none; }
+a         { color: #2A7AE2; text-decoration: none; }
 a:hover   { color: #000; text-decoration: underline; }
 a:visited { color: #205caa; }
 
 /* Utility */
 
 .wrap:before,
-.wrap:after { content:""; display:table; }
+.wrap:after {
+  content:"";
+  display:table;
+}
+
 .wrap:after { clear: both; }
 .wrap {
   max-width: 800px;
@@ -38,11 +41,9 @@ a:visited { color: #205caa; }
   zoom: 1;
 }
 
-
-/* Layout Styles */
-/* ----------------------------------------------------------*/
-
-/* Site header */
+/*------------------------------------*\
+    HEADER
+\*------------------------------------*/
 
 .site-header {
   border-top: 5px solid #333;
@@ -78,7 +79,9 @@ a:visited { color: #205caa; }
   letter-spacing: -.5px;
 }
 
-/* Site footer */
+/*------------------------------------*\
+    FOOTER
+\*------------------------------------*/
 
 .site-footer {
   border-top: 1px solid #e8e8e8;
@@ -137,22 +140,24 @@ a:visited { color: #205caa; }
 }
 
 
-/* Page Content styles */
-/* ----------------------------------------------------------*/
+/*------------------------------------*\
+    PAGE CONTENT
+\*------------------------------------*/
 
 .page-content {
   padding: 30px 0;
-  background-color: #fff;
+  background-color: #FFF;
 }
 
 .more-content {
   padding-top: 0;
   padding-bottom: 20px;
-  background-color: #fff;
+  background-color: #FFF;
 }
 
-/* Home styles */
-/* ----------------------------------------------------------*/
+/*------------------------------------*\
+    HOME STYLES
+\*------------------------------------*/
 
 .home h1 { margin-bottom: 25px; }
 
@@ -176,11 +181,10 @@ a:visited { color: #205caa; }
 
 .posts .post-date, .post-tag {
   font-size: 0.8em;
-  /*opacity: 0.6;*/
 }
 
 .post-tag a, .post-tag a:visited {
-  color: #2a7ae2;
+  color: #2A7AE2;
   text-decoration: none;
 }
 
@@ -189,12 +193,12 @@ a:visited { color: #205caa; }
 }
 
 .more {
-  background-color: #337ab7;
+  background-color: #337AB7;
   padding: .4em 1.2em;
   font-size: 105%;
   font-weight: 700;
   line-height: 1;
-  color: #fff;
+  color: #FFF;
   text-align: center;
   white-space: nowrap;
   vertical-align: baseline;
@@ -202,12 +206,13 @@ a:visited { color: #205caa; }
 }
 
 .more-content a:visited {
-  color: #fff;
+  color: #FFF;
 }
 
 
-/* Post styles */
-/* ----------------------------------------------------------*/
+/*------------------------------------*\
+    POST STYLES
+\*------------------------------------*/
 
 .post-header {
   margin: 10px 0 30px;
@@ -217,7 +222,6 @@ a:visited { color: #205caa; }
 .post-header h1 {
   font-family: Baskerville, Courier New, Serif;
   font-size: 6em;
-  /*font-size: 42px;*/
   letter-spacing: -1.75px;
   line-height: 1.25;
   font-weight: 300;
@@ -271,7 +275,7 @@ a:visited { color: #205caa; }
 }
 
 .post-content blockquote {
-  border-left: 4px solid #e8e8e8;
+  border-left: 4px solid #E8E8E8;
   padding-left: 20px;
   font-size: 18px;
   opacity: .6;
@@ -285,8 +289,8 @@ a:visited { color: #205caa; }
 
 .post pre,
 .post code {
-  border: 1px solid #d5d5e9;
-  background-color: #eef;
+  border: 1px solid #D5D5E9;
+  background-color: #EEF;
   padding: 8px 12px;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
@@ -315,8 +319,10 @@ a:visited { color: #205caa; }
 .post pre.command code { background-color: #333; color: darkorange; }
 
 
-/* Modifications */
-/* ----------------------------------------------------------*/
+/*------------------------------------*\
+    MODIFICATIONS
+\*------------------------------------*/
+
 .post pre.scrollx  {
   overflow-x: scroll;
 }
@@ -360,7 +366,7 @@ a:visited { color: #205caa; }
 }
 
 /* Fixed indentation of first line in a code block. */
-.post pre code { padding-left: 0;}
+.post pre code { padding-left: 0; }
 
 
 .posts .post-author {
@@ -377,8 +383,11 @@ img {
   text-align: center;
 }
 
+/*------------------------------------*\
+    QUOTES & ATTRIBUTION
+\*------------------------------------*/
+
 .quote {
-  /*font-size: 250%;*/
   background-color: black;
   color: white;
   font-size: 1em;
@@ -409,13 +418,12 @@ div.haiku {
 }
 
 
-/* media queries */
-/* ----------------------------------------------------------*/
+/*------------------------------------*\
+    MEDIA QUERIES
+\*------------------------------------*/
 
 
 @media screen and (max-width: 750px) {
-
-  .scrollx  { }
 
   .post pre  {
     overflow-x: scroll;
@@ -445,7 +453,8 @@ div.haiku {
     height: 121px;
   }
 
- #remote, .wrap {
+ #remote,
+ .wrap {
     padding: 0 12px;
   }
 
@@ -472,45 +481,6 @@ div.haiku {
 }
 
 @media screen and (max-width: 600px) {
-
-  /*.site-nav {
-    position: fixed;
-    z-index: 10;
-    top: 14px; right: 8px;
-    background-color: white;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-    border: 1px solid #e8e8e8;
-  }
-
-  .site-nav .menu-icon {
-    display: block;
-    font-size: 24px;
-    color: #505050;
-    float: right;
-    width: 36px;
-    text-align: center;
-    line-height: 36px;
-  }
-
-  .site-nav .menu-icon svg { width: 18px; height: 16px; }
-
-  .site-nav .trigger {
-    clear: both;
-    margin-bottom: 5px;
-    display: none;
-  }
-
-  .site-nav:hover .trigger { display: block; }
-
-  .site-nav .page-link {
-    display: block;
-    text-align: right;
-    line-height: 1.25;
-    padding: 5px 10px;
-    margin: 0;
-  }*/
 
   .post-header h1 { font-size: 36px; }
   .post-content h2 { font-size: 28px; }
