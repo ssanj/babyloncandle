@@ -32,7 +32,7 @@ When I try to use use the secondary constructor:
 SomeThing(3)
 ```
 
-We get the following compiler error:
+I get the following compiler error:
 
 ```{.terminal}
 Error:(19, 23) type mismatch;

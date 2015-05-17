@@ -32,10 +32,10 @@ Unschedule more of your life. Create space. Read a lot more to give yourself cre
 
 15. The hardest thing is spending time on the most important things in life.
 16. [Bike shedding](http://en.wikipedia.org/wiki/Parkinson%27s_law_of_triviality) - Spending a lot of time on discussions on relatively unimportant but simple issues, while neglecting the more important but complex issues.
-17. Playing Saxophone taught him how to breathe, how to be on stage in front of people, how to listen and respond, how to co-composing on the fly, how to learn new things and how to practice deliberately.
+17. Playing Saxophone taught him how to breathe, how to be on stage in front of people, how to listen and respond, how to co-compose on the fly, how to learn new things and how to practice deliberately.
 18. If you only practise the things you are good at you'll never get better at the things you are not good at.
 19. Business Judo: what can we do that google can't do?
-20. Advice to his twenty year old self: Slow down to go further. Build foundations. Build things that last long term.
+20. Advice to his twenty year-old-self: Slow down to go further. Build foundations. Build things that last long term.
 21. Take time for yourself, meditate, focuss on the present moment.
 
 <div class="quote">

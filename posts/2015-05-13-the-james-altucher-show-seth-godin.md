@@ -5,7 +5,7 @@ description: Seth Godin shares some interesting insights on James Altucher Show.
 tags: ideas
 ---
 
-Some interesting ideas from [James Altucher Show with Seth Godin](https://www.stansberryradio.com/James-Altucher/Latest-Episodes/Episode/886/Ep-86-Seth-Godin-It-s-Your-Turn-Now-What)
+Some interesting ideas from [The James Altucher Show with Seth Godin](https://www.stansberryradio.com/James-Altucher/Latest-Episodes/Episode/886/Ep-86-Seth-Godin-It-s-Your-Turn-Now-What)
 
 1. Keep track of the impact that you make on people.
 2. People go where they grow.

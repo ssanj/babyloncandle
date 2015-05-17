@@ -1,12 +1,12 @@
 ---
-title: Why I don&apos;t use a Loyalty Card
+title: Why I don&apos;t use a Coffee Loyalty Card
 author: sanjiv sahayam
-description: .
+description: Why I don't use loyalty cards when buying coffee.
 tags: ideas, life
 comments: true
 ---
 
-Loyalty cards. They are the GO cards of the retail world. By name they seem to imply some kind of loyalty which I doubt exists.
+Loyalty cards. You can't buy anything these days without being prompted for one. By name they seem to imply some kind of loyalty which I doubt exists.
 
 I have my coffee at an [awesome coffee shop](https://www.facebook.com/coffeeanthology) everyday. I don't keep going back because I can get one free coffee for every nine I buy. Quite the contrary. I find getting your loyalty card stamped or lining up your phone with some app to register your purchase quite annoying.
 
