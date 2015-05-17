@@ -1,2 +1,3 @@
 #!/bin/bash
-./site deploy
+set -e
+./site clean && ./site rebuild && ./site deploy
