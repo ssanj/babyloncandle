@@ -38,6 +38,28 @@ a:visited { color: #205caa; }
   zoom: 1;
 }
 
+table {
+  display: table;
+  max-width: 100%;
+  width: 100%;
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+
+td {
+  border-right: 1px solid black;
+  padding: 5px;
+  text-align: center;
+}
+
+th {
+  border-bottom: 1px solid gray;
+  text-align: center;
+}
+
+thead, th {
+  background-color: #e8e8e8;
+}
 
 /* Layout Styles */
 /* ----------------------------------------------------------*/
@@ -375,6 +397,14 @@ img {
 
 .caption {
   text-align: center;
+}
+
+.section {
+  margin-top: 2em;
+}
+
+.left {
+  text-align: left;
 }
 
 .quote {
