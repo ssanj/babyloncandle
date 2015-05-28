@@ -1,5 +1,5 @@
 ---
-title: Scala Compilation Speed on MacBookPros
+title: Scala Compilation Speed on MacBook Pros
 author: sanjiv sahayam
 description: Scala compilation speed across a range of MacbookPros against a number of well-known projects.
 tags: apple, life, scala, work
@@ -11,7 +11,7 @@ graphs: true
 
 Here's how I tested each project:
 
-1. git cloned the project.
+1. Git cloned the project.
 1. Connected my laptop to the mains (to ensure no energy saving was sacrificing performance).
 1. Downloaded the world with:
 ```{.terminal}
