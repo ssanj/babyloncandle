@@ -1,7 +1,7 @@
 ---
-title: Scala Compiler Speed on MacBookPros
+title: Scala Compilation Speed on MacBookPros
 author: sanjiv sahayam
-description: Scala compiler speed across a range of MacbookPros across a number of well-known projects.
+description: Scala compilation speed across a range of MacbookPros against a number of well-known projects.
 tags: apple, life, scala, work
 comments: true
 graphs: true
@@ -11,10 +11,16 @@ graphs: true
 
 Here's how I tested each project:
 
-1. git clone the project.
+1. git cloned the project.
 1. Connected my laptop to the mains (to ensure no energy saving was sacrificing performance).
-1. run sbt clean compile (this is to download the world)
-1. run sbt "set offline := true" clean compile (run four times and then take the average, min and max)
+1. Downloaded the world with:
+```{.terminal}
+sbt clean compile
+```
+1. Ran a clean compilation four times and took the average, min and max times:
+```{.terminal}
+sbt "set offline := true" clean compile
+```
 
 Scala open source projects used:
 
