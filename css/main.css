@@ -285,6 +285,7 @@ thead, th {
 .post-content h3 {
   font-size: 26px;
   letter-spacing: -1px;
+  text-decoration: underline;
 }
 
 .post-content h4 {

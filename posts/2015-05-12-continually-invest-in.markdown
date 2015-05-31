@@ -10,4 +10,4 @@ tags: quotes
 Continually investing in the success of others is what will eventually lead to success for yourself.
 </div>
 <div class="attribution">Chris Hadfield</div>
-<div>
+</div>

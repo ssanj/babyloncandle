@@ -10,4 +10,4 @@ tags: quotes
 If I had only focused on big successes, then I would be disappointed most of the time. You have to focus on the small successes and make sure to celebrate them.
 </div>
 <div class="attribution">Chris Hadfield</div>
-<div>
+</div>

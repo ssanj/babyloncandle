@@ -10,4 +10,4 @@ tags: quotes
 Tell me what you pay attention to and I will tell you who you are.
 </div>
 <div class="attribution">José Ortega Y Gasset</div>
-<div>
+</div>

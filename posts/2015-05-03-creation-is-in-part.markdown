@@ -10,4 +10,4 @@ tags: quotes
 Creation is in part merely the business of foregoing the great and small distractions.
 </div>
 <div class="attribution">E.B. White</div>
-<div>
+</div>
