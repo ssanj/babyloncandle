@@ -1,5 +1,5 @@
 ---
-title: Show Source Changes for each Git Commit
+title: Show Source Changes for Each Git Commit
 author: sanjiv sahayam
 description: How to display patches for each commit to a Git repository.
 tags: git
