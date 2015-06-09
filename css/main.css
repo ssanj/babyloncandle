@@ -61,6 +61,13 @@ thead, th {
   background-color: #e8e8e8;
 }
 
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: auto;
+}
+
 /* Layout Styles */
 /* ----------------------------------------------------------*/
 
@@ -391,11 +398,6 @@ thead, th {
   font-weight: bold;
 }
 
-img {
-  display: block;
-  margin: auto;
-}
-
 .caption {
   text-align: center;
 }
@@ -461,28 +463,8 @@ div.haiku {
 
   .column { text-align: center; }
 
-  img[alt="diagram of how liftA2 works with the starship operator"] {
-    width: 300px;
-    height: 250px;
-  }
-
-  img[alt="picture of sanjiv sahayam"] {
-    width: 154px;
-    height: 186px;
-  }
-
-  img[alt^="screenshot of ensime"] {
-    width: 300px;
-    height: 121px;
-  }
-
- #remote, .wrap {
+  #remote, .wrap {
     padding: 0 12px;
-  }
-
-  img[alt="xkcd - regular expressions"] {
-    width: 300px;
-    height: 304px;
   }
 
   iframe#movie1 {
@@ -503,46 +485,6 @@ div.haiku {
 }
 
 @media screen and (max-width: 600px) {
-
-  /*.site-nav {
-    position: fixed;
-    z-index: 10;
-    top: 14px; right: 8px;
-    background-color: white;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-    border: 1px solid #e8e8e8;
-  }
-
-  .site-nav .menu-icon {
-    display: block;
-    font-size: 24px;
-    color: #505050;
-    float: right;
-    width: 36px;
-    text-align: center;
-    line-height: 36px;
-  }
-
-  .site-nav .menu-icon svg { width: 18px; height: 16px; }
-
-  .site-nav .trigger {
-    clear: both;
-    margin-bottom: 5px;
-    display: none;
-  }
-
-  .site-nav:hover .trigger { display: block; }
-
-  .site-nav .page-link {
-    display: block;
-    text-align: right;
-    line-height: 1.25;
-    padding: 5px 10px;
-    margin: 0;
-  }*/
-
   .post-header h1 { font-size: 36px; }
   .post-content h2 { font-size: 28px; }
   .post-content h3 { font-size: 22px; }
