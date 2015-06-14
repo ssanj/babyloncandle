@@ -6,3 +6,4 @@ site.o
 dist
 hakyllsrc
 .cabal-sandbox/
+*.DS_Store*
