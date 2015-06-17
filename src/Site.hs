@@ -314,7 +314,7 @@ siteConfig = defaultConfiguration {
                 tmpDirectory         = "dist/_cache/tmp",
                 deployCommand = "rsync -av --checksum --delete --progress " ++
                                  "--exclude-from 'excludes.txt' " ++
-                                 "dist/_site/* $BLOG_DIR"
+                                 "dist/_site/* $BLOG_WEBSITE_DIR"
              }
 --------------------------------------------------------------------------------
 

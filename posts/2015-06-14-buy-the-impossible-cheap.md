@@ -10,4 +10,4 @@ comments: true
 
 > When people think a problem is impossible they value it at zero. Successful people buy ideas low (zero) and sell them high.
 
-What problems do you perceive as "impossible"?
+What problems do you perceive as "impossible"?`

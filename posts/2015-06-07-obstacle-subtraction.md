@@ -10,6 +10,6 @@ James Altucher in his [Things I learned from Richard Branson](http://www.jamesal
 
 > I call this IDEA SUBTRACTION. Subtract the perceived obstacles to an idea and (BAM!) you find that many more ideas are born from that.
 
-I prefer to call this "obstacle subtraction", as no ideas are actually subtracted. Details. The idea is brilliant a per usual. :)
+I prefer to call this "obstacle subtraction".
 
-The next time you have an idea which has some obstacles in its way, think about what you could do if these obstacles didn't exist. What would be your next move?
+The next time you are faced with some obstacles, think about what you could do if these obstacles didn't exist. What would be your next move?

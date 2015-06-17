@@ -1,5 +1,5 @@
 ---
-title: Where's your Git HEAD at?
+title: Where&apos;s your Git HEAD at?
 author: sanjiv sahayam
 description: How to show which branch HEAD is on using Git.
 tags: git
