@@ -10,4 +10,4 @@ comments: true
 
 > When people think a problem is impossible they value it at zero. Successful people buy ideas low (zero) and sell them high.
 
-The next time you have an idea which has some obstacles in its way, think about what you could do if these obstacles didn't exist. What would be your next move?
+What "impossible" ideas do you have?

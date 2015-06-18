@@ -34,57 +34,57 @@ Scala open source projects used:
 
 
 All compilation times are in seconds (s).
+<!-- Remove indents because when you have four spaces it converts this block into a <pre></pre>-->
 <div>
 <table>
-    <thead>
-        <tr>
-            <th>Project</th>
-            <th colspan="2">Average (s)</th>
-            <th colspan="2">Minimum (s)</th>
-            <th colspan="2">Maximum (s)</th>
-        </tr>
-        <tr>
-            <th></th>
-            <th>2010</th>
-            <th>2014</th>
-            <th>2010</th>
-            <th>2014</th>
-            <th>2010</th>
-            <th>2014</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td class="left">Scalaz</td>
-            <td>234</td>
-            <td>77</td>
-            <td>232</td>
-            <td>76</td>
-            <td>264</td>
-            <td>79</td>
-        </tr>
-        <tr>
-            <td class="left">Spray</td>
-            <td>183</td>
-            <td>49</td>
-            <td>173</td>
-            <td>48</td>
-            <td>203</td>
-            <td>52</td>
-        </tr>
-        <tr>
-            <td class="left">Shapeless</td>
-            <td>189</td>
-            <td>57</td>
-            <td>178</td>
-            <td>55</td>
-            <td>208</td>
-            <td>59</td>
-        </tr>
-    </tbody>
+<thead>
+<tr>
+<th>Project</th>
+<th colspan="2">Average (s)</th>
+<th colspan="2">Minimum (s)</th>
+<th colspan="2">Maximum (s)</th>
+</tr>
+<tr>
+<th></th>
+<th>2010</th>
+<th>2014</th>
+<th>2010</th>
+<th>2014</th>
+<th>2010</th>
+<th>2014</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">Scalaz</td>
+<td>234</td>
+<td>77</td>
+<td>232</td>
+<td>76</td>
+<td>264</td>
+<td>79</td>
+</tr>
+<tr>
+<td class="left">Spray</td>
+<td>183</td>
+<td>49</td>
+<td>173</td>
+<td>48</td>
+<td>203</td>
+<td>52</td>
+</tr>
+<tr>
+<td class="left">Shapeless</td>
+<td>189</td>
+<td>57</td>
+<td>178</td>
+<td>55</td>
+<td>208</td>
+<td>59</td>
+</tr>
+</tbody>
 </table>
 </div>
-
 
 <div class="caption section">Averages</div>
 <div id="averageChart"></div>

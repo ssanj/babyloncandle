@@ -1,5 +1,5 @@
 ---
-title: How Many Coffees should one Person have a Day?
+title: How Many Coffees should you have a Day?
 author: sanjiv sahayam
 description: Thoughts on coffee consumption.
 tags: audio, coffee, life
