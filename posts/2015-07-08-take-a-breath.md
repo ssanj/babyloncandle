@@ -12,6 +12,6 @@ Whatever it is, we need to learn to take a break and do some review after we fin
 
 There would definitely have been some late nights and some very stressful moments in getting to the finish line. The business needs to acknowledge this. There should be some scheduled down time at the end of every critical task. This might mean giving the team involved a few days off to recover. It might also mean having a small celebration to mark the occasion. There could be other types of rewards like money or time to work on their own projects. 
 
-This break and reward will help the team to de-stress and replenish. It will help them return to work enthusiastic about the next task on their list. In addition there should be a retrospective where the team understand their successes and try to learn from their mistakes. All useful information for the next task.
+This rest and reward will help the team to de-stress and replenish. It will help them return to work enthusiastic about the next task on their list. In addition there should be a retrospective where the team understand their successes and try to learn from their mistakes. All useful information for the next task.
 
-Having this rest, reward and review can help sustain a team through many critical tasks without burning out. It would be competitive disadvantage to burn out a great team that consistently delivers value.
+Having this rest, reward and review can help sustain a team through many critical tasks without burning out. It would be myopic to burn out a great team that consistently delivers value.
