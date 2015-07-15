@@ -1,7 +1,7 @@
 ---
 title: Stop Complaining on Twitter
 author: sanjiv sahayam
-description: ???
+description: How to turn tweet rants into smiles.
 tags: life
 comments: true
 ---
