@@ -14,6 +14,6 @@ I've started playing around with using [Sublime Text](http://www.sublimetext.com
 
 After persisting for a few hours and after installing a bunch of useful plugins I was getting somewhere. 
 
-I found that it was much easier to focus on the code. Intellij was not constantly prompting me for stuff, or indexing or crashing or doing something else distracting. I ended up writing simpler code as I have to use less tooling. The whole experience was much more enjoyable.
+I found that it was much easier to focus on the code. Intellij was not constantly prompting me for stuff, or indexing or crashing or doing something else distracting. I ended up writing simpler code as I had to use less tooling. The whole experience was much more enjoyable.
 
-In a subsequent article I'll get into the details on how to customise your Sublime environment to make it useful for Scala development. If in the meantime you are considering leaving Intellij for Sublime, Vim, Atom or some other editor, definitely go for it. You will not regret it.
+In a subsequent article I'll get into the details on how I customised my Sublime environment to make it useful for Scala development. If in the meantime you are considering leaving Intellij for Sublime, Vim, Atom or some other editor, definitely go for it. You will not regret it.
