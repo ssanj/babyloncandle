@@ -30,7 +30,7 @@ Here's an example of running only the [ListTest](https://github.com/puffnfresh/w
 [info] All tests passed.
 ```
 
-What I did not know was how to run a single test within a test file. This functionality depends on the test framework in use.
+What I did not know was how to run a single test method within a test class. This functionality depends on the test framework in use.
 
 ## ScalaTest ##
 
