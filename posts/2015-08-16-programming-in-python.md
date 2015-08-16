@@ -1,7 +1,7 @@
 ---
 title: Programming in Python
 author: sanjiv sahayam
-description: ???
+description: Thoughts on programming in Python.
 tags: python
 comments: true
 ---
