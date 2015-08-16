@@ -1,7 +1,7 @@
 ---
 title: Git Clone Only Creates Master Branch
 author: sanjiv sahayam
-description: ???
+description: Git clone only clones the master branch. Here are some ways to clone specific remote branches.
 tags: git
 comments: true
 ---
