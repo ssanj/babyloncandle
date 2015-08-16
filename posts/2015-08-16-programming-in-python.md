@@ -16,6 +16,6 @@ Something that crash when you ran it. This is the balance between static typing 
 
 One problem with paying in production is that any syntax errors, method name errors etc, will only occur when you run some code that actually uses that erroneous pathway through the code. There could very well be pathways through the code that would blow up one day if it were used. This is pretty scary and doesn't inspire much confidence. If you are using dynamic languages your code coverage should be close to a hundred percent. A good IDE or linter would also help catch some of these errors early.
 
-[I found it fairly easy to use Functional Programming concepts](http://sanj.ink/posts/2015-08-16-functional-programming-in-python/html) in Python which suited me very well. So that's a plus.
+[I found it fairly easy to use Functional Programming concepts](http://sanj.ink/posts/2015-08-14-functional-programming-in-python.html) in Python which suited me very well. So that's a plus.
 
 Python is a easy language to get into. It's also fun to use. I wouldn't recommend it for production code though. But hey, being a static-typing fan, I'm probably biased.
