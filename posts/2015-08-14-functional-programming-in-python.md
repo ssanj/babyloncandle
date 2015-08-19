@@ -16,6 +16,8 @@ return list(map(lambda x: self.get_file_without_extension(x), files))
 
 ## Filter ##
 
+This example has a map and a filter and is very similar to a [Haskell list comprehension](http://learnyouahaskell.com/starting-out#im-a-list-comprehension).
+
 ```{.python .scrollx}
 hits = [os.path.join(root, f) for f in filenames if f.endswith(".scala") and strategy(root, dirnames, f)]
 ```
