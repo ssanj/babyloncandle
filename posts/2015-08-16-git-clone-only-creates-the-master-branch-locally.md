@@ -1,5 +1,5 @@
 ---
-title: Git Clone Only Creates the Master Branch Locally.
+title: Git Clone Only Creates the Master Branch Locally
 author: sanjiv sahayam
 description: Git clone only creates the master branch locally. How to access some of the other remote branches in the repository? The solution is easier than expected.
 tags: git
@@ -24,7 +24,7 @@ git branch -avv
 
 It looks like we only have access to the master branch locally and that we have to remotely checkout the other branches.
 
-The Git already has tracking information for all the remote branches following the clone. We can access any of the branches with as simple checkout.
+The Git already has tracking information for all the remote branches following the clone. We can access any of the branches with a simple checkout.
 
 ```{.command}
 git checkout branchname
