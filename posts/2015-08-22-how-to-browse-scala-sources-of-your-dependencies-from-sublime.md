@@ -6,7 +6,7 @@ tags: sbt, scala, sublime, sublimeide
 comments: true
 ---
 
-A feature I desperately needed in Sublime [since my migration from Intellij](http://sanj.ink/posts/2015-07-15-using-sublime-for-scala-development.html) was the ability to browse the sources of my project's dependencies. Without this ability you are basically relegated to using the Scaladocs and Google/SO for all your information. Not good.
+A feature I desperately needed in Sublime [since my migration from Intellij](http://sanj.ink/posts/2015-07-15-using-sublime-for-scala-development.html) was the ability to browse the sources of my project's dependencies. Without this ability I was basically relegated to using the Scaladocs and Google/SO for all my information. Not good.
 
 There is a way for you to do this in Sublime using [Ctags](http://ctags.sourceforge.net). 
 
@@ -24,7 +24,9 @@ Cool. That sounds promising! Unfortunately [Scala is not one of the supported la
 
 > It unzips the source jars for your project dependencies and generates ctags for these dependency sources in addition to the Scala/Java source of your project itself.
 
-In addition to downloading all the sources for your dependencies the sbt-ctags plugin also creates the .tags file that is used by any Ctags-aware editor.
+> By default, the plugin assumes you have a ctags executable on your path that is syntax-compatible with Exuberant Ctags.
+
+In addition to downloading all the sources for your dependencies the sbt-ctags plugin also creates the .tags file that can be used by any Ctags-aware editor.
 
 Fortunately Sublime has Ctags support through the [Sublime Ctags plugin](https://packagecontrol.io/packages/CTags). 
 
@@ -46,7 +48,7 @@ For additional OS installation options checkout the [Sublime Ctags page](https:/
 
 Ctags support is something we will need on every project. To do this we need to add it to the global plugins configurations so that it will be available across all our projects. 
 
-Add the [sbt-ctags plugin](https://github.com/ceedubs/sbt-ctags) to your global sbt configuration file. Global plugin dependencies should be added to the __plugins.sbt__ located at __~/.sbt/0.13/plugins__:
+Add the [sbt-ctags plugin](https://github.com/ceedubs/sbt-ctags) dependency to __plugins.sbt__ located at __~/.sbt/0.13/plugins__:
 
 ```{.scala}
 addSbtPlugin("net.ceedubs" %% "sbt-ctags" % "0.1.0")
@@ -54,9 +56,9 @@ addSbtPlugin("net.ceedubs" %% "sbt-ctags" % "0.1.0")
 
 note: _you may need to create the above file if it doesn't exist._
 
-The sbt-ctags plugin downloads the sources for your project dependencies into a subdirectory under your project's target directory. One problem with that is that every time you run an ```sbt clean``` your tags get deleted. Not very useful.
+The sbt-ctags plugin downloads the sources for your project dependencies into __target/sbt-ctags-dep-srcs__ by default. One problem with this is that every time you run an ```sbt clean``` your dependency source files are deleted. Not very useful.
 
-We want our tags in a directory that is not under the target directory. To do that globally we have to create a global plugin.
+Let's fix it so that the dependency source files are not downloaded to the target directory. We want to do this globally so we have to create a global plugin.
 
 Create the global plugin under __~/.sbt/0.13/plugins__ in a file named __CustomCtagsSrcDir.scala__ with the following contents:
 
@@ -105,7 +107,7 @@ The above incantation will download all your project dependency sources to the _
 
 You can install the Sublime Ctags plugin from [Package Control](https://packagecontrol.io/packages/CTags) or manually from the [repository](https://github.com/SublimeText/CTags).
 
-The Sublime Ctags plugin will use the __.tags__ index file generated in your project root directory with the Ctags executable to lookup the symbols you need.
+The Sublime Ctags plugin will use the __.tags__ index file generated in your project root directory to lookup the symbols you need.
 
 # Usage #
 
@@ -123,10 +125,10 @@ sbt genCtags
 
 To define a shortcut for the "Goto Definition" command add a binding to your user key bindings file. 
 
-Edit your user key bindings file by clicking on __Sublime Text__ > __Preferences__ > __Key Bindings - User__:
+Edit your user key bindings file by clicking on __Sublime Text__ > __Preferences__ > __Key Bindings - User__ and add the following binding:
 
 ```{.command .scrollx}
-  { "keys": ["f4"], "command": "goto_definition" }
+{ "keys": ["f4"], "command": "goto_definition" }
 ```
 
 The above binding maps __F4__ as the key to browse your sources. You can change this mapping to whatever you like.
