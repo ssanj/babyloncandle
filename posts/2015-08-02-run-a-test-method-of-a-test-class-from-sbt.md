@@ -2,7 +2,7 @@
 title: Run a Test Method of a Test Class from SBT
 author: sanjiv sahayam
 description: How to run a single test method of a test class using SBT.
-tags: sbt, scala
+tags: sbt, scala, sublimeide
 comments: true
 ---
 

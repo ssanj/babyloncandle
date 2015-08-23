@@ -2,7 +2,7 @@
 title: Quick File Creator Sublime Text Plugin
 author: sanjiv sahayam
 description: A Sublime Text 3 plugin to create files or directories anywhere within your project structure.
-tags: sublime
+tags: sublime, sublimeide
 comments: true
 ---
 

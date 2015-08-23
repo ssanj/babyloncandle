@@ -6,7 +6,7 @@ tags: scala, scalatest
 comments: true
 ---
 
-[This had me stumped for a while](http://stackoverflow.com/questions/6451530/how-to-show-custom-failure-messages-in-scalatest). Here's a few of ways to do it:
+[This had me stumped for a while](http://stackoverflow.com/questions/6451530/how-to-show-custom-failure-messages-in-scalatest). Here's a few ways to do it:
 
 
 ## Using assert ##
