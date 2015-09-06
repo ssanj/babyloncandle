@@ -2,7 +2,7 @@
 title: Make Time for some Awe
 author: sanjiv sahayam
 description: How awe in our lives makes us better people.
-tags: ideas, life
+tags: ideas, inspiring, life
 comments: true
 ---
 

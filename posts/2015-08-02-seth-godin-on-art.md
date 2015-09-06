@@ -2,7 +2,7 @@
 title: Seth Godin on Art
 author: sanjiv sahayam
 description: Seth Godin gives us something to think about when it comes to Art.
-tags: ideas, work
+tags: inspiring, ideas, work
 comments: true
 ---
 
