@@ -2,7 +2,7 @@
 title: But All the Good Stuff ...
 author: sanjiv sahayam
 description: Quote on taking changes by Seth Godin.
-tags: quotes
+tags: inspiring, quotes
 ---
 
 <div>

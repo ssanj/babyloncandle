@@ -2,7 +2,7 @@
 title: But a Good Life ...
 author: sanjiv sahayam
 description: A quote on how it takes time to build a good life by James Altucher.
-tags: quotes
+tags: inspiring, quotes
 comments: true
 ---
 

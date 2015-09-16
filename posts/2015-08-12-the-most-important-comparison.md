@@ -2,7 +2,7 @@
 title:  The Most Import Comparison
 author: sanjiv sahayam
 description: Quote on by Seth Godin on comparing ourselves to other people.
-tags: quotes
+tags: inspiring, quotes
 comments: true
 ---
 

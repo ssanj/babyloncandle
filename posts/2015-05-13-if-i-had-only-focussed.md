@@ -2,7 +2,7 @@
 title: If I had only focussed ...
 author: sanjiv sahayam
 description: Quote on celebrating small successes by Chris Hadfield.
-tags: quotes
+tags: inspiring, quotes
 ---
 
 <div>

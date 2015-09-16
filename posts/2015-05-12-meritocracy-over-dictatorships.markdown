@@ -2,7 +2,7 @@
 title: Meritocracy over Dictatorships
 author: sanjiv sahayam
 description: Ideas should be evaluated based on their merit.
-tags: ideas, work
+tags: culture, ideas, work
 ---
 
 I had lunch with a close friend of mine today. He mentioned how his ideas for improvements were continually shot down at work. Even when he could point to legitimate reasons for wanting to change something that was clearly broken, his lead overrode his decision and continued to work in a sloppy fashion. This all sounded very demoralising.

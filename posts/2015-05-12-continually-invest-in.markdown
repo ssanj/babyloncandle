@@ -2,7 +2,7 @@
 title: Continually Invest in ...
 author: sanjiv sahayam
 description: Quote on success by Chris Hadfield
-tags: quotes
+tags: inspiring, quotes
 ---
 
 <div>
