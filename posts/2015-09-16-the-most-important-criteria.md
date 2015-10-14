@@ -1,5 +1,5 @@
 ---
-title: The Most Important Criteria.
+title: The Most Important Criteria
 author: sanjiv sahayam
 description: How to choose your next job.
 tags: culture, ideas, work

@@ -1,5 +1,5 @@
 ---
-title: Seth Godin on The One Thing that will Change Everything.
+title: Seth Godin on The One Thing that will Change Everything
 author: sanjiv sahayam
 description: Seth Godin on how waiting for a magical thing that will solve all your problems is a waste of time.
 tags: inspiring, life, work

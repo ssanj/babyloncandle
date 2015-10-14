@@ -8,4 +8,4 @@ comments: true
 
 There is an implied contract when a [business](http://www.businessdictionary.com/definition/business.html) takes money from a customer. The customer gives the business money so it will provide them with either goods or services or both.
 
-It's easy to forget what you promised your existing customers when hunting for your new customers.
+It's easy to forget what you promised your existing customers when hunting for your new customers. This is one promise every business needs to keep.
