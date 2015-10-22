@@ -8,4 +8,4 @@ comments: true
 
 Here are some of the ways I enjoy to work.
 
-![Mind map of what I find enjoyable about work](/images/enjoyable_work_mm.png)
+![Mind map of what I find enjoyable about work](/images/enjoyable_work_mm_2.png)
