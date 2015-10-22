@@ -52,7 +52,7 @@ import ExecutionContext.Implicits.global
 
 ## Some additional rules ###
 
-### Imperative Mood ###
+### Imperative mood ###
 
 Some people advocate using [imperative mood](http://www.grammar-monster.com/glossary/imperative_mood.htm) for the subject. This is basically a command-like phrase:
 
@@ -80,7 +80,7 @@ I've tried this for a few months now and don't see any real benefit in using one
 ![Docker commits using imperative mood](/images/git-comment_imperative_mood.png)
 
 
-### Issue number in Subject ###
+### Include issue number in subject ###
 
 Some use the issue number as the first entry in the subject.
 
@@ -89,5 +89,11 @@ Some use the issue number as the first entry in the subject.
 Others use it somewhere in the subject.
 
 ![Issue number in the subject](/images/git_comment_issue_no_in_subject_end.png)
+
+### Explain what and why ###
+
+Another [guideline](http://chris.beams.io/posts/git-commit) on writing good comments is to use the body to explain the __what__ and __why__ instead of the how.
+
+![Explain what and why](/images/git_comment_what_and_why.png)
 
 If you find all these rules too constrictive, then [you're not alone](http://zachholman.com/posts/git-commit-history). I agree with Zach on this for personal projects. I think following the rules leads to better commit messages that are easier to understand. This is important when we need to collaborate with other developers.
