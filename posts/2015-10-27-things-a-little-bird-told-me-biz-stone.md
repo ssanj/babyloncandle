@@ -6,7 +6,7 @@ tags: book, ideas
 comments: true
 ---
 
-Ideas from the book [Things a Little Bird Told Me](http://thingsalittlebirdtoldme.com)
+Ideas from the book [Things a Little Bird Told Me by Biz Stone](http://thingsalittlebirdtoldme.com).
 
 
 <div class="quote">When you're starting a company, you sometimes have nothing more than an idea. And sometimes you don't even have the idea - just the supreme confidence that one day you will have an idea. You have to begin somewhere, so you declare yourself an entrepreneur just like Wile E. Coyote declares himself a genius. Then you make a business card and give yourself the title FOUNDER and CEO.</div>

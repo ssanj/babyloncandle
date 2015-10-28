@@ -6,7 +6,7 @@ tags: sublime
 comments: true
 ---
 
-If you have a look in your Sublime Text installation on OSX under
+If you have a look in your Sublime Text installation on OSX under:
 
 ```{.terminal}
 /Users/sanj/Library/Application Support/Sublime Text 3/Packages
