@@ -110,6 +110,7 @@ postCtx tags = mconcat
      dateField "date" "%B %e, %Y",
      tagsField "tags" tags,
      constField "root" (feedRoot feedConfig),
+     showSocialMediaLinksCtx,
      commonCtx,
      defaultContext
     ]
@@ -197,6 +198,9 @@ showSiteHeaderCtx = constField "showSiteHeader" "true"
 
 showSiteFooterCtx :: Context String
 showSiteFooterCtx = constField "showSiteFooter" "true"
+
+showSocialMediaLinksCtx :: Context String
+showSocialMediaLinksCtx = constField "showSocialMediaLinks" "true"
 
 archiveTitleCtx :: Context String
 archiveTitleCtx = constField "postTitle" "Archive"
