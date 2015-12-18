@@ -472,6 +472,11 @@ div.haiku {
     height: 188px;
   }
 
+  iframe.movie {
+    width: 351px;
+    height: 370px;
+  }
+
   .post-content {
     text-align: left;
     font-family: Helvetica, Arial, sans-serif;
