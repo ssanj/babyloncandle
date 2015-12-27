@@ -7,7 +7,7 @@
           <ul class="posts">
             $for(posts)$
             <li>
-              <a class="post-link" href="$url$">$title$</a>
+              <a class="post-link" href="$url$" onclick="ga('send', 'event', 'Posts', '$url$', '$title$');">$title$</a>
               <span class="post-date">$date$</span>
               <div class="post-tag">$tags$</div>
             </li>
