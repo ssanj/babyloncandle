@@ -57,6 +57,12 @@ Create a terminal bound to machine. _You have to do this before you run any dock
 eval "$(docker-machine env machine_name)"
 ```
 
+Create a tagged image from a Dockerfile:
+
+```{.terminal .scrollx}
+docker build -t repository/image:tag .
+```
+
 Run a container as a daemon:
 ```{.terminal .scrollx}
 docker run -d ...
@@ -124,6 +130,11 @@ docker start container
 Stop a Docker container:
 ```{.terminal .scrollx}
 docker stop container
+```
+
+Restart a stopped container:
+```{.terminal .scrollx}
+docker restart container
 ```
 
 Remove a Docker container:
