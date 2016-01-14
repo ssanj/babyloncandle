@@ -1,6 +1,7 @@
 ---
 title: Companion Objects
 author: sanjiv sahayam
+description: Using the power of Companion objects in Scala.
 tags: scala
 ---
 
@@ -72,13 +73,13 @@ object Companionship extends App {
     print(Car("1234567"))
     print(Car("9876543", "Ford"))
 }
-  
+
 sealed trait Vehicle {
   protected val vin:String
 }
-  
+
 class Car(val vin:String,private val model:String) extends Vehicle
-  
+
 object Car {
   def apply(vin:String, model:String) = new Car(vin, model)
   def apply(vin:String) = new Car(vin, "Jaguar")

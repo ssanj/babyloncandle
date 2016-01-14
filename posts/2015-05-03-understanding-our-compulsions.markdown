@@ -1,7 +1,7 @@
 ---
 title: Understanding our Compulsions
 author: sanjiv sahayam
-description: Chapter summary of "Understanding our Compulsions" with Dan Ariely
+description: Chapter summary of &quote;Understanding our Compulsions&quote; with Dan Ariely
 tags: chapter, ideas
 ---
 Ideas from the chapter "Understanding our Compulsions" from the book [Manage Your Day-To-Day](http://99u.com/book/manage-your-day-to-day-2) with Dan Ariely.

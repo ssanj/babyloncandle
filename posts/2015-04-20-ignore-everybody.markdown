@@ -1,7 +1,7 @@
 ---
 title: Ignore Everybody
 author: sanjiv sahayam
-description: Chapter summary of "Ignore Everybody" from the book "Ignore Everybody" by Hugh MacLeod
+description: Chapter summary of &quote;Ignore Everybody&quote; from the book Ignore Everybody by Hugh MacLeod
 tags: chapter, ideas
 ---
 

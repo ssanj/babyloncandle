@@ -1,7 +1,7 @@
 ---
 title: Laying the Groundwork for an Effective Routine
 author: sanjiv sahayam
-description: Chapter summary of "Laying the groundwork for an effective routine by Mark McGuinness"
+description: Chapter summary of &quote;Laying the groundwork for an effective routine&quote; by Mark McGuinness
 tags: chapter, ideas
 ---
 Ideas from the chapter "Laying the Groundwork for an Effective Routine" from the book [Manage Your Day-To-Day](http://99u.com/book/manage-your-day-to-day-2) by Mark  McGuinness.

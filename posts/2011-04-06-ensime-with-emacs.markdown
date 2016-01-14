@@ -1,6 +1,7 @@
 ---
 title: Ensime with Emacs
 author: sanjiv sahayam
+description: How to setup Enime to work with Emacs for Scala development.
 tags: sbt, scala
 ---
 

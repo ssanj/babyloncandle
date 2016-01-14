@@ -1,7 +1,7 @@
 ---
 title: Learning to Create Amidst Chaos
 author: sanjiv sahayam
-description: Chapter summary of "Learning to Create Amidst Chaos" by Erin Rooney Dolan from the book Manage Your Day-To-Day.
+description: Chapter summary of &quote;Learning to Create Amidst Chaos&quote; by Erin Rooney Dolan from the book&colon; &quote;Manage Your Day-To-Day&quote;.
 tags: chapter, ideas
 ---
 Ideas from the chapter "Learning to Create Amidst Chaos" from the book [Manage Your Day-To-Day](http://99u.com/book/manage-your-day-to-day-2) by Erin Rooney Dolan.

@@ -1,6 +1,7 @@
 ---
 title: Disable MySql History
 author: sanjiv sahayam
+description: How to prevent all your mysql commands from being recorded.
 tags: mysql
 ---
 

@@ -1,7 +1,7 @@
 ---
 title: Harnessing the Power of Frequency
 author: sanjiv sahayam
-description: Chapter summary of "Harnessing the power of frequency by Gretchen Rubin"
+description: Chapter summary of &quote;Harnessing the power of frequency&quote; by Gretchen Rubin
 tags: chapter, ideas
 ---
 Ideas from the chapter "Harnessing the power of frequency" from the book [Manage Your Day-To-Day](http://99u.com/book/manage-your-day-to-day-2) by Gretchen Rubin.
