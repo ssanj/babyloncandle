@@ -1,8 +1,8 @@
 ---
 title: How to Install Yosemite on a New SSD
 author: sanjiv sahayam
-description: ???
-tags: apple
+description: How to install macosx Yosemite onto a new SSD.
+tags: apple, macosx, yosemite
 comments: true
 ---
 
@@ -29,3 +29,5 @@ _where MyVolume is the name of your USB stick. Change this to match the name of 
 8. Follow the prompts until Yosemite is installed.
 
 [Here's link to a video on how to physically install the SSD as well as run the software installation](https://www.youtube.com/watch?v=F82ThP-6jeA).
+
+If you'd rather install El Capitan on the SSD then follow the [How to Install El Capitan on a New SSD](http://sanj.ink/posts/2016-01-21-how-to-install-el-capitan-on-a-new-ssd.html) guide.

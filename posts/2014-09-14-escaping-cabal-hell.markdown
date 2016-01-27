@@ -11,7 +11,7 @@ Cabal. What a nightmare. Right? That was the view I had on it until recently. I 
 
 And if you haven't read it, have a read of the [Cabal User Guide](http://www.haskell.org/cabal/users-guide/) to understand how things work. Read the User Manual? Are you crazy?
 
-Some other unusual errors have missing header files (.h). I came across one of these [errors](http://blog.ssanj.net/posts/2014-09-08-cabal-fails-to-install-pcre-light.html) and the solution was to install the necessary library on the OS. So basically any Haskell wrappers around OS libraries would (obviously) need the correct versions of the library installed.
+Some other unusual errors have missing header files (.h). I came across one of these [errors](http://sanj.ink/posts/2014-10-23-cabal-fails-to-install-pcre-light-linux.html) and the solution was to install the necessary library on the OS. So basically any Haskell wrappers around OS libraries would (obviously) need the correct versions of the library installed.
 
 Hopefully a basic understanding of Cabal usage plus some solutions to common problems will lead you to Cabal heaven. Too soon? ;)
 

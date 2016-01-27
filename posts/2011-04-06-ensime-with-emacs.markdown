@@ -5,7 +5,7 @@ description: How to setup Enime to work with Emacs for Scala development.
 tags: sbt, scala
 ---
 
-I've been toying with the idea of looking for an alternative to Intellij for Scala development for a while now. I tried to use [Ensime](Ensime) with Emacs a few months ago and never got it going for one reason or another. More recently, I've got Ensime and Emacs working together and thought I'd blog about it for anyone else who had trouble getting everything to work together.
+I've been toying with the idea of looking for an alternative to Intellij for Scala development for a while now. I tried to use [Ensime](https://github.com/ensime/ensime-emacs) with Emacs a few months ago and never got it going for one reason or another. More recently, I've got Ensime and Emacs working together and thought I'd blog about it for anyone else who had trouble getting everything to work together.
 
 Here are the minimum requrements as stated on the Ensime user [manual](http://aemon.com/file_dump/ensime_manual.html):
 
