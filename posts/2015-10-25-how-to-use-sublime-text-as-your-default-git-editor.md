@@ -2,7 +2,7 @@
 title: How to Use Sublime Text as Your Default Git Editor
 author: sanjiv sahayam
 description: How to set Sublime Text as your default Git editor.
-tags: git, sublime
+tags: git, sublime, sublimeide
 comments: true
 ---
 

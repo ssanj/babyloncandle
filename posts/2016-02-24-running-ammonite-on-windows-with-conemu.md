@@ -67,3 +67,5 @@ cp repl/target/scala-2.11/ammonite-repl-0.5.6-SNAPSHOT-2.11.7 ~/bin/amm
 ```
 
 And now I can run amm as per usual on Windows.
+
+![Ammonite on Windows](/images/ammonite_on_windows7_conemu.png)
