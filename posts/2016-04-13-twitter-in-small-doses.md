@@ -1,0 +1,15 @@
+---
+title: Twitter in Small Doses
+author: sanjiv sahayam
+description: Twitter and other social media platforms are just one constant stream of noise, with almost no signal.
+tags: life, twitter
+comments: true
+---
+
+I've been guilty of checking Twitter almost habitually at every free moment I have. It's like I expect something new and interesting to be happening every five minutes - it isn't.
+
+Recently I tried limiting my Twitter exposure to set times during the day: once in the morning, once at lunch and once after work. I found that this really reduced the mental stress of constantly processing mostly useless information on Twitter. It also helped me to focus more on the few tweets I did care about and respond to them thoughtfully instead of smart-arse comments. Another benefit was that I was able to concentrate deeper on the actual work I had to do because I wasn't constantly context-switching with Twitter.
+
+Something else that because crystal clear was that nothing happening on Twitter was all that important. This again made it much easier to stay way from it.
+
+If you are habitually checking Twitter or some other social media constantly, try and give yourself a schedule of when you can check it. You'll soon find that these platforms while they maybe useful sometimes are more often than not, a complete waste of time.
