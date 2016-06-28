@@ -1,7 +1,7 @@
 ---
 title: How to Run a Specific Main Class with Parameters through SBT
 author: sanjiv sahayam
-description: ???
+description: How to run a specific main class through SBT when you've got multiple main classes.
 tags: sbt, scala
 comments: true
 ---
