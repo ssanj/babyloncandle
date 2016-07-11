@@ -14,7 +14,7 @@ Reading the [ScalaTest documentation for Property-Based Testing](http://www.scal
 
 ## Example
 
-In any event [I managed to find a working example](https://github.com/oscarrenalias/scalacheck-cookbook/blob/master/markdown/scalacheck-integration.md) and it turned out it was quite straightforward.
+In any event [I managed to find a working example](https://github.com/oscarrenalias/scalacheck-cookbook/blob/master/markdown/scalacheck-integration.md#using-scalacheck-with-scalatest) and it turned out it was quite straightforward.
 
 I thought I'd use a simple example in ScalaCheck and then discuss how to convert that example into ScalaTest's property-based tests.
 
