@@ -191,7 +191,7 @@ Errors as displayed as:
 
 As you can see, this style is much closer to the default ScalaCheck property style as properties can be left as Boolean expressions.
 
-The digram below outlines the two different styles and some of the basic methods provided by each of the traits.
+The diagram below outlines the two different styles and some of the basic methods provided by each of the traits.
 
 ![Summary of the different property-based testing styles](/images/scalatest_scalacheck_summary_of_different_property-based_testing_styles.png)
 
