@@ -236,7 +236,7 @@ allPapersPattern :: Pattern
 allPapersPattern = "papers/*"
 
 imagesPattern :: Pattern
-imagesPattern = "images/*"
+imagesPattern = "images/**"
 
 cssPattern :: Pattern
 cssPattern = "css/*"
