@@ -190,7 +190,7 @@ For __p2__ the original failing input is 133 and it is then shrunk down to 0. Le
 So we finally we have much clear idea about how all this "shrinking stuff" works! Here's a simple diagram depicting how a shrinker works.
 
 <div class="figure">
-<a href="../images/pbt_how-does-scalacheck-shrinking-work.png"><img src="../images/../images/pbt_how-does-scalacheck-shrinking-work.png" alt="caption"></a>
+<a href="../images/pbt_how-does-scalacheck-shrinking-work.png"><img src="../images/pbt_how-does-scalacheck-shrinking-work.png" alt="caption"></a>
 <p class="caption">How Shrinking Works</p>
 </div>
 
