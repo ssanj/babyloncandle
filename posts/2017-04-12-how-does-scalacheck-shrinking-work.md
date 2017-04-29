@@ -187,8 +187,7 @@ For __p2__ the original failing input is 133 and it is then shrunk down to 0. Le
 1. The shrinker shrinks the value of 0 and returns an empty Stream indicating there are no more shrinks
 1. The shrinker then returns the value of 0 as the "simplest" input that will fail the property as it can't be further reduced
 
-So we finally we have much clear idea about how all this "shrinking stuff" works! Here's a simple diagram depicting how
-a shrinker works.
+So we finally we have much clear idea about how all this "shrinking stuff" works! Here's a simple diagram depicting how a shrinker works.
 
 <div class="figure">
 <a href="../images/pbt_how-does-scalacheck-shrinking-work.png"><img src="../images/../images/pbt_how-does-scalacheck-shrinking-work.png" alt="caption"></a>
