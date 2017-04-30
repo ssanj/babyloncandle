@@ -28,35 +28,33 @@ Some interesting ideas from [Marie Forleo's interview with Seth Godin](https://w
 1. We have to acknowledge we have finite resources, finite time, finite connection. How will we use them to produce outcomes we are proud of?
 1. Don't be a wondering generality. Be a meaningful specific.
 
-<div>
- <div class="quote">Unless you're 4-years-old, if you loose at Monopoly I think you realise it is not personal. It was a game. You didn't get the rolls you needed, maybe you made a couple of strategy mistakes, but you can play again tomorrow. It's not about you, don't have a tantrum, don't turn the board over and don't beat yourself up. Why don't we take that adult mindset and apply it to other things?</div>
- <div class="attribution">Seth Godin</div>
-</div>
+    <div>
+     <div class="quote">Unless you're 4-years-old, if you loose at Monopoly I think you realise it is not personal. It was a game. You didn't get the rolls you needed, maybe you made a couple of strategy mistakes, but you can play again tomorrow. It's not about you, don't have a tantrum, don't turn the board over and don't beat yourself up. Why don't we take that adult mindset and apply it to other things?</div>
+     <div class="attribution">Seth Godin</div>
+    </div>
 
 1. Isn't our goal to be better at the game?
 1. We can be mindful, we can be present, we can breathe and say "That's interesting". And that answer is so much better than freaking out over what every small failure means.
 1. Don't act like failure is fatal. It isn't.
 
 
-<div>
-<div class="quote">It should be called Kickfinisher.</div>
-<div class="attribution">Seth Godin</div>
-</div>
+    <div>
+    <div class="quote">It should be called Kickfinisher.</div>
+    <div class="attribution">Seth Godin</div>
+    </div>
 
 1. It wasn't the big launch, it's the big finish.
 
-<div>
-<div class="quote">The long way is the shortcut.</div>
-<div class="attribution">Seth Godin</div>
-</div>
+    <div>
+    <div class="quote">The long way is the shortcut.</div>
+    <div class="attribution">Seth Godin</div>
+    </div>
 
 1. Raising Free Range Kids means teaching kids to fail at solving interesting problems, because that's the only way you ever get good at solving interesting problems.
 1. How to measure your success - Will people miss you if you are gone?
 1. Permission is the privilege of being looked forward to and being missed if you were gone.
 
-<div>
-<div class="quote">Our goal isn't to touch everyone. Our goal is to change someone; just one person. if you get good at that, do 5, then do 100. But stop worrying about everyone. Everyone doesn't matter.</div>
-<div class="attribution">Seth Godin</div>
-</div>
-
-
+    <div>
+    <div class="quote">Our goal isn't to touch everyone. Our goal is to change someone; just one person. If you get good at that, do 5, then do 100. But stop worrying about everyone. Everyone doesn't matter.</div>
+    <div class="attribution">Seth Godin</div>
+    </div>
