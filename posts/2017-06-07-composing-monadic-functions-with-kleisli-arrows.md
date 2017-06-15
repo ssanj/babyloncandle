@@ -2,7 +2,7 @@
 title: Composing Monadic Functions with Kleisli Arrows
 author: sanjiv sahayam
 description: How to use Kleisli Arrows to compose functions in a Monadic context.
-tags: fp, scala
+tags: arrow, fp, kleisli, scala
 comments: true
 ---
 
