@@ -18,7 +18,7 @@ In [Cats](http://typelevel.org/cats/) the [Arrow typeclass](https://github.com/t
 Arrow[F[_, _]] //simplified
 ```
 
-These two type holes correspond to the input and output types of the Arrow. F can be any type constructor that takes two types and performs a mapping between them. A __scala.Function1__ is an example of F, as is the __Kleisli Arrow__ we saw in previous articles. It might be helpful to think for Arrows as simple functions from one type to another for the moment.
+These two type holes correspond to the input and output types of the Arrow. F can be any type constructor that takes two types and performs a mapping between them. A __scala.Function1__ is an example of F, as is the __Kleisli Arrow__ we saw in previous articles. It might be helpful to think of Arrows as simple functions from one type to another for the moment.
 
 Lets now go through some of the functions defined on Arrow and how they are used. For the remainder of the article lets assume that the type constructor supplied to Arrow is a [__scala.Function1__](http://www.scala-lang.org/api/current/scala/Function1.html):
 
@@ -49,6 +49,12 @@ fa.lift(f) //Function1[String, Int]
 
 Since __findLength__ is already a __scala.Function1__ it is a little pointless to lift it into a __scala.Function1__ but hopefully its usage is clear.
 
+In [Scalaz](https://github.com/scalaz) this function is defined as [arr](https://github.com/scalaz/scalaz/blob/series/7.3.x/core/src/main/scala/scalaz/Arrow.scala#L16) but essentially lifts a function into an Arrow:
+
+```{.scala .scrollx}
+def arr[A, B](f: A => B): A =>: B
+```
+
 ## [id](https://github.com/typelevel/cats/blob/master/core/src/main/scala/cats/arrow/Category.scala#L11)
 
 The __id__ function is defined as:
@@ -74,7 +80,7 @@ def first[A, B, C](fa: F[A, B]): F[(A, C), (B, C)]
 
 The __first__ function takes Arrow __fa__ from __A__ => __B__ and returns another Arrow (__A__, __C__) => (__B__, __C__). It applies the function in __fa__ to the first parameter of the tuple, which is an __A__ and converts it to a __B__. The second parameter of the tuple it leaves untouched and returns a (__B__, _C_).
 
-![First](/images/arrow-functions/arrow-first.jpg)
+![First](/images/arrow-functions/arrow-first3.jpg)
 
 For the remaining examples we have the following definitions at our disposal:
 
@@ -113,7 +119,7 @@ def second[A, B, C](fa: F[A, B]): F[(C, A), (C, B)]
 
 The __second__ function takes Arrow __fa__ from __A__ => __B__ and returns another Arrow with takes in a tuple of (__C__, __A__) => (__C__, __B__). It applies the function in __fa__ to the second parameter of the tuple __A__ and converts it to a __B__. The first parameter of the tuple it leaves untouched and returns a (_C_, __B__).
 
-![Second](/images/arrow-functions/arrow-second.jpg)
+![Second](/images/arrow-functions/arrow-second2.jpg)
 
 For example if we wanted to apply function to the __Age__ element of a __Name__ and __Age__ pair and but wanted to leave the __Name__ element untouched we could do:
 
@@ -125,7 +131,7 @@ toPersonF(name, age) //returns Person(Name(Nagate,Tanikaze),Age(44))
 
 Notice how the __Name__ value of the input is unchanged.
 
-## [split](https://github.com/typelevel/cats/blob/master/core/src/main/scala/cats/arrow/Split.scala)
+## [split/spread/\*\*\*](https://github.com/typelevel/cats/blob/master/core/src/main/scala/cats/arrow/Split.scala)
 
 The __split__ function is an application of __first__ and __second__. It is defined as:
 
@@ -133,9 +139,9 @@ The __split__ function is an application of __first__ and __second__. It is defi
 def split[A, B, C, D](f: F[A, B], g: F[C, D]): F[(A, C), (B, D)]
 ```
 
-The __split__ function takes Arrow __f__ from __A__ => __B__ and an Arrow __g__ from __C__ => __D__ and returns another Arrow with takes in a tuple of (__A__, __C__) => (__B__, __D__). It applies the function in __f__ to the first parameter of the tuple __A__ and converts it to a __B__. It also applies the function in __g__ to the second parameter of the tuple __C__ and converts it to a __D__ returning a final result of (__B__, __D__). Split has the symbolic representation of __***__.
+The __split__ function takes Arrow __f__ from __A__ => __B__ and an Arrow __g__ from __C__ => __D__ and returns another Arrow with takes in a tuple of (__A__, __C__) => (__B__, __D__). It applies the function in __f__ to the first parameter of the tuple __A__ and converts it to a __B__. It also applies the function in __g__ to the second parameter of the tuple __C__ and converts it to a __D__ returning a final result of (__B__, __D__). Split has the symbolic representation of __\*\*\*__ and is sometimes referred to as the __spread__ function because it applies multiple functions to multiple inputs.
 
-![Split](/images/arrow-functions/arrow-split.jpg)
+![Split](/images/arrow-functions/arrow-split3.jpg)
 
 For example if we wanted to apply function to the __Name__ and __Age__ element of a __Name__ and __Age__ pair at once we could do:
 
@@ -145,7 +151,7 @@ val toPersonF: ((Name, Age)) => Person = bothNameAndAgeF andThen (Person.apply _
 toPersonF(name, age)//Person(Name(NAGATE,Tanikaze),Age(44))
 ```
 
-## [combine](https://github.com/scalaz/scalaz/blob/series/7.3.x/core/src/main/scala/scalaz/Arrow.scala#L55)
+## [combine/merge/&&&](https://github.com/scalaz/scalaz/blob/series/7.3.x/core/src/main/scala/scalaz/Arrow.scala#L55)
 
 __combine__ is defined as:
 
@@ -157,7 +163,7 @@ Although Cats does not define combine, [scalaz does](https://github.com/scalaz/s
 
 The __combine__ function takes Arrow __fab__ from __A__ => __B__ and an Arrow __fac__ from __A__ => __C__ and returns another Arrow with takes in an input of __A__, and returns a tuple of (__B__, __C__). It's important to note that the same input __A__ is supplied to both arrows __fab__ and __fac__.
 
-![Split](/images/arrow-functions/arrow-combine.jpg)
+![Combine](/images/arrow-functions/arrow-combine.jpg)
 
 For example given a __Person__ if we want to break it into primitive representations of its __Name__ and __Age__ fields we could do:
 
@@ -171,7 +177,7 @@ val combineF: Person => (String, Int) = ArrowFuncs.combine(combineName, combineA
 combineF(person) // ("Nagate Tanikaze",22): (String, Int)
 ```
 
-__combine__ has a symbolic representation of __&&&__.
+__combine__ has a symbolic representation of __&&&__ and is sometimes referred to as the __merge__ function.
 
 
 ## liftA2
