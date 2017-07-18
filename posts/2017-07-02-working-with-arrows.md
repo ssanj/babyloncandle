@@ -159,7 +159,7 @@ __combine__ is defined as:
 def combine[A, B, C](fab: F[A, B], fac: => F[A, C]): F[A, (B, C)]
 ```
 
-Although Cats does not define combine, [scalaz does](https://github.com/scalaz/scalaz/blob/series/7.3.x/core/src/main/scala/scalaz/Arrow.scala#L55). For the purpose of this post I've created an implementation of combine in the example source.
+Although Cats does not define combine, [scalaz does](https://github.com/scalaz/scalaz/blob/series/7.3.x/core/src/main/scala/scalaz/Arrow.scala#L55). For the purpose of this post I've created an implementation of combine in the [example source](https://github.com/ssanj/arrows/blob/master/src/main/scala/net/ssanj/arrow/ArrowFuncs.scala#L8).
 
 The __combine__ function takes Arrow __fab__ from __A__ => __B__ and an Arrow __fac__ from __A__ => __C__ and returns another Arrow with takes in an input of __A__, and returns a tuple of (__B__, __C__). It's important to note that the same input __A__ is supplied to both arrows __fab__ and __fac__.
 
@@ -181,6 +181,39 @@ __combine__ has a symbolic representation of __&&&__ and is sometimes referred t
 
 
 ## liftA2
+
+liftA2 is defined as:
+
+```{.scala .scrollx}
+def liftA2[A, B, C, D](fab: F[A, B], fac: F[A, C])(f: B => C => D): F[A, D] //simplified
+```
+
+I could not find a definition of liftA2 in either Cats nor Scalaz. I've referenced it here directly from the [Generalising monads to arrows paper by John Hughes](https://www.researchgate.net/publication/222520426_Generalising_monads_to_arrows) in Haskell:
+
+```{.haskell .scrollx}
+liftA2 :: Arrow a => (b -> c -> d) -> a e b -> a e c -> a e d
+```
+
+I have a sample of implementation of this in the [example source](https://github.com/ssanj/arrows/blob/master/src/main/scala/net/ssanj/arrow/ArrowFuncs.scala#L13).
+
+The __liftA2__ function is very similar to the __combine__ function with the addition of running a function on the result of __combine__.
+
+The __liftA2__ function takes an Arrow __fab__ from __A__ => __B__, an Arrow __fac__ from __A__ => __C__ and a function __f__ from __B__ => __C__ => __D__ and returns another Arrow with takes in an input of __A__, and returns a __D__.
+
+![liftA2](/images/arrow-functions/arrow-liftA2-2.jpg)
+
+For example given a Person if we want to break it into primitive representations of its Name and Age fields and then apply a function on the separated bits we could do:
+
+```{.scala .scrollx}
+val person = Person(name, age)
+val combineName: Person => String = {
+  case Person(Name(first, last), _) => s"$first $last"
+}
+val combineAge: Person => Int = _.age.age
+def makePersonString: String => Int => String = name => age => s"person[name='$name', age=$age]"
+val lifta2: Person => String = ArrowFuncs.liftA2(combineName, combineAge)(makePersonString)
+lifta2(person) //"person[name='Nagate Tanikaze', age=22]"
+```
 
 ## compose/andThen
 
