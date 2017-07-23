@@ -1,16 +1,18 @@
 ---
-title: Working with Arrows
+title: Working with Arrows in Scala
 author: sanjiv sahayam
-description: ???
+description: An overview of functions on the Arrow typeclass in Scala with Cats and Scalaz
 tags: arrows, scala,
 comments: true
 ---
 
-In the [last article](http://sanj.ink/posts/2017-06-12-reading-configuration-with-kleisli-arrows.html) we looked at how we could read configuration with a Kleisli Arrow similar to a Reader Monad.
+In the [last article](http://sanj.ink/posts/2017-06-12-reading-configuration-with-kleisli-arrows.html) we looked at how we could read configuration with a Kleisli Arrow similar to using a Reader Monad.
 
 We've been using Arrows for the last couple of articles but haven't defined what an Arrow is exactly.
 
-An Arrow is a computation that runs within a context which takes in an input and returns an output.
+An Arrow is a computation that runs within a context which takes in an input and returns an output. A more detailed explanation from [Typeclassopedia](https://wiki.haskell.org/Typeclassopedia#Arrow) states:
+
+> The Arrow class represents another abstraction of computation, in a similar vein to Monad and Applicative. However, unlike Monad and Applicative, whose types only reflect their output, the type of an Arrow computation reflects both its input and output. Arrows generalize functions: if arr is an instance of Arrow, a value of type b `arr` c can be thought of as a computation which takes values of type b as input, and produces values of type c as output. In the (->) instance of Arrow this is just a pure function; in general, however, an arrow may represent some sort of “effectful” computation
 
 In [Cats](http://typelevel.org/cats/) the [Arrow typeclass](https://github.com/typelevel/cats/blob/master/core/src/main/scala/cats/arrow/Arrow.scala#L8) is defined with the type constructor F which has two type holes:
 
@@ -32,7 +34,7 @@ and the resulting Arrow is:
 val fa = Arrow[Function1]
 ```
 
-## [lift](https://github.com/typelevel/cats/blob/master/core/src/main/scala/cats/arrow/Arrow.scala#L13)
+## [lift](https://github.com/typelevel/cats/blob/master/core/src/main/scala/cats/arrow/Arrow.scala#L13)/[arr](https://github.com/scalaz/scalaz/blob/series/7.3.x/core/src/main/scala/scalaz/Arrow.scala#L16)
 
 This is a simple function to construct an Arrow given its input and output types. This is defined in Cats as:
 
@@ -49,7 +51,7 @@ fa.lift(f) //Function1[String, Int]
 
 Since __findLength__ is already a __scala.Function1__ it is a little pointless to lift it into a __scala.Function1__ but hopefully its usage is clear.
 
-In [Scalaz](https://github.com/scalaz) this function is defined as [arr](https://github.com/scalaz/scalaz/blob/series/7.3.x/core/src/main/scala/scalaz/Arrow.scala#L16) but essentially lifts a function into an Arrow:
+In [Scalaz](https://github.com/scalaz) this function is defined as arr:
 
 ```{.scala .scrollx}
 def arr[A, B](f: A => B): A =>: B
@@ -121,7 +123,7 @@ The __second__ function takes Arrow __fa__ from __A__ => __B__ and returns anoth
 
 ![Second](/images/arrow-functions/arrow-second2.jpg)
 
-For example if we wanted to apply function to the __Age__ element of a __Name__ and __Age__ pair and but wanted to leave the __Name__ element untouched we could do:
+For example if we wanted to apply a function to the __Age__ element of a __Name__ and __Age__ pair and but wanted to leave the __Name__ element untouched we could do:
 
 ```{.scala .scrollx}
 val onlyAgeF: ((Name, Age)) => (Name, Age) = fa.second[Age, Age, Name](doubleAge)
@@ -131,7 +133,7 @@ toPersonF(name, age) //returns Person(Name(Nagate,Tanikaze),Age(44))
 
 Notice how the __Name__ value of the input is unchanged.
 
-## [split/spread/\*\*\*](https://github.com/typelevel/cats/blob/master/core/src/main/scala/cats/arrow/Split.scala)
+## [split/product/\*\*\*](https://github.com/typelevel/cats/blob/master/core/src/main/scala/cats/arrow/Split.scala)
 
 The __split__ function is an application of __first__ and __second__. It is defined as:
 
@@ -139,11 +141,11 @@ The __split__ function is an application of __first__ and __second__. It is defi
 def split[A, B, C, D](f: F[A, B], g: F[C, D]): F[(A, C), (B, D)]
 ```
 
-The __split__ function takes Arrow __f__ from __A__ => __B__ and an Arrow __g__ from __C__ => __D__ and returns another Arrow with takes in a tuple of (__A__, __C__) => (__B__, __D__). It applies the function in __f__ to the first parameter of the tuple __A__ and converts it to a __B__. It also applies the function in __g__ to the second parameter of the tuple __C__ and converts it to a __D__ returning a final result of (__B__, __D__). Split has the symbolic representation of __\*\*\*__ and is sometimes referred to as the __spread__ function because it applies multiple functions to multiple inputs.
+The __split__ function takes Arrow __f__ from __A__ => __B__ and an Arrow __g__ from __C__ => __D__ and returns another Arrow with takes in a tuple of (__A__, __C__) => (__B__, __D__). It applies the function in __f__ to the first parameter of the tuple __A__ and converts it to a __B__. It also applies the function in __g__ to the second parameter of the tuple __C__ and converts it to a __D__ returning a final result of (__B__, __D__). Split has the symbolic representation of __\*\*\*__ and is sometimes referred to as the __product__ function because it applies multiple functions to multiple inputs.
 
 ![Split](/images/arrow-functions/arrow-split3.jpg)
 
-For example if we wanted to apply function to the __Name__ and __Age__ element of a __Name__ and __Age__ pair at once we could do:
+For example if we wanted to apply a function to the __Name__ and __Age__ element of a __Name__ and __Age__ pair at once we could do:
 
 ```{.scala .scrollx}
 val bothNameAndAgeF: ((Name, Age)) => (Name, Age) = fa.split[Name, Name, Age, Age](upperName, doubleAge)
@@ -151,7 +153,7 @@ val toPersonF: ((Name, Age)) => Person = bothNameAndAgeF andThen (Person.apply _
 toPersonF(name, age)//Person(Name(NAGATE,Tanikaze),Age(44))
 ```
 
-## [combine/merge/&&&](https://github.com/scalaz/scalaz/blob/series/7.3.x/core/src/main/scala/scalaz/Arrow.scala#L55)
+## [combine/fanout/&&&](https://github.com/scalaz/scalaz/blob/series/7.3.x/core/src/main/scala/scalaz/Arrow.scala#L55)
 
 __combine__ is defined as:
 
@@ -161,7 +163,7 @@ def combine[A, B, C](fab: F[A, B], fac: => F[A, C]): F[A, (B, C)]
 
 Although Cats does not define combine, [scalaz does](https://github.com/scalaz/scalaz/blob/series/7.3.x/core/src/main/scala/scalaz/Arrow.scala#L55). For the purpose of this post I've created an implementation of combine in the [example source](https://github.com/ssanj/arrows/blob/master/src/main/scala/net/ssanj/arrow/ArrowFuncs.scala#L8).
 
-The __combine__ function takes Arrow __fab__ from __A__ => __B__ and an Arrow __fac__ from __A__ => __C__ and returns another Arrow with takes in an input of __A__, and returns a tuple of (__B__, __C__). It's important to note that the same input __A__ is supplied to both arrows __fab__ and __fac__.
+The __combine__ function takes Arrow __fab__ from __A__ => __B__ and an Arrow __fac__ from __A__ => __C__ and returns another Arrow which takes in an input of __A__, and returns a tuple of (__B__, __C__). It's important to note that the same input __A__ is supplied to both arrows __fab__ and __fac__.
 
 ![Combine](/images/arrow-functions/arrow-combine.jpg)
 
@@ -177,7 +179,7 @@ val combineF: Person => (String, Int) = ArrowFuncs.combine(combineName, combineA
 combineF(person) // ("Nagate Tanikaze",22): (String, Int)
 ```
 
-__combine__ has a symbolic representation of __&&&__ and is sometimes referred to as the __merge__ function.
+__combine__ has a symbolic representation of __&&&__ and is sometimes referred to as the __fanout__ function.
 
 
 ## liftA2
@@ -194,7 +196,7 @@ I could not find a definition of liftA2 in either Cats nor Scalaz. I've referenc
 liftA2 :: Arrow a => (b -> c -> d) -> a e b -> a e c -> a e d
 ```
 
-I have a sample of implementation of this in the [example source](https://github.com/ssanj/arrows/blob/master/src/main/scala/net/ssanj/arrow/ArrowFuncs.scala#L13).
+A sample of implementation of this can be found in the [example source](https://github.com/ssanj/arrows/blob/master/src/main/scala/net/ssanj/arrow/ArrowFuncs.scala#L13).
 
 The __liftA2__ function is very similar to the __combine__ function with the addition of running a function on the result of __combine__.
 
@@ -202,7 +204,7 @@ The __liftA2__ function takes an Arrow __fab__ from __A__ => __B__, an Arrow __f
 
 ![liftA2](/images/arrow-functions/arrow-liftA2-2.jpg)
 
-For example given a Person if we want to break it into primitive representations of its Name and Age fields and then apply a function on the separated bits we could do:
+For example given a __Person__ if we want to break it into primitive representations of its __Name__ and __Age__ fields and then apply a function on the separated bits we could do:
 
 ```{.scala .scrollx}
 val person = Person(name, age)
@@ -215,9 +217,76 @@ val lifta2: Person => String = ArrowFuncs.liftA2(combineName, combineAge)(makePe
 lifta2(person) //"person[name='Nagate Tanikaze', age=22]"
 ```
 
-## compose/andThen
+## [compose/<<<](https://github.com/typelevel/cats/blob/master/core/src/main/scala/cats/arrow/Compose.scala#L12) and [andThen/>>>](https://github.com/typelevel/cats/blob/master/core/src/main/scala/cats/arrow/Compose.scala#L15)
 
+compose is defined as:
 
+```{.scala .scrollx}
+def compose[A, B, C](f: F[B, C], g: F[A, B]): F[A, C]
+```
 
-//Why do Arrows return a pair on first and second?
+and has the symbolic representation of __<<<__.
 
+andThen is defined as:
+
+```{.scala .scrollx}
+def andThen[A, B, C](f: F[A, B], g: F[B, C]): F[A, C]
+```
+
+and has the symbolic representation of __>>>__.
+
+Compose and andThen are basically the same function with the first and second arguments swapped.
+
+These functions combine arrows passing on the output of one arrow as the input to the next one, similar to regular function composition.
+
+For example given a __Name__ and __Age__, if we wanted to convert them to a __Person__ and then covert the __Person__ to a String we could do:
+
+```{.scala .scrollx}
+def personA = fa.lift[(Name, Age), Person](na => Person(na._1, na._2))
+val makePersonStringA = fa.lift[Person, String](p =>  s"person[name='${p.name.first}' ${p.name.last}, age=${p.age} yrs]")
+
+val composeF: Tuple2[Name, Age] => String = personA >>> makePersonStringA
+val andThenF: Tuple2[Name, Age] => String =  makePersonStringA <<< personA
+
+composeF(name, age) //person[name='Nagate' Tanikaze, age=Age(22) yrs]
+andThenF(name, age) //person[name='Nagate' Tanikaze, age=Age(22) yrs]
+```
+
+//Why do we use tuples instead of simple values?
+
+//Add some more advanced examples
+//workday example
+//this week in scala site
+//virtuslabs example
+
+//Laws?
+
+//http://hackage.haskell.org/package/base-4.9.1.0/docs/src/Control.Arrow.html#zeroArrow
+<!-- "compose/arr"   forall f g .
+                (arr f) . (arr g) = arr (f . g)
+"first/arr"     forall f .
+                first (arr f) = arr (first f)
+"second/arr"    forall f .
+                second (arr f) = arr (second f)
+"product/arr"   forall f g .
+                arr f *** arr g = arr (f *** g)
+"fanout/arr"    forall f g .
+                arr f &&& arr g = arr (f &&& g)
+"compose/first" forall f g .
+                (first f) . (first g) = first (f . g)
+"compose/second" forall f g .
+                (second f) . (second g) = second (f . g)
+ -->
+
+ //or
+ //https://wiki.haskell.org/Typeclassopedia#Laws_8
+<!--
+                        arr id  =  id
+                  arr (h . g)  =  arr g >>> arr h
+                first (arr g)  =  arr (g *** id)
+              first (g >>> h)  =  first g >>> first h
+   first g >>> arr (id *** h)  =  arr (id *** h) >>> first g
+          first g >>> arr fst  =  arr fst >>> g
+first (first g) >>> arr assoc  =  arr assoc >>> first g
+
+assoc ((x,y),z) = (x,(y,z)) -->
