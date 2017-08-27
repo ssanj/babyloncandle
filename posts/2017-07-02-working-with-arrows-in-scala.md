@@ -14,13 +14,13 @@ An Arrow is a computation that runs within a context which takes in an input and
 
 > The Arrow class represents another abstraction of computation, in a similar vein to Monad and Applicative. However, unlike Monad and Applicative, whose types only reflect their output, the type of an Arrow computation reflects both its input and output. Arrows generalize functions: if arr is an instance of Arrow, a value of type b `arr` c can be thought of as a computation which takes values of type b as input, and produces values of type c as output. In the (->) instance of Arrow this is just a pure function; in general, however, an arrow may represent some sort of “effectful” computation
 
-In [Cats](http://typelevel.org/cats/) the [Arrow typeclass](https://github.com/typelevel/cats/blob/master/core/src/main/scala/cats/arrow/Arrow.scala#L8) is defined with the type constructor F which has two type holes:
+In [Cats](http://typelevel.org/cats/) the [Arrow typeclass](https://github.com/typelevel/cats/blob/series/0.8.x/core/src/main/scala/cats/arrow/Arrow.scala#L8) is defined with the type constructor F which has two type holes:
 
 ```{.scala .scrollx}
 Arrow[F[_, _]] //simplified
 ```
 
-These two type holes correspond to the input and output types of the Arrow. F can be any type constructor that takes two types and performs a mapping between them. A __scala.Function1__ is an example of F, as is the __Kleisli Arrow__ we saw in previous articles. It might be helpful to think of Arrows as simple functions from one type to another for the moment.
+These two type holes correspond to the input and output types of the Arrow respectively. __F__ can be any type constructor that takes two types and performs a mapping between them. A __scala.Function1__ is an example of __F__, as is the __Kleisli Arrow__ we saw in previous articles. It might be helpful to think of Arrows as simple functions from one type to another for the moment.
 
 Lets now go through some of the functions defined on Arrow and how they are used. For the remainder of the article lets assume that the type constructor supplied to Arrow is a [__scala.Function1__](http://www.scala-lang.org/api/current/scala/Function1.html):
 
@@ -34,7 +34,7 @@ and the resulting Arrow is:
 val fa = Arrow[Function1]
 ```
 
-## [lift](https://github.com/typelevel/cats/blob/master/core/src/main/scala/cats/arrow/Arrow.scala#L13)/[arr](https://github.com/scalaz/scalaz/blob/series/7.3.x/core/src/main/scala/scalaz/Arrow.scala#L16)
+## [lift](https://github.com/typelevel/cats/blob/series/0.8.x/core/src/main/scala/cats/arrow/Arrow.scala#L13)/[arr](https://github.com/scalaz/scalaz/blob/series/7.3.x/core/src/main/scala/scalaz/Arrow.scala#L16)
 
 This is a simple function to construct an Arrow given its input and output types. This is defined in Cats as:
 
@@ -56,8 +56,9 @@ In [Scalaz](https://github.com/scalaz) this function is defined as arr:
 ```{.scala .scrollx}
 def arr[A, B](f: A => B): A =>: B
 ```
+where __=>:__ is a typeconstructor similar to __F__.
 
-## [id](https://github.com/typelevel/cats/blob/master/core/src/main/scala/cats/arrow/Category.scala#L11)
+## [id](https://github.com/typelevel/cats/blob/series/0.8.x/core/src/main/scala/cats/arrow/Category.scala#L11)
 
 The __id__ function is defined as:
 
@@ -65,14 +66,14 @@ The __id__ function is defined as:
 def id[A]: F[A, A]
 ```
 
-The type signature of the above tells us that F returns the input type A as its output, essentially giving us the [identity](http://www.scala-lang.org/api/2.11.11/index.html#scala.Predef$@identity[A](x:A):A) function.
+The type signature of the above tells us that __F__ returns the input type A as its output, essentially giving us the [identity](http://www.scala-lang.org/api/2.11.11/index.html#scala.Predef$@identity[A](x:A):A) function.
 
 ```{.scala .scrollx}
 val intF1 = fa.id[Int] //Function1[Int, Int]
 intF1(10) //returns 10
 ```
 
-## [first](https://github.com/typelevel/cats/blob/master/core/src/main/scala/cats/functor/Strong.scala#L24)
+## [first](https://github.com/typelevel/cats/blob/series/0.8.x/core/src/main/scala/cats/functor/Strong.scala#L24)
 
 The __first__ function is defined as:
 
@@ -111,7 +112,7 @@ toPersonF(name, age) //returns Person(Name(NAGATE,Tanikaze),Age(22))
 
 Notice how the __Age__ value of the input is unchanged.
 
-## [second](https://github.com/typelevel/cats/blob/master/core/src/main/scala/cats/functor/Strong.scala#L39)
+## [second](https://github.com/typelevel/cats/blob/series/0.8.x/core/src/main/scala/cats/functor/Strong.scala#L39)
 
 The __second__ function is very similar to __first__ only with its parameters switched. It is defined as:
 
@@ -133,7 +134,7 @@ toPersonF(name, age) //returns Person(Name(Nagate,Tanikaze),Age(44))
 
 Notice how the __Name__ value of the input is unchanged.
 
-## [split/product/\*\*\*](https://github.com/typelevel/cats/blob/master/core/src/main/scala/cats/arrow/Split.scala)
+## [split/product/\*\*\*](https://github.com/typelevel/cats/blob/series/0.8.x/core/src/main/scala/cats/arrow/Split.scala)
 
 The __split__ function is an application of __first__ and __second__. It is defined as:
 
@@ -161,7 +162,7 @@ __combine__ is defined as:
 def combine[A, B, C](fab: F[A, B], fac: => F[A, C]): F[A, (B, C)]
 ```
 
-Although Cats does not define combine, [scalaz does](https://github.com/scalaz/scalaz/blob/series/7.3.x/core/src/main/scala/scalaz/Arrow.scala#L55). For the purpose of this post I've created an implementation of combine in the [example source](https://github.com/ssanj/arrows/blob/master/src/main/scala/net/ssanj/arrow/ArrowFuncs.scala#L8).
+Although Cats does not define __combine__, [scalaz does](https://github.com/scalaz/scalaz/blob/series/7.3.x/core/src/main/scala/scalaz/Arrow.scala#L55). For the purpose of this post I've created an implementation of __combine__ in the [example source](https://github.com/ssanj/arrows/blob/master/src/main/scala/net/ssanj/arrow/ArrowFuncs.scala#L8).
 
 The __combine__ function takes Arrow __fab__ from __A__ => __B__ and an Arrow __fac__ from __A__ => __C__ and returns another Arrow which takes in an input of __A__, and returns a tuple of (__B__, __C__). It's important to note that the same input __A__ is supplied to both arrows __fab__ and __fac__.
 
@@ -184,13 +185,13 @@ __combine__ has a symbolic representation of __&&&__ and is sometimes referred t
 
 ## liftA2
 
-liftA2 is defined as:
+__liftA2__ is defined as:
 
 ```{.scala .scrollx}
 def liftA2[A, B, C, D](fab: F[A, B], fac: F[A, C])(f: B => C => D): F[A, D] //simplified
 ```
 
-I could not find a definition of liftA2 in either Cats nor Scalaz. I've referenced it here directly from the [Generalising monads to arrows paper by John Hughes](https://www.researchgate.net/publication/222520426_Generalising_monads_to_arrows) in Haskell:
+I could not find a definition of __liftA2__ in either Cats nor Scalaz. I've referenced it here directly from the [Generalising monads to arrows paper by John Hughes](https://www.researchgate.net/publication/222520426_Generalising_monads_to_arrows) in Haskell:
 
 ```{.haskell .scrollx}
 liftA2 :: Arrow a => (b -> c -> d) -> a e b -> a e c -> a e d
@@ -217,9 +218,9 @@ val lifta2: Person => String = ArrowFuncs.liftA2(combineName, combineAge)(makePe
 lifta2(person) //"person[name='Nagate Tanikaze', age=22]"
 ```
 
-## [compose/<<<](https://github.com/typelevel/cats/blob/master/core/src/main/scala/cats/arrow/Compose.scala#L12) and [andThen/>>>](https://github.com/typelevel/cats/blob/master/core/src/main/scala/cats/arrow/Compose.scala#L15)
+## [compose/<<<](https://github.com/typelevel/cats/blob/series/0.8.x/core/src/main/scala/cats/arrow/Compose.scala#L12) and [andThen/>>>](https://github.com/typelevel/cats/blob/series/0.8.x/core/src/main/scala/cats/arrow/Compose.scala#L15)
 
-compose is defined as:
+__compose__ is defined as:
 
 ```{.scala .scrollx}
 def compose[A, B, C](f: F[B, C], g: F[A, B]): F[A, C]
@@ -227,7 +228,7 @@ def compose[A, B, C](f: F[B, C], g: F[A, B]): F[A, C]
 
 and has the symbolic representation of __<<<__.
 
-andThen is defined as:
+__andThen__ is defined as:
 
 ```{.scala .scrollx}
 def andThen[A, B, C](f: F[A, B], g: F[B, C]): F[A, C]
@@ -235,15 +236,15 @@ def andThen[A, B, C](f: F[A, B], g: F[B, C]): F[A, C]
 
 and has the symbolic representation of __>>>__.
 
-Compose and andThen are basically the same function with the first and second arguments swapped.
+__compose__ and __andThen__ are basically the same function with the first and second arguments swapped.
 
 These functions combine arrows passing on the output of one arrow as the input to the next one, similar to regular function composition.
 
 For example given a __Name__ and __Age__, if we wanted to convert them to a __Person__ and then covert the __Person__ to a String we could do:
 
 ```{.scala .scrollx}
-def personA = fa.lift[(Name, Age), Person](na => Person(na._1, na._2))
-val makePersonStringA = fa.lift[Person, String](p =>  s"person[name='${p.name.first}' ${p.name.last}, age=${p.age} yrs]")
+def personA: Tuple2[Name, Age] => Person = na => Person(na._1, na._2)
+val makePersonStringA: Person  => String = p =>  s"person[name='${p.name.first}' ${p.name.last}, age=${p.age} yrs]"
 
 val composeF: Tuple2[Name, Age] => String = personA >>> makePersonStringA
 val andThenF: Tuple2[Name, Age] => String =  makePersonStringA <<< personA
@@ -252,41 +253,146 @@ composeF(name, age) //person[name='Nagate' Tanikaze, age=Age(22) yrs]
 andThenF(name, age) //person[name='Nagate' Tanikaze, age=Age(22) yrs]
 ```
 
-//Why do we use tuples instead of simple values?
+## A Worked Example
 
-//Add some more advanced examples
-//workday example
-//this week in scala site
-//virtuslabs example
+We've learned a lot of functions which are somewhat cryptic until you start to use them. To make their usage a little clearer lets look at an example.
 
-//Laws?
+Assume we have the following functions at our disposal:
 
-//http://hackage.haskell.org/package/base-4.9.1.0/docs/src/Control.Arrow.html#zeroArrow
-<!-- "compose/arr"   forall f g .
-                (arr f) . (arr g) = arr (f . g)
-"first/arr"     forall f .
-                first (arr f) = arr (first f)
-"second/arr"    forall f .
-                second (arr f) = arr (second f)
-"product/arr"   forall f g .
-                arr f *** arr g = arr (f *** g)
-"fanout/arr"    forall f g .
-                arr f &&& arr g = arr (f &&& g)
-"compose/first" forall f g .
-                (first f) . (first g) = first (f . g)
-"compose/second" forall f g .
-                (second f) . (second g) = second (f . g)
- -->
+```{.scala .scrollx}
+  final case class ItemId(id: Long)
+  final case class ItemDescReq(itemId: Long, userId: String)
+  final case class ItemDetail(itemId: Long, value: Double, desc: String)
+  final case class User(name: String, id: String)
+  final case class ValuableItemsResponse(expensive: List[ItemDetail], veryExpensive: List[ItemDetail])
+  final case class Price(price: Double)
 
- //or
- //https://wiki.haskell.org/Typeclassopedia#Laws_8
-<!--
-                        arr id  =  id
-                  arr (h . g)  =  arr g >>> arr h
-                first (arr g)  =  arr (g *** id)
-              first (g >>> h)  =  first g >>> first h
-   first g >>> arr (id *** h)  =  arr (id *** h) >>> first g
-          first g >>> arr fst  =  arr fst >>> g
-first (first g) >>> arr assoc  =  arr assoc >>> first g
+  type UserData = Map[String, List[ItemId]]
+  type ItemData = Map[Long, ItemDetail]
+  type Results  = List[Either[String, ItemDetail]]
 
-assoc ((x,y),z) = (x,(y,z)) -->
+  val userData = Map[String, List[ItemId]](
+    "1000" -> List(ItemId(1001), ItemId(1002), ItemId(1003), ItemId(1007), ItemId(1004)),
+    "2000" -> List(ItemId(2001), ItemId(2002))
+  )
+
+  val itemData = Map[Long, ItemDetail](
+    1001L -> ItemDetail(1001, 2000.00,  "Couch"),
+    1002L -> ItemDetail(1002, 100.00,   "Apple TV"),
+    1003L -> ItemDetail(1003, 75000.00, "Luxury Car"),
+    1004L -> ItemDetail(1004, 3000,     "Laptop"),
+    2001L -> ItemDetail(2001, 1500.00,  "Coffee Machine"),
+    2002L -> ItemDetail(2002, 500.00,   "DLSR")
+  )
+
+  val getSavedItems: User => UserData => List[ItemId] = user => data => data.getOrElse(user.id, Nil)
+
+  val idToDesc: User => ItemId => ItemDescReq = user => itemId => ItemDescReq(itemId.id, user.id)
+
+  val getDetails: ItemDescReq => ItemData => Either[String, ItemDetail] = itemDescReq => data =>
+    data.get(itemDescReq.itemId).toRight(s"could not find item with id: ${itemDescReq.itemId}")
+
+  val isExpensive: Range => ItemDetail => Boolean = range => item => range.contains(item.value)
+
+  val valuableItemsResponse : Tuple2[Range, Range] => List[ItemDetail] => ValuableItemsResponse = prices => items =>
+    ValuableItemsResponse(items.filter(isExpensive(prices._1)), items.filter(isExpensive(prices._2)))
+
+  val valuableItemsResponseString: ValuableItemsResponse => String = items => {
+    s"expensive:${itemDetailString(items.expensive)},veryExpensive:${itemDetailString(items.veryExpensive)}"
+  }
+
+  val itemDetailString: List[ItemDetail] => String = _.map(id => s"${id.desc}=$$${id.value}").mkString(",")
+
+  val errorString: List[Either[String, ItemDetail]] => String = itemsE =>
+    itemsE.collect { case Left(error) => error } mkString("\n")
+```
+
+We now want to use the above functions to do the following:
+
+1. Get the saved items for a User.
+1. Convert each item to a item request.
+1. Look up the details of each item requested. (this may fail)
+1. Filter the successful requests against two price ranges, one for _expensive_ and the other for very _expensive_.
+1. The filtered items should then be put into a ValuableItemsResponse object.
+1. At the end we need to print out a description of the valuable items found and any errors that were generated.
+
+We can then glue these functions together to give us the output we desire:
+
+```{.scala .scrollx}
+  // User => (UserData => List[ItemId], (ItemId => ItemDescReq))
+  val f1 = ArrowFuncs.combine(getSavedItems, idToDesc)
+
+  // User => List[ItemDescReq]
+  val f2 = f1 >>> { case (fi, fd) =>  fi(userData) map fd }
+
+  //User => (Results, Results)
+  val f3 = f2 >>> (_ map getDetails) >>> (_ map (_(itemData))) >>> (_.partition(_.isLeft))
+
+  //(Results, Results) => (Results, List[ItemDetail])
+  val f4 = fa.second[Results, List[ItemDetail], Results](_ collect { case Right(value) => value })
+
+  //User => (Results, List[ItemDetail])
+  val f5 = f3 >>> f4
+
+  //(Results, List[ItemDetail]) => (Results, Tuple2[Range, Range] => ValuableItemsResponse)
+  val f6 =
+    fa.second[List[ItemDetail],
+              Tuple2[Range, Range] => ValuableItemsResponse,
+              Results](
+      items => prices => valuableItemsResponse(prices)(items)
+    )
+
+   //User => (Results, Tuple2[Range, Range] => ValuableItemsResponse)
+   val f7 = f5 >>>  f6
+
+   //(Results, Tuple2[Range, Range] => ValuableItemsResponse) => (Results, ValuableItemsResponse)
+   val f8 =
+    fa.second[
+      Tuple2[Range, Range] => ValuableItemsResponse,
+      ValuableItemsResponse,
+      Results](_(Range(500, 3000), Range(10000, 100000)))
+
+  //User => (Results, ValuableItemsResponse)
+  val f9 = f7 >>> f8
+
+  //(Results, ValuableItemsResponse) => (String, String)
+  val f10 = fa.split[Results, String, ValuableItemsResponse, String](
+    errorString, valuableItemsResponseString
+  )
+
+  //User => (String, String)
+  val f11 = f9 >>> f10
+
+  val (errors, values) = f11(User("Guybrush threepwood", "1000"))
+```
+
+which outputs:
+
+```{.terminal .scrollx}
+expensive:Couch=$2000.0,veryExpensive:Luxury Car=$75000.0, errors: could not find item with id: 1007
+```
+
+or more succinctly:
+
+```{.scala .scrollx}
+val pipeline =
+    ArrowFuncs.combine(getSavedItems, idToDesc) >>>
+    { case (fi, fd) =>  fi(userData) map fd } >>>
+    (_ map getDetails) >>>
+    (_ map (_(itemData))) >>>
+    (_.partition(_.isLeft)) >>>
+    fa.second[Results, List[ItemDetail], Results](_ collect { case Right(value) => value }) >>>
+    fa.second[List[ItemDetail], Tuple2[Range, Range] => ValuableItemsResponse, Results](
+      items => prices => valuableItemsResponse(prices)(items)
+    ) >>>
+    fa.second[Tuple2[Range, Range] => ValuableItemsResponse, ValuableItemsResponse, Results](
+      _(Range(500, 3000), Range(10000, 100000))
+    ) >>>
+    fa.split[Results, String, ValuableItemsResponse, String](
+      errorString, valuableItemsResponseString
+    )
+
+    val (errors, values) = pipeline(User("Guybrush threepwood", "1000"))
+```
+
+Hopefully this has given you a gentle introduction into the world of Arrows.
