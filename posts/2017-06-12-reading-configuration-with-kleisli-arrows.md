@@ -6,7 +6,7 @@ tags: arrow, fp, kleisli, scala
 comments: true
 ---
 
-In a [previous article](posts/2017-06-07-composing-monadic-functions-with-kleisli-arrows.html) we looked at how Kleisli Arrows compose functions in a Monadic context.
+In a [previous article](http://sanj.ink/posts/2017-06-07-composing-monadic-functions-with-kleisli-arrows.html) we looked at how Kleisli Arrows compose functions in a Monadic context.
 
 A Kleisli Arrow is defined as follows:
 
