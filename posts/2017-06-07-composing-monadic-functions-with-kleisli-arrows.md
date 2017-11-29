@@ -19,7 +19,7 @@ To make this more concrete with a simple example, lets start with the following 
 ```{.scala .scrollx}
   def mul2: Int => Int = _ * 2
 
-  def power2: Int => Double = Math.pow(2, _)
+  def power2: Int => Double = Math.pow(_, 2)
 
   def doubleToInt: Double => Int = _.toInt
 
@@ -31,7 +31,7 @@ While these simple functions work in isolation, we can also combine them (compos
 ```{.scala .scrollx}
 val pipeline: Int => String = intToString compose mul2 compose doubleToInt compose power2
 
-pipeline(3)//returns "16"
+pipeline(3)//returns "18"
 ```
 
 The __pipeline__ function, combines all the functions together to create a new function that:
