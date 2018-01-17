@@ -11,65 +11,73 @@ Stacking Monads can be somewhat confusing to get your head around. While looking
 
 I needed to use this stack as I was working with the IO Monad and needed some way to capture the outcomes of a computation (via a Writer) and also needed to supply the initial inputs (via a Reader).
 
-While Reader and Writer on their own seem easy to use, it can be somewhat daunting to try and figure out how to combine the transformer variations of these Monads over some other Monad.
+While Reader and Writer Monads on their own seem easy to use, it can be somewhat daunting to try and figure out how to combine the transformer variations of these Monads over some other Monad.
 
-> Say Monad one more time...
+![Say Monad one more time](https://scalerablog.files.wordpress.com/2015/10/bdu68sacyaafkkr.jpg)
 
+## Reader and ReaderT
 
-## Type signatures
-
-Let's start by looking at the type signature for a ReaderT Monad Transformer:
-
-```{.haskell .scrollx}
-newtype ReaderT r m a = ReaderT { runReaderT :: r -> m a }
-```
-
-The type variables are as follows:
-
-* r = resource
-* m = Monad
-* a = result
-
-We can see from the [newtype](https://stackoverflow.com/questions/5889696/difference-between-data-and-newtype-in-haskell) which defines ReaderT that, it encapsulates the type:
-
-```{.haskell .scrollx}
-r -> m a
-```
-
-So everytime we see a __ReaderT r m a__ we can mentally substitute it with a simple function of the type:
-
-```{.haskell .scrollx}
-r -> m a
-```
-
-A ReaderT Monad Transformer is very similar to a Reader Monad:
+Let's start by looking at the type signature for the Reader Monad:
 
 ```{.haskell .scrollx}
 r -> a
 ```
 
-in that it requires some input from the environment _r_ before it returns the result _a_. The only difference being that ReaderT returns that _a_ in a Monad _m_.
+The Reader Monad when given some resource, _r_ from the environment will return a result of _a_.
 
+The type variables defined are as follows:
 
-Given a __ReaderT r m a__ we can unwrap its value via the _runReaderT_ method:
+* r = resource from the environment
+* a = value returned
+
+Next lets have a look at the type signature for a ReaderT Monad Transformer (MT):
+
+```{.haskell .scrollx}
+newtype ReaderT r m a = ReaderT { runReaderT :: r -> m a }
+```
+
+That seems a lot less clear than the definition of the Reader Monad. As we'll see below they are essentially very similar.
+
+The type variables defined are as follows:
+
+* r = resource from the environment
+* m = the resulting Monad
+* a = value returned in the Monad
+
+The ReaderT MT has one extra type variable, _m_, which is a Monad. If we examine the ReaderT constructor we can see that it encapsulates a type very similar to that of the Reader Monad:
+
+```{.haskell .scrollx}
+r -> m a -- ReaderT MT
+r ->   a -- Reader Monad
+```
+
+The ReaderT MT is simply a Reader Monad whose result is returned within another Monad. More on that later. Hopefully the connection between the Reader Monad and the Reader MT is getting clearer.
+
+When we see a ReaderT r m a we can mentally substitute it with a function of the type:
+
+```{.haskell .scrollx}
+r -> m a
+```
+
+Given a ReaderT r m a we can unwrap its value via the _runReaderT_ method:
 
 ```{.haskell .scrollx}
 runReaderT :: ReaderT r m a -> r -> m a
 ```
 
-Also given a simple Reader Monad `r -> a` we can lift it into a __ReaderT__ Monad Transformer with the _reader_ or the _asks_ function:
+Also given a simple Reader Monad (`r -> a`) we can lift it into a ReaderT MT with the _reader_ or the _asks_ function:
 
 ```{.haskell .scrollx}
 reader,asks :: Monad m => (r -> a) -> ReaderT r m a
 ```
 
-Also note that __ReaderT r m__ is a Monad:
+Also note that ReaderT r m is a Monad if m is a Monad:
 
 ```{.haskell .scrollx}
 Monad m => Monad (ReaderT r m)
 ```
 
- along with __m__ which is also a Monad on its own. This is important to note when using _do_ notation, with __ReaderT__; each value will be wrapped in __ReaderT r m__ and not __ReaderT__:
+ This is important to know when using _do_ notation with the ReaderT MT as each bind operation will result in a ReaderT r m and not a ReaderT:
 
 ```{.haskell .scrollx}
 someFunc :: ReaderT r m a
@@ -78,15 +86,15 @@ someFunc = do
     return a -- this will be returned into ReaderT r m
 ```
 
-If you need to wrap a value within a  __ReaderT__ use:
+If you need to wrap a value within a ReaderT MT use:
 
 ```{.haskell .scrollx}
-ReaderT \r -> ma -- your value of (m a)
+ReaderT \r -> -- your value of (m a)
 ```
 
 This might all seem very confusing at the moment. These are different ways of lifting values into the transformer stack at different points.
 
-Some other useful methods on __ReaderT__ are:
+Some other useful functions that work with the ReaderT MT are:
 
 * _ask_ - to retrieve the supplied resource
 
@@ -100,14 +108,107 @@ ask :: Monad m => ReaderT r m r
 local :: (r -> r) -> ReaderT r m a -> ReaderT r m a
 ```
 
+* _mapReaderT_ - to change all components of the ReaderT MT except the input type (the inner Monad and result type):
 
-## A ReaderT example
+```{.haskell .scrollx}
+mapReaderT :: (m a -> n b) -> ReaderT r m a -> ReaderT r n b
+```
+
+## Writer and WriterT
+
+As we've not looked at the definitions of the Writer Monad and the WriterT MT let's do that now. The Writer Monad is defined as:
+
+```{.haskell .scrollx}
+(a, w)
+```
+
+The type variables defined are:
+
+* a = return value
+* w = log value (which has to be an Monoid)
+
+The Writer Monad will return a pair of values; a result __a__ along with an accumulated log __w__.
+
+The WriterT MT is defined as:
+
+```{.haskell .scrollx}
+newtype WriterT w m a = WriterT { runWriterT :: m (a, w) }
+```
+
+where the type variables defined are:
+
+* a = return value
+* m = the resulting Monad
+* w = log value (which has to be an Monoid)
+
+The WriterT constructor encapsulates:
+
+```{.haskell .scrollx}
+m (a, w)
+```
+
+It's basically a Writer Monad within another Monad m:
+
+```{.haskell .scrollx}
+  (a, w) -- Writer Monad
+m (a, w) -- WriterT MT
+```
+
+Some other useful functions that work with the WriterT MT are:
+
+* _runWriterT_ - to unwrap the value of a WriterT MT and return the result and the log:
+
+```{.haskell .scrollx}
+runWriterT :: WriterT w m a -> m (a, w)
+```
+
+* _execWriterT_ - to unwrap the value of a WriterT MT and return only the log:
+
+```{.haskell .scrollx}
+execWriterT :: Monad m => WriterT w m a -> m w
+```
+
+* _tell_ - to write a log entry into the WriterT MT:
+
+```{.haskell .scrollx}
+tell :: Monad m => w -> WriterT w m ()
+```
+
+* _listen_ - to change the result to include the log:
+
+```{.haskell .scrollx}
+listen :: Monad m => WriterT w m a -> WriterT w m (a, w)
+```
+
+* _pass_ - to run a function on the log to update it:
+
+```{.haskell .scrollx}
+pass :: Monad m => WriterT w m (a, w -> w) -> WriterT w m a
+```
+
+* _mapWriterT_ - to change all components of the WriterT MT (the inner Monad, result and log type):
+
+```{.haskell .scrollx}
+mapWriterT :: (m (a, w) -> n (b, w’)) -> WriterT w m a -> WriterT w’ n b
+```
+
+## MonadTrans
+
+The MonadTrans typeclass defines one function called _lift_:
+
+```{.haskell .scrollx}
+lift :: Monad m => m a -> t m a
+```
+
+that lifts a Monad into a MT.
+
+## A ReaderT WriterT example
 
 Given the above types and functions, let's have a look at an example of using a ReaderT transformer stack.
 
-Say we had some configuration about an external service, like the _host_ and _port_ the service is running on. How could we use a Reader to supply that config to a simple program?
+Say we had some configuration about an external service, like its _host_ and _port_. How could we use a Reader Monad to supply that configuration to a program?
 
-Let's start by defining a _Config_ type as a Map of String keys and values:
+Let's start by defining a type alias to a Map of String keys and values:
 
 ```{.haskell .scrollx}
 import qualified Data.Map.Lazy as M
@@ -115,14 +216,22 @@ import qualified Data.Map.Lazy as M
 type Config = M.Map String String
 ```
 
-Let's also define a _serverConfig_ function to return our populated config from a list of key-value pairs:
+Let's also define a _serverConfig_ function to return our populated configuration from a list of key-value pairs:
 
 ```{.haskell .scrollx}
 serverConfig :: Config
 serverConfig = M.fromList [("host", "localhost"), ("port", "7654")]
 ```
 
-Let's use a Reader to read the host:
+Let's definite a function to read the host:
+
+```{.haskell .scrollx}
+getHost :: Reader Config (Maybe String)
+```
+
+Given a Config this function may or may not return a String with the host value.
+
+It would could be implemented as:
 
 ```{.haskell .scrollx}
 getHost :: Reader Config (Maybe String)
@@ -133,7 +242,13 @@ getHost = do
 
 First, the _getHost_ function requests the Config instance from the environment using the _ask_ function. It then looks up the "host" key from that config. Finally it lifts the Maybe value returned from the _lookup_ function into the Reader Monad using the _return_ function.
 
-We also use a __Reader__ to read the port:
+Let's define a function to read the port:
+
+```{.haskell .scrollx}
+getPort :: Reader Config (Maybe Int)
+```
+
+It would could be implemented as:
 
 ```{.haskell .scrollx}
 getPort :: Reader Config (Maybe Int)
@@ -142,40 +257,29 @@ getPort = do
   return (Map.lookup "port" config >>= readMaybe)
 ```
 
-This function is similar to _getHost_ with the additional bind (>>=) operation to join together the value read from _lookup_ with _readMaybe_. readMaybe is defined in `Text.Read` as:
+This function is similar to _getHost_ with the additional bind (>>=) operation to join together the value read from _lookup_ with _readMaybe_. readMaybe tries to parse a String into a value of type Int in this case. If it successfully parses the value it returns a (_Just a_) or if it fails it returns a _Nothing_. readMaybe is defined in `Text.Read` as:
 
 ```{.haskell .scrollx}
 readMaybe :: Read a => String -> Maybe a
 ```
 
-and tries to read in a value supplied as String into a target type _a_, where if it successfully reads in the value it returns a (_Just a_) or if it fails it returns a _Nothing_.
-
-If we follow the types for _getHost_ we see that it is defined as:
-
-```{.haskell .scrollx}
-Reader Config (Maybe String)
-```
-
-Given a Config type we may return a String with the host value.
-
-_getPort_ is defined as:
-
-```{.haskell .scrollx}
-Reader Config (Maybe Int)
-```
-
-Given a Config type, we may return a Int with the port value.
-
-Also notice that we used a __Reader__ as opposed to a __ReaderT__ and that might be an a little confusing. So why didn't we use a __ReaderT__ directly to read this config? We could have but a __ReaderT__ requires an inner __Monad m__:
+Also notice that we used a Reader Monad as opposed to a ReaderT MT to read both the host and port. Since the Reader Monad and the ReaderT MT are very similar we can easily convert between them. Why didn't we use a ReaderT MT directly to read the configuration? We could have, but the ReaderT MT requires an inner Monad m:
 
 ```{.haskell .scrollx}
 ReaderT r m a
 ```
 
-and we haven't decided on what __m__ is at the moment. To keep things simple I've used a __Reader__. I'll demonstrate how we could have directly used a __ReaderT__ Monad Transformer to implement _getHost_ and _getPort_ later on.
+and we haven't decided on what __m__ is at the moment. I'll demonstrate how we could have directly used a ReaderT MT to implement _getHost_ and _getPort_ later on.
 
+Now that we've written functions to read the host and port, lets go ahead and use those values in a ReaderT MT along with a WriterT MT to log out the values we received from the configuration:
 
-Now that we've written functions to read the host and port, lets go ahead and use those values in a __ReaderT__ along with a __WriterT__ to log out the values we received from the config:
+```{.haskell .scrollx}
+getConfig :: ReaderT Config (WriterT String IO) ()
+```
+
+Given a Config type as an input, the result returned will be in a WriterT MT with a log type of String with an inner Monad of IO and a value of unit () return within IO.
+
+It's implemented as:
 
 ```{.haskell .scrollx}
 getConfig :: ReaderT Config (WriterT String IO) ()
@@ -191,62 +295,22 @@ getConfig = do
   return ()
 ```
 
-Lets start with the type definition of _getConfig_:
-
-```{.haskell .scrollx}
-getConfig :: ReaderT Config (WriterT String IO) ()
-```
-
-This says that when given a Config type as an input, the result returned will be in a __WriterT__ with a log type of String with an inner Monad of __IO__ and a value of unit ().
-
-We've not looked at the definitions of __Writer__ and __Writer__ so let's do that now. Writer is defined as:
-
-```{.haskell .scrollx}
-(a, w)
-```
-
-The type variables are:
-
-* a = return value
-* w = log value (which has to be an Monoid)
-
-WriterT is defined as:
-
-```{.haskell .scrollx}
-newtype WriterT w m a = WriterT { runWriterT :: m (a, w) }
-```
-
-where the type variables are:
-
-* a = return value
-* m = Monad
-* w = log value (which has to be an Monoid)
-
-and it encapsulates:
-
-```{.haskell .scrollx}
-m (a, w)
-```
-
-So it's basically a Writer within a Monad m.
-
-Let's delve into the implementation of _getConfig_:
+Let's delve into the implementation of _getConfig_. The first two lines read the host and port into Maybe values from the configuration:
 
 ```{.haskell .scrollx}
   hostM <- fromReader getHost
   portM <- fromReader getPort
 ```
 
-The above lines read the host and port into Maybe values from the configuration.
 
-The following lines covert the Maybe values for host and port into their String equivalents:
+The next two lines covert the Maybe values for host and port into their String equivalents:
 
 ```{.haskell .scrollx}
   let host = maybe "-" id hostM
       port = maybe "-" show portM
 ```
 
-The following lines simply write String values to the log in order:
+The following four lines write String values to the log in order:
 
 ```{.haskell .scrollx}
   _ <- log "\nConfig"
@@ -255,123 +319,34 @@ The following lines simply write String values to the log in order:
   _ <- log (printf "\nport: %s" port)
 ```
 
-and the final return:
+and the final line returns a unit result into ReaderT r m Monad:
 
 ```{.haskell .scrollx}
 return ()
 ```
 
-lifts a unit value (), into the ReaderT (WriterT String IO) Monad. That seems quite easy to understand and closely follows an imperative program that would have the same functionality (without side effects though!)
+which is ReaderT (WriterT String IO) Monad in this instance.
 
-Let's look at the helper function _fromReader_:
-
-```{.haskell .scrollx}
-fromReader :: Monad m => ReaderT r Identity a -> ReaderT r m a
-fromReader = mapReaderT (return . runIdentity)
-```
-
-The type definition:
+Let's look at the type definition of the _fromReader_ function:
 
 ```{.haskell .scrollx}
-fromReader :: Monad m => ReaderT r Identity a -> ReaderT r m a
+fromReader :: Monad m => ReaderT r a -> ReaderT r m a
 ```
 
-tells us that we are mapping from one type of ReaderT to another:
+_fromReader_ converts a Reader Monad to a ReaderT MT. It is implemented as:
 
 ```{.haskell .scrollx}
-ReaderT r Identity a ->
-ReaderT r m        a
+fromReader :: Monad m => Reader r a -> ReaderT r m a
+fromReader = reader . runReader
 ```
 
-Basically we want to map the contents of the Identity Monad to another Monad m. So why do we need to do this at all? Where did Identity come from?
-
-This comes from the fact that the __Reader__ Monad is defined in terms of a __ReaderT__ Monad Transformer:
+The _runReader_ function is defined as:
 
 ```{.haskell .scrollx}
-type Reader r = ReaderT r Identity
+runReader :: Reader r a -> r -> a
 ```
 
-So even when we used the __Reader__ Monad in _getHost_ and _getPort_ we were actually using the __ReaderT__ Monad Transformer!
-
-So what is Identity?
-
-```{.haskell .scrollx}
-newtype Identity a
-```
-
-We can deduce from the above definition that Identity is just a wrapper around any type _a_.
-
-From the docs:
-
-> The identity functor and monad.
-
-> This trivial type constructor serves two purposes:
-
-> * It can be used with functions parameterized by functor or monad classes.
-> * It can be used as a base monad to which a series of monad transformers may be applied to construct a composite monad. Most monad transformer modules include the special case of applying the transformer to Identity. For example, State s is an abbreviation for StateT s Identity.
-
-What's interesting is that there are Monad, Applicative, Functor (and multiple other) type class instances for Identity and that gives us the power to use it within any Monad Transformer stack that requires an inner Monad. The Identity Monad does not perform any effects and simply wraps a values. This can be seen as a "empty" Monad that does nothing.
-
-If we revisit the type of the _getHost_ function:
-
-```{.haskell .scrollx}
-Reader Config (Maybe String) -- r -> a
-       r       a
-```
-
-we can expand it to use the full __ReaderT__ definition as:
-
-```{.haskell .scrollx}
-ReaderT Config Identity (Maybe String) -- r -> m a
-        r      m         a
-```
-
-In order to retrieve a value from the Identity type we need use the _runIdentity_ function:
-
-```{.haskell .scrollx}
-runIdentity :: Identity a -> a
-```
-
-It should now be clear as to why we need to transform inner Monads on our _Reader_ instances:
-
-```{.haskell .scrollx}
-fromReader ::
-  ReaderT Config Identity a ->  -- this is the Reader
-  ReaderT Config m        a     -- this is the ReaderT
-```
-
-In order to perform this mapping we use the _mapReaderT_ function which is defined as:
-
-```{.haskell .scrollx}
-mapReaderT :: (m a -> n b) -> ReaderT r m a -> ReaderT r n b
-```
-
-We can see from the type definition for _mapReaderT_ that the inner Monad of a __ReaderT__ Monad Transformer (m a) is converted to another type (n b).
-
-In our case we want to convert the inner Monad from:
-
-```{.haskell .scrollx}
-Identity (Maybe a)
-```
-
-to
-
-```{.haskell .scrollx}
-m (Maybe a)
-```
-
-The implementation of _fromReader_ allows us to do just this:
-
-```{.haskell .scrollx}
-fromReader :: Monad m => ReaderT r Identity a -> ReaderT r m a
-fromReader = mapReaderT (return . runIdentity)
-```
-
-When given a _m a_, which in this case is _Identity a_, we run it with _runIdentity_ to get the value of _a_ and we then lift that _a_ into the required Monad m, using the _return_ function.
-
-This seems like unnecessary work and ideally there should be an inbuilt function that does this for us.
-
-//TODO: Can we avoid having this at all?
+and unwraps the Reader Monad to a function (`r -> a`). The _reader_ (as defined previously) lifts a function from (`r -> a`) into the ReaderT MT. This seems like unnecessary work and ideally there should be an inbuilt function that does this for us.
 
 Next let's have a look at the _log_ function:
 
@@ -386,7 +361,7 @@ From the type definition:
 w -> t (WriterT w m) ()
 ```
 
-we can see that we are lifing some log __w__ into a transformer stack __t (WriterT w m)__.
+we can see that we are lifing some log __w__ into a transformer stack __t__ (WriterT __w m__).
 
 _tell_ is defined as:
 
@@ -415,7 +390,7 @@ runReaderT :: ReaderT r m a -> r -> m a
 
 When given a __ReaderT__ Monad Transformer and the resource, the above function returns the inner Monad.
 
-and _execWriterT_:
+_execWriterT_ is defined as:
 
 ```{.haskell .scrollx}
 execWriterT :: Monad m => WriterT w m a -> m w
@@ -426,20 +401,141 @@ which basically returns the log __w__ in the Monad __m__.
 When running the stack, it is run from outside-in. So given a _ReaderT (WriterT String m) a_,
 we:
 
-1. Run the ReaderT with runReaderT. This returns the inner Monad m: WriterT String m a
-1. Run the WriterT with execWriterT. This returns the log in the inner Monad m: m w
+1. Run the ReaderT MT with runReaderT. This returns result (__a__) in the inner Monad m: WriterT String m a
+1. Run the WriterT MT with execWriterT. This returns the log (__w__) in the inner Monad m: m w
 
 Substituting the actual Monads in the above:
 
 1. Run the ReaderT with runReaderT. This returns WriterT String IO ()
 1. Run the WriterT with execWriterT. This returns IO String
 
-//TODO: Explain this better
+The final output of running the above is:
 
+```{.terminal .scrollx}
+Config
+======
+host: localhost
+port: 7654
+```
+
+### Using ReaderT instead of Reader
+
+Here are the functions that need to be rewritten if we directly use ReaderT MT instead of using the Reader Monad to read the configuration:
+
+_getHost2_
+
+```{.haskell .scrollx}
+getHost2 :: Monad m => ReaderT Config m (Maybe String)
+getHost2 = -- same as getHost
+```
+
+_getPort2_
+
+```{.haskell .scrollx}
+getPort2 :: Monad m => ReaderT Config m (Maybe Int)
+getPort2 = -- same as getPort
+```
+
+_getConfig2_
+
+```{.haskell .scrollx}
+getConfig2 :: ReaderT Config (WriterT String IO) ()
+getConfig2 = do
+  hostM <- getHost2 -- no need to call fromReader
+  portM <- getPort2 -- no need to call fromReader
+  ... -- same as getConfig
+```
+
+We can see that this solution is a lot easier with less work to do. We just needed to add a Monad type constraint to the _getHost_ and _getPort_ functions. We also have no need for the _fromReader_ function which is a bonus!
+
+## The complete solution:
+
+```{.haskell .scrollx}
+module Config (readWriteConfig) where
+
+import Text.Printf (printf)
+import Control.Monad.IO.Class
+import Control.Monad.Trans.Class
+import Control.Monad.Trans.Reader
+import Control.Monad.Trans.Writer.Lazy
+import qualified Data.Map.Lazy as Map
+import Data.List (intercalate)
+import Data.Functor.Identity (Identity, runIdentity)
+import Text.Read (readMaybe)
+import Prelude hiding (log)
+
+type Config = Map.Map String String
+
+serverConfig :: Config
+serverConfig = Map.fromList [("host", "localhost"), ("port", "7654")]
+
+-- variation with Reader
+
+getHost :: Reader Config (Maybe String)
+getHost = do
+  config <- ask
+  return (Map.lookup "host" config)
+
+getPort :: Reader Config (Maybe Int)
+getPort = do
+  config <- ask
+  return (Map.lookup "port" config >>= readMaybe)
+
+fromReader :: Monad m => Reader r a -> ReaderT r m a
+fromReader = reader . runReader
+
+log :: (Monad m, MonadTrans t, Monoid w) => w -> t (WriterT w m) ()
+log = lift . tell
+
+getConfig :: ReaderT Config (WriterT String IO) ()
+getConfig = do
+  hostM <- fromReader getHost
+  portM <- fromReader getPort
+  let host = maybe "-" id hostM
+      port = maybe "-" show portM
+  _ <- log "\nConfig"
+  _ <- log "\n======"
+  _ <- log (printf "\nhost: %s" host)
+  _ <- log (printf "\nport: %s" port)
+  return ()
+
+readWriteConfig :: IO ()
+readWriteConfig = execWriterT (runReaderT getConfig serverConfig) >>= putStrLn
+
+-- variation with ReaderT
+
+getHost2 :: Monad m => ReaderT Config m (Maybe String)
+getHost2 = do
+  config <- ask
+  return (Map.lookup "host" config)
+
+getPort2 :: Monad m => ReaderT Config m (Maybe Int)
+getPort2 = do
+  config <- ask
+  return (Map.lookup "port" config >>= readMaybe)
+
+getConfig2 :: ReaderT Config (WriterT String IO) ()
+getConfig2 = do
+  hostM <- getHost2
+  portM <- getPort2
+  let host = maybe "-" id hostM
+      port = maybe "-" show portM
+  _ <- log "\nConfig"
+  _ <- log "\n======"
+  _ <- log (printf "\nhost: %s" host)
+  _ <- log (printf "\nport: %s" port)
+  return ()
+
+readWriteConfig2 :: IO ()
+readWriteConfig2 = execWriterT (runReaderT getConfig2 serverConfig) >>= putStrLn
+
+```
 
 https://stackoverflow.com/questions/43840588/use-readert-maybe-or-maybet-reader#43840589
 
 ## A tale of at least two Monads
+
+![Monads](https://pbs.twimg.com/media/CgKMfpQWwAAEsJQ.jpg)
 
 Each Monad Transformer is composed of at least two Monads. If we take ReaderT as an example, we have its definition as:
 
@@ -456,21 +552,6 @@ ReaderT r (WriterT w m) a
 then __ReaderT r (WriterT w m)__ is a Monad, __WriterT w m__ is a Monad and __m__ is a Monad.
 
 ---------
-newtype WriterT w m a = WriterT { runWriterT :: m (a, w) }
-WriterT w m a
-w - log
-m - monad
-a - value
-encapsulates: m (w, a)
-
-
-runWriterT :: WriterT w m a -> m (a, w)
--- other methods
-execWriterT :: Monad m => WriterT w m a -> m w
-mapWriterT :: (m (a, w) -> n (b, w')) -> WriterT w m a -> WriterT w' n b
-tell :: Monad m => w -> WriterT w m ()
-listen :: Monad m => WriterT w m a -> WriterT w m (a, w)
-pass :: Monad m => WriterT w m (a, w -> w) -> WriterT w m a
 
 mapM      :: Monad m      => (a -> m b) -> t a -> m (t b)
 traverse :: Applicative f => (a -> f b) -> t a -> f (t b)
