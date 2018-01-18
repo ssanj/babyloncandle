@@ -15,7 +15,7 @@ While Reader and Writer Monads on their own seem easy to use, it can be somewhat
 
 ![Say Monad one more time](https://scalerablog.files.wordpress.com/2015/10/bdu68sacyaafkkr.jpg)
 
-## Reader and ReaderT
+# Reader and ReaderT
 
 Let's start by looking at the type signature for the Reader Monad:
 
@@ -44,7 +44,7 @@ The type variables defined are as follows:
 * m = the resulting Monad
 * a = value returned in the Monad
 
-The ReaderT MT has one extra type variable, _m_, which is a Monad. If we examine the ReaderT constructor we can see that it encapsulates a type very similar to that of the Reader Monad:
+The ReaderT MT has one extra type variable __m__ which is a Monad. If we examine the ReaderT constructor we can see that it encapsulates a type very similar to that of the Reader Monad:
 
 ```{.haskell .scrollx}
 r -> m a -- ReaderT MT
@@ -71,7 +71,7 @@ Also given a simple Reader Monad (`r -> a`) we can lift it into a ReaderT MT wit
 reader,asks :: Monad m => (r -> a) -> ReaderT r m a
 ```
 
-Also note that ReaderT r m is a Monad if m is a Monad:
+Also note that ReaderT r m is a Monad if __m__ is a Monad:
 
 ```{.haskell .scrollx}
 Monad m => Monad (ReaderT r m)
@@ -92,7 +92,7 @@ If you need to wrap a value within a ReaderT MT use:
 ReaderT \r -> -- your value of (m a)
 ```
 
-This might all seem very confusing at the moment. These are different ways of lifting values into the transformer stack at different points.
+This might all seem very confusing at the moment. These are different ways of lifting values into the transformer stack at different points. Once you start using the ReaderT MT this will become clearer.
 
 Some other useful functions that work with the ReaderT MT are:
 
@@ -102,7 +102,7 @@ Some other useful functions that work with the ReaderT MT are:
 ask :: Monad m => ReaderT r m r
 ```
 
-* _local_ - to map a function across the resource _before_ using it:
+* _local_ - to map a function on the resource _before_ using it:
 
 ```{.haskell .scrollx}
 local :: (r -> r) -> ReaderT r m a -> ReaderT r m a
@@ -114,7 +114,7 @@ local :: (r -> r) -> ReaderT r m a -> ReaderT r m a
 mapReaderT :: (m a -> n b) -> ReaderT r m a -> ReaderT r n b
 ```
 
-## Writer and WriterT
+# Writer and WriterT
 
 As we've not looked at the definitions of the Writer Monad and the WriterT MT let's do that now. The Writer Monad is defined as:
 
@@ -140,6 +140,8 @@ where the type variables defined are:
 * a = return value
 * m = the resulting Monad
 * w = log value (which has to be an Monoid)
+
+Both __a__ and __w__ are returned as a pair within the Monad __m__.
 
 The WriterT constructor encapsulates:
 
@@ -192,7 +194,7 @@ pass :: Monad m => WriterT w m (a, w -> w) -> WriterT w m a
 mapWriterT :: (m (a, w) -> n (b, w’)) -> WriterT w m a -> WriterT w’ n b
 ```
 
-## MonadTrans
+# MonadTrans
 
 The MonadTrans typeclass defines one function called _lift_:
 
@@ -200,9 +202,9 @@ The MonadTrans typeclass defines one function called _lift_:
 lift :: Monad m => m a -> t m a
 ```
 
-that lifts a Monad into a MT.
+that lifts a Monad into a MT. We can use this function to return a Monad into a given transformer.
 
-## A ReaderT WriterT example
+# A ReaderT WriterT example
 
 Given the above types and functions, let's have a look at an example of using a ReaderT transformer stack.
 
@@ -229,7 +231,7 @@ Let's definite a function to read the host:
 getHost :: Reader Config (Maybe String)
 ```
 
-Given a Config this function may or may not return a String with the host value.
+Given a _Config_ this function will return the host name in a _Just_ if present, or a _Nothing_ if not.
 
 It would could be implemented as:
 
@@ -269,7 +271,7 @@ Also notice that we used a Reader Monad as opposed to a ReaderT MT to read both 
 ReaderT r m a
 ```
 
-and we haven't decided on what __m__ is at the moment. I'll demonstrate how we could have directly used a ReaderT MT to implement _getHost_ and _getPort_ later on.
+and we haven't decided on what __m__ is at the moment. I'll demonstrate how we could have directly used a ReaderT MT to implement _getHost_ and _getPort_ [later](/posts/2018-01-12-readert-writert.html#using-readert-instead-of-reader) on.
 
 Now that we've written functions to read the host and port, lets go ahead and use those values in a ReaderT MT along with a WriterT MT to log out the values we received from the configuration:
 
@@ -277,7 +279,7 @@ Now that we've written functions to read the host and port, lets go ahead and us
 getConfig :: ReaderT Config (WriterT String IO) ()
 ```
 
-Given a Config type as an input, the result returned will be in a WriterT MT with a log type of String with an inner Monad of IO and a value of unit () return within IO.
+Given a Config type as an input, the result returned will be in a WriterT MT with a log type of String with an inner Monad of IO and a value of unit () return within IO. That sounds more complicated that it really is.
 
 It's implemented as:
 
@@ -310,7 +312,7 @@ The next two lines covert the Maybe values for host and port into their String e
       port = maybe "-" show portM
 ```
 
-The following four lines write String values to the log in order:
+The next four lines write String values to the log in order:
 
 ```{.haskell .scrollx}
   _ <- log "\nConfig"
@@ -346,7 +348,7 @@ The _runReader_ function is defined as:
 runReader :: Reader r a -> r -> a
 ```
 
-and unwraps the Reader Monad to a function (`r -> a`). The _reader_ (as defined previously) lifts a function from (`r -> a`) into the ReaderT MT. This seems like unnecessary work and ideally there should be an inbuilt function that does this for us.
+and unwraps the Reader Monad to a function (`r -> a`). The _reader_ function (as defined previously) lifts a function from (`r -> a`) into the ReaderT MT. This seems like unnecessary work and ideally there should be an in-built function that does this for us.
 
 Next let's have a look at the _log_ function:
 
@@ -361,19 +363,7 @@ From the type definition:
 w -> t (WriterT w m) ()
 ```
 
-we can see that we are lifing some log __w__ into a transformer stack __t__ (WriterT __w m__).
-
-_tell_ is defined as:
-
-```{.haskell .scrollx}
-tell :: Monad m => w -> WriterT w m ()
-```
-
-and _lift_ is defined as:
-
-```{.haskell .scrollx}
-lift :: Monad m => m a -> t m a
-```
+we can see that we are lifing some log __w__ into a transformer stack __t__ containing a WriterT w m.
 
 We've come a long way and we've got everything setup as needed. The only thing left to do is run the transformer stack and reap our rewards. We can do that with the _readWriteConfig_ function:
 
@@ -382,32 +372,12 @@ readWriteConfig :: IO ()
 readWriteConfig = execWriterT (runReaderT getConfig serverConfig) >>= putStrLn
 ```
 
-Let's start with the definition of the _runReaderT_ function:
-
-```{.haskell .scrollx}
-runReaderT :: ReaderT r m a -> r -> m a
-```
-
-When given a __ReaderT__ Monad Transformer and the resource, the above function returns the inner Monad.
-
-_execWriterT_ is defined as:
-
-```{.haskell .scrollx}
-execWriterT :: Monad m => WriterT w m a -> m w
-```
-
-which basically returns the log __w__ in the Monad __m__.
-
 When running the stack, it is run from outside-in. So given a _ReaderT (WriterT String m) a_,
 we:
 
-1. Run the ReaderT MT with runReaderT. This returns result (__a__) in the inner Monad m: WriterT String m a
-1. Run the WriterT MT with execWriterT. This returns the log (__w__) in the inner Monad m: m w
-
-Substituting the actual Monads in the above:
-
-1. Run the ReaderT with runReaderT. This returns WriterT String IO ()
-1. Run the WriterT with execWriterT. This returns IO String
+1. Run the ReaderT MT with runReaderT. This returns result __a__ in the inner Monad __m__ which is a WriterT String m a. Substituting the IO Monad for __m__, returns a WriterT String IO (). Notice that the result __a__ is of type Unit but we don't care about the result, only the log.
+1. Run the WriterT MT with execWriterT. This returns the log __w__ in the inner Monad __m__ which is an __m w__. Substituting the IO Monad for __m__ and String for __w__, returns an IO String.
+1. Binding through from IO String to _putStrLn_ gives us an IO ().
 
 The final output of running the above is:
 
@@ -418,7 +388,7 @@ host: localhost
 port: 7654
 ```
 
-### Using ReaderT instead of Reader
+## Using ReaderT instead of Reader
 
 Here are the functions that need to be rewritten if we directly use ReaderT MT instead of using the Reader Monad to read the configuration:
 
@@ -446,9 +416,16 @@ getConfig2 = do
   ... -- same as getConfig
 ```
 
-We can see that this solution is a lot easier with less work to do. We just needed to add a Monad type constraint to the _getHost_ and _getPort_ functions. We also have no need for the _fromReader_ function which is a bonus!
+We can see that this solution is a lot easier with less work to do. We just needed to add a Monad type constraint to the _getHost_ and _getPort_ functions. We also have no need for the _fromReader_ function which is a bonus! We can also call the _readWriteConfig_ function with _getConfig2_ instead of _getConfig_ and it all works:
 
-## The complete solution:
+_readWriteConfig2_
+
+```{.haskell .scrollx}
+readWriteConfig2 :: IO ()
+readWriteConfig2 = execWriterT (runReaderT getConfig2 serverConfig) >>= putStrLn
+```
+
+The complete Solution
 
 ```{.haskell .scrollx}
 module Config (readWriteConfig) where
@@ -531,9 +508,7 @@ readWriteConfig2 = execWriterT (runReaderT getConfig2 serverConfig) >>= putStrLn
 
 ```
 
-https://stackoverflow.com/questions/43840588/use-readert-maybe-or-maybet-reader#43840589
-
-## A tale of at least two Monads
+# A tale of at least two Monads
 
 ![Monads](https://pbs.twimg.com/media/CgKMfpQWwAAEsJQ.jpg)
 
@@ -543,13 +518,13 @@ Each Monad Transformer is composed of at least two Monads. If we take ReaderT as
 ReaderT r m a
 ```
 
-where __ReaderT r m__ is a Monad and __m__ is a Monad. If you stack Monads, in the __m__ type variable as with a WriterT for example:
+where ReaderT r m is a Monad and __m__ is a Monad. If you stack Monads, in the __m__ type variable as with a WriterT for example:
 
 ```{.haskell .scrollx}
 ReaderT r (WriterT w m) a
 ```
 
-then __ReaderT r (WriterT w m)__ is a Monad, __WriterT w m__ is a Monad and __m__ is a Monad.
+then ReaderT r (WriterT w m) is a Monad, WriterT w m is a Monad and __m__ is a Monad. Talk about Monad overload!
 
 ---------
 
@@ -559,3 +534,7 @@ traverse :: Applicative f => (a -> f b) -> t a -> f (t b)
 sequenceA :: Applicative f => t (f a) -> f (t a)
 sequence   :: Monad m      => t (m a) -> m (t a)
 
+
+# References
+
+1. [use-readert-maybe-or-maybet-reader](https://stackoverflow.com/questions/43840588/use-readert-maybe-or-maybet-reader#43840589)
