@@ -281,7 +281,7 @@ Also notice that we used a Reader Monad as opposed to a ReaderT MT to read both 
 ReaderT r m a
 ```
 
-and we haven't decided on what __m__ is at the moment. I'll demonstrate how we could have directly used a ReaderT MT to implement _getHost_ and _getPort_ [later](/posts/2018-01-12-readert-writert.html#using-readert-instead-of-reader) on.
+and we haven't decided on what __m__ is at the moment. I'll demonstrate how we could have directly used a ReaderT MT to implement _getHost_ and _getPort_ [later](https://sanj.ink/posts/2018-01-12-stacking-the-readert-writert-monad-transformer-stack-in-haskell.html#using-readert-instead-of-reader) on.
 
 Now that we've written functions to read the host and port, lets go ahead and use those values in a ReaderT MT along with a WriterT MT to log out the values we received from the configuration:
 
