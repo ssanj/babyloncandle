@@ -1,8 +1,8 @@
 ---
-title: Using ReaderTWriterT in Haskell
+title: Stacking the ReaderT WriterT Monad Transformer Stack in Haskell
 author: sanjiv sahayam
-description: ???
-tags: haskell, monad-transformer
+description: How to stack a Monad Transformer stack of a ReaderT Writer.
+tags: fp, haskell, monad-transformer
 comments: true
 ---
 
@@ -25,7 +25,7 @@ Let's start by looking at the type signature for the Reader Monad:
 r -> a
 ```
 
-The Reader Monad when given some resource, _r_ from the environment will return a result of _a_.
+The Reader Monad when given some resource, __r__ from the environment will return a result of __a__.
 
 The type variables defined are as follows:
 
@@ -38,7 +38,7 @@ Next lets have a look at the type signature for a ReaderT Monad Transformer (MT)
 newtype ReaderT r m a = ReaderT { runReaderT :: r -> m a }
 ```
 
-That seems a lot less clear than the definition of the Reader Monad. As we'll see below they are essentially very similar.
+This is less clear than the definition of the Reader Monad. As we'll see below they are essentially very similar.
 
 The type variables defined are as follows:
 
@@ -53,13 +53,21 @@ r -> m a -- ReaderT MT
 r ->   a -- Reader Monad
 ```
 
-The ReaderT MT is simply a Reader Monad whose result is returned within another Monad. More on that later. Hopefully the connection between the Reader Monad and the Reader MT is getting clearer.
+The ReaderT MT is simply a Reader Monad whose result is returned within another Monad. More on that later. Hopefully the connection between the Reader Monad and the Reader MT is clearer.
 
 When we see a ReaderT r m a we can mentally substitute it with a function of the type:
 
 ```{.haskell .scrollx}
 r -> m a
 ```
+
+And when we see a function of the type `r -> m a` we can mentally substitute it with:
+
+```{.haskell .scrollx}
+ReaderT r m a
+```
+
+Depending on the situation it might be easier to think in one of the above versions of the ReaderT MT.
 
 Given a ReaderT r m a we can unwrap its value via the _runReaderT_ method:
 
@@ -281,7 +289,7 @@ Now that we've written functions to read the host and port, lets go ahead and us
 getConfig :: ReaderT Config (WriterT String IO) ()
 ```
 
-Given a Config type as an input, the result returned will be in a WriterT MT with a log type of String with an inner Monad of IO and a value of unit () return within IO. That sounds more complicated that it really is.
+Given a Config type as an input, the result returned will be in a WriterT MT with a log type of String with an inner Monad of IO and a value of unit () returned within IO. That sounds more complicated than it really is.
 
 It's implemented as:
 
@@ -359,19 +367,40 @@ log :: (Monad m, MonadTrans t, Monoid w) => w -> t (WriterT w m) ()
 log = lift . tell
 ```
 
-From the type definition:
+From the type definition of _tell_:
 
 ```{.haskell .scrollx}
-w -> t (WriterT w m) ()
+tell :: Monad m => w -> WriterT w m ()
 ```
 
-from the definition of lift given previously:
+we can see that we almost get the result we want:
+
+```{.haskell .scrollx}
+w -> WriterT w m ()
+```
+
+We just need to lift the WriterT w m Monad into a Monad Transformer __t__ and we can do that with the _lift_ defined previously:
 
 ```{.haskell .scrollx}
 lift :: Monad m => m a -> t m a
 ```
 
-we can see that we are lifing some log __w__ into a transformer stack __t__ through the WriterT w m Monad having a value of Unit.
+which gives us:
+
+```{.haskell .scrollx}
+w -> WriterT w m () -- tell
+
+m a -> t m a -- lift
+-- replacing m with (WriterT w m)
+(WriterT w m) a -> t (WriterT w m) a
+-- replacing a with ()
+(WriterT w m) () -> t (WriterT w m) ()
+
+-- combining lift . tell
+w -> t (WriterT w m) ()
+```
+
+We can see that we are lifing some log __w__ into a transformer stack __t__ through the WriterT w m Monad.
 
 We've come a long way and we've got everything setup as needed. The only thing left to do is run the transformer stack and reap our rewards. We can do that with the _readWriteConfig_ function:
 
@@ -383,11 +412,23 @@ readWriteConfig = execWriterT (runReaderT getConfig serverConfig) >>= putStrLn
 When running the stack, it is run from outside-in. So given a _ReaderT (WriterT String m) a_,
 we:
 
-1. Run the ReaderT MT with runReaderT. This returns result __a__ in the inner Monad __m__ which is a WriterT String m. Substituting the IO Monad for __m__ and Unit for __a__ returns a WriterT String IO (). We don't care about the result of __a__ - only the log.
-1. Run the WriterT MT with execWriterT. This returns the log __w__ in the inner Monad __m__ which is an __m w__. Substituting the IO Monad for __m__ and String for __w__, returns an IO String.
-1. Binding through from IO String to _putStrLn_ gives us an IO ().
+1. Run the ReaderT MT:
 
-The final output of running the above is:
+```{.haskell .scrollx}
+r -> m a
+```
+
+with runReaderT. This returns the result __a__ in the inner Monad __m__ which is a WriterT String m. Substituting the IO Monad for __m__ and Unit for __a__ returns a WriterT String IO (). We don't care about the result of __a__ - only the log.
+
+2. Run the WriterT MT:
+
+```{.haskell .scrollx}
+m (a, w)
+```
+
+with execWriterT. This returns the log __w__ in the inner Monad __m__ which is an __m w__. Substituting the IO Monad for __m__ and String for __w__, returns an IO String.
+
+3. Binding through from IO String to _putStrLn_ gives us an IO (). The final output of running the above is:
 
 ```{.terminal .scrollx}
 Config
@@ -433,7 +474,7 @@ getConfig2 = do
   ... -- same as getConfig
 ```
 
-We can see that this solution is a lot easier with less work to do. We just needed to add a Monad type constraint to the _getHost_ and _getPort_ functions. We also have no need for the _fromReader_ function which is a bonus! We can also call the _readWriteConfig_ function with _getConfig2_ instead of _getConfig_ and it all works:
+We can see that this solution is a lot easier with less work to do. We just needed to add a Monad type constraint to the _getHost2_ and _getPort2_ functions. We also have no need for the _fromReader_ function which is a bonus! We can also call the _readWriteConfig_ function with _getConfig2_ instead of _getConfig_ and it all works:
 
 _readWriteConfig2_
 
@@ -527,7 +568,24 @@ readWriteConfig2 = execWriterT (runReaderT getConfig2 serverConfig) >>= putStrLn
 
 # A Tale of At Least Two Monads
 
-![Monads](https://pbs.twimg.com/media/CgKMfpQWwAAEsJQ.jpg)
+A Monad is based on a type constructor:
+
+```{.haskell .scrollx}
+(* -> *)
+```
+
+which has one type hole; it creates a type when given a type. A simple example is the Maybe Monad:
+
+```{.haskell .scrollx}
+Maybe :: * -> *
+```
+
+While we can create a Monad instance for the Maybe type constructor, a specific Maybe instance like Maybe String can't have one because it has no type holes:
+
+```{.haskell .scrollx}
+ Maybe         :: * -> *
+(Maybe String) ::      * -- no type hole
+```
 
 Each Monad Transformer is composed of at least two Monads. If we take ReaderT MT as an example, we have its definition as:
 
@@ -587,7 +645,7 @@ and a _process'_ function as:
 process' :: ReaderT Person (WriterT String IO) String
 ```
 
-The main difference between the above functions is that one return a Unit return type and the other returns a String, respectively. Given that the ReaderT MT stack is almost the same as that in the previous example, it should be fairly easy to implement the above functions.
+The main difference between the above functions is that one returns a Unit return type and the other returns a String, respectively. Given that the ReaderT MT stack is almost the same as that in the previous example, it should be fairly easy to implement the above functions.
 
 The _process_ function is implemented as:
 
@@ -606,7 +664,7 @@ We've not seen the [_liftIO_](https://hackage.haskell.org/package/transformers-0
 liftIO :: IO a -> m a
 ```
 
-which just lifts a value from the IO Monad to another Monad. In the above example, _liftIO_ will lift a Unit value from the IO Monad (`putStrLn p`), into the ReaderT Person (WriterT String IO) Monad.
+which just lifts a value from the IO Monad into another Monad. In the above example, _liftIO_ will lift a Unit value from the IO Monad (`putStrLn p`), into the ReaderT Person (WriterT String IO) Monad.
 
 The _process'_ function is implemented as:
 
@@ -643,7 +701,7 @@ Next let's Run the _process'_ function with a Person instance:
 
 ## Traversable
 
-Before we look at the next invocation let's look at the definition of the [_mapM_](http://hackage.haskell.org/package/base-4.10.1.0/docs/Prelude.html#v:mapM) function. The _mapM_ function maps each element of a structure to a monadic action, evaluates these actions from left to right, and collect the results.
+Before we look at the next invocation let's look at the definition of the [_mapM_](http://hackage.haskell.org/package/base-4.10.1.0/docs/Prelude.html#v:mapM) function. The _mapM_ function maps each element of a structure to a monadic action, evaluates these actions from left to right, and collects the results.
 
 ```{.haskell .scrollx}
 mapM :: Monad m => (a -> m b) -> t a -> m (t b)
@@ -668,7 +726,7 @@ mapM  :: (a -> m b) -> t a -> m (t b)
 mapM_ :: (a -> m b) -> t a -> m () -- only performs a side effect
 ```
 
-which it discards (returns Unit). This is useful to use when you don't care about the return value and just want to perform some side effect.
+which it discards (returns Unit). This is useful when you don't care about the return value and just want to perform some side effect.
 
 Some other interesting functions on the Traversable typeclass are:
 
@@ -718,7 +776,7 @@ Let's use _mapM_ to run our ReaderT stack with multiple input values:
 The _mapM_ function is run as follows:
 
 1. Each _runReaderT process'_ is supplied a Person from the _peopleDb_ function, which then returns a  ReaderT Person (WriterT String IO) String.
-1. These results are then collect as a `ReaderT Person (WriterT String IO) [String]`
+1. These results are then collected as a ReaderT Person (WriterT String IO) [String]
 
 Here's how we derive the result by replacing each type parameter with the actual types:
 
