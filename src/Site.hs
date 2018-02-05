@@ -333,7 +333,7 @@ feedConfig =  FeedConfiguration {
                 feedDescription = "The blog of Sanjiv Sahayam",
                 feedAuthorName = "sanjiv sahayam",
                 feedAuthorEmail = "sanjsmailbox@gmail.com",
-                feedRoot =  "http://blog.ssanj.net"
+                feedRoot =  "https://blog.ssanj.net"
              }
 --------------------------------------------------------------------------------
 

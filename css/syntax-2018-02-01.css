@@ -17,6 +17,8 @@ td.sourceCode { padding-left: 5px; }
 .sourceCode span.re { }
 .sourceCode span.er { color: red; font-weight: bold; }
 
+/* Scala */
+
 .post pre.sourceCode.scala, .post code.sourceCode.scala {
     background-color: black;
 }
@@ -41,7 +43,34 @@ td.sourceCode { padding-left: 5px; }
     color: darkgray;
 }
 
-
 .post code.sourceCode.scala {
     color: white;
 }
+
+/* Haskell */
+
+.post pre.sourceCode.haskell, .post code.sourceCode.haskell {
+    background-color: black;
+}
+
+.post code.sourceCode.haskell {
+    color: white;
+}
+
+.post code.sourceCode.haskell span.ot,
+.post code.sourceCode.haskell span.fu,
+.post code.sourceCode.haskell span.kw {
+    color: #F9266B;
+}
+
+.post code.sourceCode.haskell span.dt {
+    color: #66D9EF;
+}
+
+.post code.sourceCode.haskell span.st {
+    color: #E6DB74;
+}
+.post code.sourceCode.haskell span.co {
+    color: #73715E;
+}
+
