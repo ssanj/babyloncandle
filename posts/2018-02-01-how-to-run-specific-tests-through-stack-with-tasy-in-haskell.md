@@ -1,8 +1,8 @@
 ---
 title: How to Run Specific Tests through Stack with Tasty in Haskell
 author: sanjiv sahayam
-description: ???
-tags: Haskell, Stack
+description: How to run a specific test through Tasty when used through Stack
+tags: haskell, stack
 comments: true
 ---
 
