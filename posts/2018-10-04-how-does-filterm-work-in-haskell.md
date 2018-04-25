@@ -36,7 +36,7 @@ filterM p = foldr (\x -> liftA2 (\flg -> if flg then (x:) else id) (p x)) (pure 
 
 From the above definition it looks like whenever the monadic filter function `(a -> m Bool)` returns a `m True`, the value in the supplied list is appended to an accumulator, and if it doesn't match the existing accumulator is left unchanged.
 
-Although this sound very simple, I found the usage of __filterM__ to be somewhat difficult to understand - at least at first. Let's start investigate its usage by looking at some example instnaces for __m__.
+Although this sound very simple, I found the usage of __filterM__ to be somewhat difficult to understand - at least at first. Let's start investigate its usage by looking at some example instancesces for __m__.
 
 ## Maybe
 
@@ -208,19 +208,7 @@ There are two main expansions happening in the implementation of __filterM__:
 1. __liftA2__ is creating a Cartesian Product of the flags __[True, False]__ and the accumulator __acc__ and combining them with supplied function, which prepends the current value of the list __x__ to the accumulator __accx__ if the flag is True or returns the existing accumulator __accx__ if it is False.
 1. All the combinations returned from __listA2__ are then returned into __foldr__ as the new value of the accumulator __acc__.
 
-Given that there are many combinations when using __numbers__, lets use something a little smaller:
-
-```{.haskell .scrollx}
- filterM (\n -> [True, False]) [1,2,3]
-```
-
-which results in:
-
-```{.haskell .scrollx}
-[[1,2,3],[1,2],[1,3],[1],[2,3],[2],[3],[]]
-```
-
- Because __filterM__ is implemented using __foldr__ the accumulated values are used from last to first.
+Because __filterM__ is implemented using __foldr__ the accumulated values are used from last to first.
 
  Given the following legend:
 
@@ -233,93 +221,305 @@ result //value of accx after applying flg1
 newacc //value of acc returned to foldr
 ```
 
-Let's start from the end of the list at 3 and follow it up to 1.
+Let's start from the end of the list at 5 and follow it up to 1.
 
-For the value of 3:
+For the value of 5:
 
 ```{.terminal .scrollx}
-x = 3
+x = 5
 acc = [[]]
 flags = [True, False]
 --------------------
 accx []
 flg1 True
-result = 3:[] => [3]
+result = 5:[] => [5]
 --------------------
 accx []
 flg1 False
 result => []
 --------------------
-newacc = [[3], []]
+newacc = [[5], []]
+```
+
+For the value of 4:
+
+```{.terminal .scrollx}
+x = 4
+acc = [[5], []]
+flags = [True, False]
+--------------------
+accx [5]
+flg1 True
+result = 4:[5] => [4,5]
+--------------------
+accx []
+flg1 True
+result = 4:[] => [4]
+--------------------
+accx [5]
+flg1 False
+result => [5]
+--------------------
+accx []
+flg1 False
+result => []
+--------------------
+newacc = [[4,5],[4],[5], []]
+```
+
+For the value of 3:
+
+```{.terminal .scrollx}
+x = 3
+acc = [[4,5],[4],[5], []]
+flags = [True, False]
+--------------------
+accx [4,5]
+flg1 True
+result = 3:[4,5] => [3,4,5]
+--------------------
+accx [4]
+flg1 True
+result = 3:[4] => [3,4]
+--------------------
+accx [5]
+flg1 True
+result = 3:[5] => [3,5]
+--------------------
+accx []
+flg1 True
+result = 3:[] => [3]
+--------------------
+accx [4,5]
+flg1 False
+result => [4,5]
+--------------------
+accx [4]
+flg1 False
+result => [4]
+--------------------
+accx [5]
+flg1 False
+result => [5]
+--------------------
+accx []
+flg1 False
+result => []
+--------------------
+newacc = [[3,4,5],[3,4],[3,5],[3],[4,5],[4],[5],[]]
 ```
 
 For the value of 2:
 
-
 ```{.terminal .scrollx}
 x = 2
-acc = [[3], []]
+acc = [[3,4,5],[3,4],[3,5],[3],[4,5],[4],[5],[]]
 flags = [True, False]
+--------------------
+accx [3,4,5]
+flg1 True
+result = 2:[3,4,5] => [2,3,4,5]
+--------------------
+accx [3,4]
+flg1 True
+result = 2:[3,4] => [2,3,4]
+--------------------
+accx [3,5]
+flg1 True
+result = 2:[3,5] => [2,3,5]
 --------------------
 accx [3]
 flg1 True
 result = 2:[3] => [2,3]
 --------------------
+accx [4,5]
+flg1 True
+result = 2:[4,5] => [2,4,5]
+--------------------
+accx [4]
+flg1 True
+result = 2:[4] => [2,4]
+--------------------
+accx [5]
+flg1 True
+result = 2:[5] => [2,5]
+--------------------
 accx []
 flg1 True
 result = 2:[] => [2]
+--------------------
+accx [3,4,5]
+flg1 False
+result => [3,4,5]
+--------------------
+accx [3,4]
+flg1 False
+result => [3,4]
+--------------------
+accx [3,5]
+flg1 False
+result => [3,5]
 --------------------
 accx [3]
 flg1 False
 result => [3]
 --------------------
+accx [4,5]
+flg1 False
+result => [4,5]
+--------------------
+accx [4]
+flg1 False
+result => [4]
+--------------------
+accx [5]
+flg1 False
+result => [5]
+--------------------
 accx []
 flg1 False
 result => []
 --------------------
-newacc = [[2,3], [2], [3], []]
+newacc = [[2,3,4,5],[2,3,4],[2,3,5],[2,3],[2,4,5],[2,4],[2,5],[2],[3,4,5],[3,4],[3,5],[3],[4,5],[4],[5],[]]
 ```
 
 For the value of 1:
 
 ```{.terminal .scrollx}
 x = 1
-acc = [[2,3], [2], [3], []]
+acc = [[2,3,4,5],[2,3,4],[2,3,5],[2,3],[2,4,5],[2,4],[2,5],[2],[3,4,5],[3,4],[3,5],[3],[4,5],[4],[5],[]]
 flags = [True, False]
+--------------------
+accx [2,3,4,5]
+flg1 True
+result = 1:[2,3,4,5] => [1,2,3,4,5]
+--------------------
+accx [2,3,4]
+flg1 True
+result = 1:[2,3,4] => [1,2,3,4]
+--------------------
+accx [2,3,5]
+flg1 True
+result = 1:[2,3,5] => [1,2,3,5]
 --------------------
 accx [2,3]
 flg1 True
 result = 1:[2,3] => [1,2,3]
 --------------------
+accx [2,4,5]
+flg1 True
+result = 1:[2,4,5] => [1,2,4,5]
+--------------------
+accx [2,4]
+flg1 True
+result = 1:[2,4] => [1,2,4]
+--------------------
+accx [2,5]
+flg1 True
+result = 1:[2,5] => [1,2,5]
+--------------------
 accx [2]
 flg1 True
 result = 1:[2] => [1,2]
+--------------------
+accx [3,4,5]
+flg1 True
+result = 1:[3,4,5] => [1,3,4,5]
+--------------------
+accx [3,4]
+flg1 True
+result = 1:[3,4] => [1,3,4]
+--------------------
+accx [3,5]
+flg1 True
+result = 1:[3,5] => [1,3,5]
 --------------------
 accx [3]
 flg1 True
 result = 1:[3] => [1,3]
 --------------------
+accx [4,5]
+flg1 True
+result = 1:[4,5] => [1,4,5]
+--------------------
+accx [4]
+flg1 True
+result = 1:[4] => [1,4]
+--------------------
+accx [5]
+flg1 True
+result = 1:[5] => [1,5]
+--------------------
 accx []
 flg1 True
 result = 1:[] => [1]
+-------------------- *
+accx [2,3,4,5]
+flg1 False
+result => [2,3,4,5]
+--------------------
+accx [2,3,4]
+flg1 False
+result => [2,3,4]
+--------------------
+accx [2,3,5]
+flg1 False
+result => [2,3,5]
 --------------------
 accx [2,3]
 flg1 False
-result = [2,3]
+result => [2,3]
+--------------------
+accx [2,4,5]
+flg1 False
+result => [2,4,5]
+--------------------
+accx [2,4]
+flg1 False
+result => [2,4]
+--------------------
+accx [2,5]
+flg1 False
+result => [2,5]
 --------------------
 accx [2]
 flg1 False
-result = [2]
+result => [2]
+--------------------
+accx [3,4,5]
+flg1 False
+result => [3,4,5]
+--------------------
+accx [3,4]
+flg1 False
+result => [3,4]
+--------------------
+accx [3,5]
+flg1 False
+result => [3,5]
 --------------------
 accx [3]
 flg1 False
-result = [3]
+result => [3]
+--------------------
+accx [4,5]
+flg1 False
+result => [4,5]
+--------------------
+accx [4]
+flg1 False
+result => [4]
+--------------------
+accx [5]
+flg1 False
+result => [5]
 --------------------
 accx []
 flg1 False
-result = []
+result => []
 --------------------
-newacc = [[1,2,3],[1,2],[1,3],[1],[2,3],[2],[3],[]]
+
+newacc = [[1,2,3,4,5],[1,2,3,4],[1,2,3,5],[1,2,3],[1,2,4,5],[1,2,4],[1,2,5],[1,2],[1,3,4,5],[1,3,4],[1,3,5],[1,3],[1,4,5],[1,4],[1,5],[1],[2,3,4,5],[2,3,4],[2,3,5],[2,3],[2,4,5],[2,4],[2,5],[2],[3,4,5],[3,4],[3,5],[3],[4,5],[4],[5],[]]
 ```
 
 Hopefully that was easier to understand. You can find alternate explanations to this problem [here](https://stackoverflow.com/questions/25476248/powerset-function-1-liner#45105085) and [here](https://byorgey.wordpress.com/2007/06/26/deducing-code-from-types-filterm).
