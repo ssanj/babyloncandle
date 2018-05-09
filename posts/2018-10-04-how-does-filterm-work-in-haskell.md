@@ -1,12 +1,12 @@
 ---
 title: How does filterM work in Haskell?
 author: sanjiv sahayam
-description: ???
+description: How to use filterM in Haskell to filter things in by a condition and by an effect.
 tags: haskell
 comments: true
 ---
 
-__filterM__ is an interesting function. In one sense it's very similar to __filter__ which we all know and love. It's much more powerful though as we shall soon see. Let's start by having a look at the definition of __fitler__:
+__filterM__ is an interesting function. In one sense it's very similar to __filter__ which we all know and love. It's much more powerful though as we shall soon see. Let's start by having a look at the definition of __filter__:
 
 ```{.haskell .scrollx}
 filter :: (a -> Bool) -> [a] -> [a]
@@ -34,9 +34,9 @@ filterM   :: (Applicative m) => (a -> m Bool) -> [a] -> m [a]
 filterM p = foldr (\x -> liftA2 (\flg -> if flg then (x:) else id) (p x)) (pure [])
 ```
 
-From the above definition it looks like whenever the monadic filter function `(a -> m Bool)` returns a `m True`, the value in the supplied list is appended to an accumulator, and if it doesn't match the existing accumulator is left unchanged.
+From the above definition it looks like whenever the monadic filter function `(a -> m Bool)` returns a `m True`, the value in the supplied list is prepended to an accumulator, and if it doesn't match the existing accumulator is left unchanged.
 
-Although this sound very simple, I found the usage of __filterM__ to be somewhat difficult to understand - at least at first. Let's start investigate its usage by looking at some example instancesces for __m__.
+Although this sound very simple, I found the usage of __filterM__ to be somewhat difficult to understand - at least at first. Let's start investigating its usage by looking at some example instances for __m__.
 
 ## Maybe
 
@@ -171,7 +171,7 @@ With List, things get more interesting. Consider the following:
 filterM (\n -> [True, False]) numbers
 ```
 
-What do you reckon the answer would be? Probably not:
+What do you reckon the answer would be? Probably not a [powerset](https://en.wikipedia.org/wiki/Power_set):
 
 ```{.haskell .scrollx}
 [[1,2,3,4,5],[1,2,3,4],[1,2,3,5],[1,2,3],[1,2,4,5],[1,2,4],[1,2,5],[1,2],
@@ -192,7 +192,7 @@ How does this work with List? If we use __liftA2__ with List:
 liftA2 (+) [1,2,3] [4,5,6]
 = [5,6,7,6,7,8,7,8,9]
 ```
-we see that we get a Cartesian Product of values (all combinations). List is a non-deterministic Monad and as such it produces results of every possible combination.
+we see that we get a [Cartesian product](https://en.wikipedia.org/wiki/Cartesian_product) of values (all combinations). List is a non-deterministic Monad and as such it produces results of every possible combination.
 
 Let's start by expanding out the point-free implementation of __filterM__:
 
@@ -201,11 +201,11 @@ filterM p =
   foldr (\x acc -> liftA2 (\flg1 accx -> if flg1 then (x:accx) else accx) (p x) acc) (pure [])
 ```
 
-__accx__ is the accumulator value passed to __liftA2__. The values passed will be the Cartesian Product of __[True, False]__ and the accumulator of list __acc__, which is initially __[[]]__.
+__accx__ is the accumulator value passed to __liftA2__. The values passed will be the Cartesian product of __[True, False]__ and the accumulator of list __acc__, which is initially __[[]]__.
 
 There are two main expansions happening in the implementation of __filterM__:
 
-1. __liftA2__ is creating a Cartesian Product of the flags __[True, False]__ and the accumulator __acc__ and combining them with supplied function, which prepends the current value of the list __x__ to the accumulator __accx__ if the flag is True or returns the existing accumulator __accx__ if it is False.
+1. __liftA2__ is creating a Cartesian product of the flags __[True, False]__ and the accumulator __acc__ and combining them with supplied function, which prepends the current value of the list __x__ to the accumulator __accx__ if the flag is True or returns the existing accumulator __accx__ if it is False.
 1. All the combinations returned from __listA2__ are then returned into __foldr__ as the new value of the accumulator __acc__.
 
 Because __filterM__ is implemented using __foldr__ the accumulated values are used from last to first.
@@ -522,6 +522,38 @@ result => []
 newacc = [[1,2,3,4,5],[1,2,3,4],[1,2,3,5],[1,2,3],[1,2,4,5],[1,2,4],[1,2,5],[1,2],[1,3,4,5],[1,3,4],[1,3,5],[1,3],[1,4,5],[1,4],[1,5],[1],[2,3,4,5],[2,3,4],[2,3,5],[2,3],[2,4,5],[2,4],[2,5],[2],[3,4,5],[3,4],[3,5],[3],[4,5],[4],[5],[]]
 ```
 
-Hopefully that was easier to understand. You can find alternate explanations to this problem [here](https://stackoverflow.com/questions/25476248/powerset-function-1-liner#45105085) and [here](https://byorgey.wordpress.com/2007/06/26/deducing-code-from-types-filterm).
+That was a bit harder than necessary!
 
 ## State
+
+Now let's use a Monad that has two type holes. The State Monad allows us to return a value and thread through some state we are interested in. Let's use our __isEven__ method to filter in all the even inputs and use a list to record all the values inspected along the way:
+
+```{.haskell .scrollx}
+let x1 = filterM (\x -> state (\s -> (isEven(x), s ++ [x]))) [1 .. 10]
+//x1 :: (Integral a, Monad m) => StateT [a] m [a]
+evalState x1 [] //the value
+= [2,4,6,8,10] //only even numbers
+execState x1 []
+= [1,2,3,4,5,6,7,8,9,10] //the state - all inspected values
+```
+
+The interesting thing to note is that given __x1__'s type:
+
+```{.haskell .scrollx}
+x1 :: (Integral a, Monad m) => StateT [a] m [a]
+```
+
+The __m__ in __filterM__:
+
+```{.haskell .scrollx}
+filterM :: Applicative m => (a -> m Bool) -> [a] -> m [a]
+```
+
+is:
+
+```{.haskell .scrollx}
+StateT [a] m
+```
+which is why we can return a Bool in the value position and have it filter the inputs for us.
+
+Hopefully that was somewhat easier to understand. You can find alternate explanations to this problem [here](https://stackoverflow.com/questions/25476248/powerset-function-1-liner#45105085) and [here](https://byorgey.wordpress.com/2007/06/26/deducing-code-from-types-filterm).
