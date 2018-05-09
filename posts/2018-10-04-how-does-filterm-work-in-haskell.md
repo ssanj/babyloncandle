@@ -213,12 +213,12 @@ Because __filterM__ is implemented using __foldr__ the accumulated values are us
  Given the following legend:
 
 ```{.terminal .scrollx}
-x      //element in the list
-acc    //value of accumulator
-accx   //value of accumulator at current combination
-flg1   //value of flag at current combination
-result //value of accx after applying flg1
-newacc //value of acc returned to foldr
+x      -- element in the list
+acc    -- value of accumulator
+accx   -- value of accumulator at current combination
+flg1   -- value of flag at current combination
+result -- value of accx after applying flg1
+newacc -- value of acc returned to foldr
 ```
 
 Let's start from the end of the list at 5 and follow it up to 1.
@@ -524,17 +524,30 @@ newacc = [[1,2,3,4,5],[1,2,3,4],[1,2,3,5],[1,2,3],[1,2,4,5],[1,2,4],[1,2,5],[1,2
 
 That was a bit harder than necessary!
 
+## Either
+
+Using __filterM__ with __Either__ is pretty much the same as a __Maybe__:
+
+```{.haskell .scrollx}
+let e1 = filterM (\x -> if x == 11 then Left "You gave me eleven" else Right (isEven x))
+-- e1 :: :: Integral a => [a] -> Either [Char] [a]
+e1 [1 .. 10]
+= Right [2,4,6,8,10] -- only even numbers
+e1 [1 .. 11]
+= Left "You gave me eleven" -- drops all results on a Left
+```
+
 ## State
 
-Now let's use a Monad that has two type holes. The State Monad allows us to return a value and thread through some state we are interested in. Let's use our __isEven__ method to filter in all the even inputs and use a list to record all the values inspected along the way:
+Now let's use a Monad that has two type holes which are both used together. The State Monad allows us to return a value and thread through some state we are interested in at the same time. Let's use our __isEven__ method to filter in all the even inputs and use a list to record all the values inspected along the way:
 
 ```{.haskell .scrollx}
 let x1 = filterM (\x -> state (\s -> (isEven(x), s ++ [x]))) [1 .. 10]
-//x1 :: (Integral a, Monad m) => StateT [a] m [a]
-evalState x1 [] //the value
-= [2,4,6,8,10] //only even numbers
-execState x1 []
-= [1,2,3,4,5,6,7,8,9,10] //the state - all inspected values
+-- x1 :: (Integral a, Monad m) => StateT [a] m [a]
+evalState x1 []          -- get value
+= [2,4,6,8,10]           -- only even numbers
+execState x1 []          -- get state
+= [1,2,3,4,5,6,7,8,9,10] -- the state - all inspected values
 ```
 
 The interesting thing to note is that given __x1__'s type:
