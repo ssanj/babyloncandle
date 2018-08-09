@@ -32,7 +32,7 @@ For example, to define a function that pauses for a given delay before printing 
 
 To unset multiline mode use:
 
-```{.haskell .scrollx}
+```{.command .scrollx}
 unset +m
 ```
 
