@@ -775,8 +775,8 @@ Let's use _mapM_ to run our ReaderT stack with multiple input values:
 
 The _mapM_ function is run as follows:
 
-1. Each _runReaderT process'_ is supplied a Person from the _peopleDb_ function, which then returns a  ReaderT Person (WriterT String IO) String.
-1. These results are then collected as a ReaderT Person (WriterT String IO) [String]
+1. Each _runReaderT process'_ is supplied a Person from the _peopleDb_ function, which then returns a  WriterT String IO String.
+1. These results are then collected as a WriterT String IO [String].
 
 Here's how we derive the result by replacing each type parameter with the actual types:
 
@@ -786,12 +786,12 @@ mapM :: (a -> m b) -> t a -> m (t b)
 mapM    (Person -> m b) t Person  -> m (t b)
 -- replacing t with []:
 mapM    (Person -> m b) [Person]  -> m [b]
--- replacing m (the Monad) with ReaderT Person (WriterT String IO)
-(Person -> ReaderT Person (WriterT String IO) b) -> [Person] -> ReaderT Person (WriterT String IO) [b]
+-- replacing m (the Monad) with WriterT String IO
+(Person -> WriterT String IO b) -> [Person] -> WriterT String IO [b]
 -- replacing b with String
-(Person -> ReaderT Person (WriterT String IO) String) -> [Person] -> ReaderT Person (WriterT String IO) [String]
+(Person -> WriterT String IO String) -> [Person] -> WriterT String IO [String]
 -- which returns the this result:
-ReaderT Person (WriterT String IO) [String]
+WriterT String IO [String]
 ```
 
 The final output is:
