@@ -1,7 +1,7 @@
 ---
 title: Obstacle Subtraction
 author: sanjiv sahayam
-description: A spin on James Altucher's: "Idea Subtraction" concept.
+description: A spin on James Altucher's&#58; "Idea Subtraction" concept.
 tags: ideas, life
 comments: true
 ---

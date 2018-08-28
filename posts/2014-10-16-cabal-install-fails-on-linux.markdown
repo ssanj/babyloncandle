@@ -1,7 +1,7 @@
 ---
 title: Cabal Install cabal-install Fails on Linux
 author: sanjiv sahayam
-description: My cabal upgrade of cabal via cabal-install failed on Ubuntu 12.04 with the rather cryptic error of: "cannot find -lz". Here are the steps I took to resolve the problem.
+description: My cabal upgrade of cabal via cabal-install failed on Ubuntu 12.04 with the rather cryptic error of&#58; "cannot find -lz". Here are the steps I took to resolve the problem.
 tags: cabal, haskell, linux
 ---
 

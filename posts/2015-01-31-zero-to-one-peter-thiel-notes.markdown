@@ -1,7 +1,7 @@
 ---
 title: Zero to One - Peter Thiel
 author: sanjiv sahayam
-description: Ideas from the book: Zero to One - Notes on startups or How to build the future - Peter Thiel with Blake Masters
+description: Ideas from the book&#58; Zero to One - Notes on startups or How to build the future - Peter Thiel with Blake Masters
 tags: book, ideas
 ---
 

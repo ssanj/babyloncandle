@@ -1,7 +1,7 @@
 ---
 title: The Dip - Seth Godin
 author: sanjiv sahayam
-description: Ideas from the book: The Dip - The little book that teaches you when to quit (and when to stick) by Seth Godin.
+description: Ideas from the book&#58; The Dip - The little book that teaches you when to quit (and when to stick) by Seth Godin.
 tags: book, ideas
 comments: true
 ---

@@ -1,7 +1,7 @@
 ---
 title: The Consolations of Philosophy - Alain de Botton
 author: sanjiv sahayam
-description: Ideas from the book: The Consolations of Philosophy by Alain de Botton.
+description: Ideas from the book&#58; The Consolations of Philosophy by Alain de Botton.
 tags: book, ideas
 comments: true
 ---

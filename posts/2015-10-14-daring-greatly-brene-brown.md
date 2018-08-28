@@ -1,7 +1,7 @@
 ---
 title: Daring Greatly - Brené Brown
 author: sanjiv sahayam
-description: Ideas from the book: Daring Greatly - How the courage to be vulnerable transforms the way we live, love, parent and lead - Brené Brown
+description: Ideas from the book&#58; Daring Greatly - How the courage to be vulnerable transforms the way we live, love, parent and lead - Brené Brown
 tags: book, ideas
 comments: true
 ---

@@ -1,7 +1,7 @@
 ---
 title: Things a Little Bird Told Me - Biz Stone
 author: sanjiv sahayam
-description: Ideas from the book: Things a Little Bird Told Me - Confessions of the Creative Mind - Biz Stone.
+description: Ideas from the book&#58; Things a Little Bird Told Me - Confessions of the Creative Mind - Biz Stone.
 tags: book, ideas
 comments: true
 ---

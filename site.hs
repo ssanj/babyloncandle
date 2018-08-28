@@ -39,9 +39,6 @@ main = hakyllWith siteConfig $ do
         let precompiler = liftM (fmap demoteHeaders) (pandocCompiler >>= saveSnapshot contentSnapshot)
         compile $ compilerGlue precompiler [postTemplate, defaultTemplate] (postCtx tags)
 
-    match allPapersPattern $ do
-        compile $ pandocCompiler >>= saveSnapshot paperSnapshot
-
     tagsRules tags $ \tag pattern -> do
 
         route idRoute
@@ -58,17 +55,6 @@ main = hakyllWith siteConfig $ do
             compilerGlue (getResourceBody >>= applyAsTemplate ctx) [defaultTemplate] ctx
 
     match templatesPattern $ compile templateCompiler
-
-    -- match aboutPagePattern $ do
-    --     route $ setExtension htmlExtension
-    --     compile $ compilerGlue pandocCompiler [aboutTemplate, defaultTemplate] commonCtx
-
-    -- create [papersPage] $ do
-    --     route idRoute
-    --     compile $ do
-    --         (papers, count) <- partitionPosts (withLength id) . recentFirst =<< loadAllSnapshots allPapersPattern paperSnapshot
-    --         let ctx = paperListCtx papers count <> commonCtxWithDescription papersPageDescription
-    --         compilerGlue emptyCompiler [papersTemplate, defaultTemplate] ctx
 
     create [searchDataPage] $ do
         route idRoute
@@ -154,14 +140,6 @@ createFieldFromOther keyn keyo = field keyn $ getField keyo
 postListCtx :: [Item String] -> Tags -> Context String
 postListCtx posts tags = listField "posts" (postCtx tags) (return posts)
 
-paperCtx :: Context String
-paperCtx = mconcat [modificationTimeField "mtime" "%U",
-                    dateField "date" "%B %e, %Y",
-                    commonCtx]
-
-paperListCtx :: [Item String] -> Int -> Context String
-paperListCtx papers paperCount = mconcat [listField "papers" paperCtx (return papers), postCountCtx  paperCount]
-
 commonCtxWithDescription :: String -> Context String
 commonCtxWithDescription description = constField "description" description <> commonCtx
 
@@ -232,9 +210,6 @@ feedCtx = mconcat [ bodyField "description", defaultContext]
 allPostsPattern :: Pattern
 allPostsPattern = "posts/*"
 
-allPapersPattern :: Pattern
-allPapersPattern = "papers/*"
-
 imagesPattern :: Pattern
 imagesPattern = "images/**"
 
@@ -259,8 +234,6 @@ googleAuthPattern = "googleac0741b9661397ea.html"
 bingAuthPattern :: Pattern
 bingAuthPattern = "BingSiteAuth.xml"
 
-aboutPagePattern :: Pattern
-aboutPagePattern = "about.markdown"
 --------------------------------------------------------------------------------
 
 
@@ -271,8 +244,6 @@ aboutPagePattern = "about.markdown"
 contentSnapshot :: Snapshot
 contentSnapshot = "content"
 
-paperSnapshot :: Snapshot
-paperSnapshot = "paperContent"
 --------------------------------------------------------------------------------
 
 
@@ -288,9 +259,6 @@ rssFeedPage = "feed.xml"
 
 sitemapPage :: Identifier
 sitemapPage = "sitemap.xml"
-
-papersPage :: Identifier
-papersPage = "papers.html"
 
 searchDataPage :: Identifier
 searchDataPage = "data/pages.json"
@@ -348,20 +316,12 @@ defaultTemplate = "default.html"
 archiveTemplate :: String
 archiveTemplate = "archive.html"
 
-searchDataTemplate :: String
-searchDataTemplate = "pages_template.json"
-
-aboutTemplate :: String
-aboutTemplate = "about.html"
 
 postTemplate :: String
 postTemplate = "post.html"
 
 postsTemplate :: String
 postsTemplate = "posts.html"
-
-papersTemplate :: String
-papersTemplate = "papers.html"
 
 sitemapItemTemplate :: String
 sitemapItemTemplate = "sitemap-item.xml"
@@ -432,6 +392,3 @@ archivePageDescription = "A collection of all the posts across this site in orde
 
 indexPageDescription :: String
 indexPageDescription = "Welcome to Sanj's blog. Have a read of my latest posts."
-
-papersPageDescription :: String
-papersPageDescription = "A collection technical papers I have read or want to read."

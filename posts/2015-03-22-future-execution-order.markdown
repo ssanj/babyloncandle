@@ -1,7 +1,7 @@
 ---
 title: Future Execution Order
 author: sanjiv sahayam
-description: An experiment to determine two things: 1. When does a Future execute. 2. The order of Future execution within a for-comprehension.
+description: An experiment to determine two things&#58; 1. When does a Future execute. 2. The order of Future execution within a for-comprehension.
 tags: future,scala
 ---
 
