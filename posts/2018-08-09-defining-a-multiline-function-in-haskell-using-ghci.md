@@ -33,7 +33,7 @@ For example, to define a function that pauses for a given delay before printing 
 To unset multiline mode use:
 
 ```{.command .scrollx}
-unset +m
+:unset +m
 ```
 
 References: [Multi-line commands in GHCi](https://stackoverflow.com/questions/8443035/multi-line-commands-in-ghci), [How to define a function in ghci across multiple lines?](https://stackoverflow.com/questions/2846050/how-to-define-a-function-in-ghci-across-multiple-lines)

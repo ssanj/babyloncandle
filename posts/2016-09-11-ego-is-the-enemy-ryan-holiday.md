@@ -1,7 +1,7 @@
 ---
 title: Ego is the Enemy - Ryan Holiday
 author: sanjiv sahayam
-description: Ideas from the book: Ego is the Enemy - The Fight to Master Our Greatest Opponent by Ryan Holiday.
+description: Ideas from the book&#58; Ego is the Enemy - The Fight to Master Our Greatest Opponent by Ryan Holiday.
 tags: book, ideas
 comments: true
 ---

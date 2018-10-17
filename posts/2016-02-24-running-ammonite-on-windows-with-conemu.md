@@ -1,7 +1,7 @@
 ---
 title: Running Ammonite on Windows 7 with ConEmu
 author: sanjiv sahayam
-description: If Ammonite fails with: RuntimeException&colon; Nonzero exit value&colon; 1, here&apos;s one way to fix it.
+description: If Ammonite fails with&#58; RuntimeException&colon; Nonzero exit value&colon; 1, here&apos;s one way to fix it.
 tags: ammonite, scala, windows, conemu
 comments: true
 ---

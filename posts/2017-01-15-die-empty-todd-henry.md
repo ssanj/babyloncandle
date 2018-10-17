@@ -1,7 +1,7 @@
 ---
 title: Die Empty - Todd Henry
 author: sanjiv sahayam
-description: Ideas from the book: Die Empty - Unleash Your Best Work Every Day by Todd Henry.
+description: Ideas from the book&#58; Die Empty - Unleash Your Best Work Every Day by Todd Henry.
 tags: book, ideas
 comments: true
 ---

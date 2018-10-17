@@ -1,7 +1,7 @@
 ---
 title: Essentialism - Greg McKeown
 author: sanjiv sahayam
-description: Ideas from the book: Essentialism - The disciplined pursuit of less by Greg McKeown.
+description: Ideas from the book&#58; Essentialism - The disciplined pursuit of less by Greg McKeown.
 tags: book, ideas
 comments: true
 ---

@@ -8,3 +8,4 @@ hakyllsrc
 .cabal-sandbox/
 *.DS_Store*
 *.sublime-*
+.stack-work

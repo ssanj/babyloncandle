@@ -1,7 +1,7 @@
 ---
 title: Ignore Everybody - Hugh MacLeod
 author: sanjiv sahayam
-description: Ideas from the book: Ignore Everybody And 39 Other Keys to Creativity.
+description: Ideas from the book&#58; Ignore Everybody And 39 Other Keys to Creativity.
 tags: book, ideas
 comments: true
 ---
