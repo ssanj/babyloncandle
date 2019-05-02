@@ -1,8 +1,8 @@
 ---
 title: &quot;Default arguments are insane&quot; needs explanation in Wartremover for Scala
 author: sanjiv sahayam
-description: ???
-tags: scala, linting
+description: What are the pitfalls of using default arguments?
+tags: scala, linting, wartremover
 comments: true
 ---
 
