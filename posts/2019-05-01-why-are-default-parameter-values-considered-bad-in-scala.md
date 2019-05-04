@@ -1,12 +1,14 @@
 ---
-title: &quot;Default arguments are insane&quot; needs explanation in Wartremover for Scala
+title: Why are Default Parameter Values Considered Bad in Scala?
 author: sanjiv sahayam
-description: What are the pitfalls of using default arguments?
+description: What are the pitfalls of using Default Parameter Values or default arguments?
 tags: scala, linting, wartremover
 comments: true
 ---
 
-There is a very long issue under [Wartremover](https://github.com/wartremover) titled: [&quot;Default arguments are insane&quot; needs explanation](https://github.com/wartremover/wartremover/issues/116). I personally love using Wartremover as it definitely increases the quality of any Scala code I write. The issues around using Default Arguments or
+There is a very long issue under [Wartremover](https://github.com/wartremover) titled: [&quot;Default arguments are insane&quot; needs explanation](https://github.com/wartremover/wartremover/issues/116). Wartremover is a Scala linter that I personally love using as it definitely increases the quality of any Scala code I write.
+
+The issues around using Default Arguments or
 [Default Parameter Values](https://docs.scala-lang.org/tour/default-parameter-values.html) (as Scala refers to them) are somewhat subtle. The Wartemover issue seems to go on forever, but there are lots of really great ideas in there and I though I could summarise some of them here.
 
 ## What is a Default Parameter Value?
@@ -18,11 +20,11 @@ Here's a quick example of Default Parameter Values (DPV):
 ```{.scala .scrollx}
 def log(message: String, level: String = "INFO") = println(s"$level: $message")
 
-log("System starting")  // prints INFO: System starting
+log("System starting")  //We didn't supply level which defaults to INFO; prints INFO: System starting
 log("User not found", "WARNING")  // prints WARNING: User not found
 ```
 
-One of the main benefits of DPV are that you as the programmer don't need to supply all the parameters to a function - just the ones that are mandatory. This sounds like a really useful idea, so why are people recommending that we don't use it?
+One of the main benefits of DPV is that you don't need to supply all the parameters to a method - just the ones that are mandatory. This sounds like a really useful idea, so why are people recommending that we don't use it?
 
 ## Issues
 
@@ -35,15 +37,17 @@ val streamName: String = ...
 KinesisStream.fromUrl(streamName)
 ```
 
-Now if you just read the above function it looks like it might be doing the wrong thing. Why are we supplying a Stream name to a function that clearly states that it needs a Url?
+Now if you just read the above method it looks like it might be doing the wrong thing. Why are we supplying a Stream name to a method that clearly states that it needs a Url?
 
-The function is defined as:
+The method is defined as:
 
 ```{.scala .scrollx}
-KinesisStream.fromUrl(streamName: String, url: Option[String] = None) ...
+object KinesisStream {
+  def fromUrl(streamName: String, url: Option[String] = None): ...
+}
 ```
 
-The default value for `url` hides the true nature of what this function needs. The `url` parameter has been made optional because under some circumstances it is not needed.
+The default value for `url` hides the true nature of what this method needs. The `url` parameter has been made optional because under some circumstances it is not needed.
 
 ### 2. ~~Breaks Currying and Partial Application~~
 
@@ -97,20 +101,18 @@ Let's have a go with Rob's example:
 scala> def foo(n: Int = 3, s: String) = s * n
 foo: (n: Int, s: String)String
 
-scala> foo _
-res17: (Int, String) => String = $$Lambda$1191/1542722356@4e216b7e
-
-//does not work
-scala> foo(42)
-<console>:13: error: not enough arguments for method foo: (n: Int, s: String)String.
-Unspecified value parameter s.
-       foo(42)
+//works
+scala> foo(s = "$$")
+res36: String = $$$$$$
 
 //works
-scala> foo(42, _:String)
-res19: String => String = $$Lambda$1192/1172016038@6c826924
+scala> val p1 = foo(42, _:String)
+p1: String => String = $$Lambda$1192/1172016038@6c826924
 
-//can we get defaults for free?
+scala> p1("@")
+res38: String = @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+//can we get defaults for free after conversion to a function?
 scala> val f1 = foo _
 f1: (Int, String) => String = $$Lambda$1193/1526085518@205b3a1a
 
@@ -120,14 +122,37 @@ scala> f1(10)
 Unspecified value parameter v2.
        f1(10)
 
-//have to supply all arguments
+//works
+scala> val p2 = f1(10, _: String)
+p2: String => String = $$Lambda$1408/1660635397@7f8ac326
+
+scala> p2("*")
+res44: String = **********
+
+scala> val p3 = f1(_:Int, "$")
+p3 => String = $$Lambda$1409/1435397638@4047789d
+
+scala> p3(5)
+res48: String = $$$$$
+
+//we can also supply all arguments
 scala> f1(10, "*")
-res21: String = **********
+res50: String = **********
+
+//use in higher-order functions
+scala> messages.map(p1)
+res51: List[String] = List(hellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohello, worldworldworldworldworldworldworldworldworldworldworldworldworldworldworldworldworldworldworldworldworldworldworldworldworldworldworldworldworldworldworldworldworldworldworldworldworldworldworldworldworldworld)
+
+scala> messages.map(p2)
+res52: List[String] = List(hellohellohellohellohellohellohellohellohellohello, worldworldworldworldworldworldworldworldworldworld)
+
+scala> List(1,2,3).map(p3)
+res53: List[String] = List($, $$, $$$)
 ```
 
-This seems to be a moot issue. While the syntax is more awkward than necessary, Currying and Partial Application is certainly possible with DPV.
+This seems to be a moot issue. While the syntax is more awkward than necessary, Currying and Partial Application is certainly possible with DPV. Once we η-expand the method `foo` to the value `f1`, we lose the defaulted values defined in `foo` though; which seems a little odd.
 
-Another way to partially apply functions with default parameters is create a wrapper function with only the mandatory fields:
+Another way to partially apply methods with default parameters is create a wrapper method with only the mandatory fields:
 
 ```{.scala .scrollx}
 scala> def foo(n: Int = 3, s: String) = s * n
@@ -145,9 +170,11 @@ scala> messages.map(foo2)
 res30: List[String] = List(hellohellohello, worldworldworld)
 ```
 
+The above technique alludes that there should have been two separate methods all along.
+
 ### 3. Bugs of Convenience
 
-In a project I worked on we had some asynchronous tasks that split a workload into chunks using a sliding window of ten elements. Here's a simplified version of the issue:
+In a project I worked on we had some asynchronous tasks that split a workload into chunks using a sliding window of ten elements. Here's a simplified version of the code:
 
 ```{.scala .scrollx}
 scala> val elements = (1 to 30).toList
@@ -200,11 +227,11 @@ scala> it.next
 res27: List[Int] = List(21, 22, 23, 24, 25, 26, 27, 28, 29, 30)
 ```
 
-we can see it sliding over ten elements at a time as expected. These kind of bugs are hard to find. We lean on the compiler a lot to point out our mistakes. With DPV while our lives are more convenient because we have less parameters to supply our functions, the compiler fails to see our errors and omissions and can't help.
+We can see the code slides over ten elements at a time as expected. These kind of bugs are hard to find. We lean on the compiler a lot to point out our mistakes. With DPV while our lives are more convenient because we have less parameters to supply our functions, the compiler fails to see our errors and omissions and can't help.
 
 ### 4. Bugs due to Refactoring
 
-Consider an API at version 1.x that has the following function:
+Consider an API at version 1.x that has the following method:
 
 ```{.scala .scrollx}
 object Database
@@ -212,13 +239,13 @@ object Database
 }
 ```
 
-Now in the client of the library goes ahead and uses the above function:
+A client of the library may use it like:
 
 ```{.scala .scrollx}
 Database.fromUrl("someUrl")
 ```
 
-The developer of the library decides to add a `tableName` parameter as the `url` optional when run locally.
+The developer of the library decides to add a `tableName` parameter as the `url` is optional when run locally.
 Not wanting to introduce an additional method for this our developer then decides to make `url` a DPV.
 
 As this is a breaking change, he bumps the version of the library to 2.x.
@@ -241,11 +268,11 @@ But now we have problem. Since the location of the `url` parameter has changed, 
 
 ## Alternate Designs
 
-Here are some alternate ways not to use DPV.
+Here are some ways to get around using DPV.
 
 ### Supply all Parameters
 
-Take away developer convenience for software correctness. Get the developer to supply all parameters. We can change the `log` function from:
+Replace developer convenience for software correctness. Get the developer to supply all parameters. We can change the `log` function from:
 
 ```{.scala .scrollx}
 def log(message: String, level: String = "INFO") = println(s"$level: $message")
@@ -269,7 +296,7 @@ However this technique can get tedious if you have a lot of parameters that you 
 
 ### Breakout Separate Methods
 
-If you don't want to supply all the parameters each time, consider creating separate methods for the parameters you do care about.
+If you don't want to supply all the parameters each time, consider creating separate methods for the situations you care about.
 
 In the case of the bug with the Database refactoring, we could have pulled out some extra methods:
 
@@ -281,14 +308,13 @@ object Database {
 }
 ```
 
-Rob Norris on splitting out methods:
+[Rob Norris on splitting out methods](https://github.com/wartremover/wartremover/issues/116#issuecomment-51173792):
 
 >  If you have a method with a single default arg you could reasonably suggest splitting it into two methods (as you might do with a single option or boolean arg)
 
+### Have a Default Object
 
-### Have a Default Config Object
-
-If you have a lot of parameters to your function (and this might be a problem by itself) you could use a config default object.
+If you have a lot of parameters to your function (and this might be a problem by itself) you could use a default object.
 
 Take `tcpConnect` as an example:
 
@@ -323,27 +349,44 @@ fromTcpConnection(defaultTcpConnection.copy(port = 8080))
 fromTcpConnection(defaultTcpConnection.copy(host = "https://...", port = 443, sslEncryption = true))
 ```
 
-Rob Norris on using default config objects:
+[Rob Norris on using default config objects](https://github.com/wartremover/wartremover/issues/116#issuecomment-51173792):
 
 > ... right, but then you have the awful copy method to contend with, then you add lenses, then you add phantom types to ensure that options haven't been set more than once, etc., etc., and I'm not convinced that the complexity is warranted, given the lack thus far of any convincing reason not to use default args
+
+As Rob mentions, depending on how far you want to take it, avoiding DPVs might lead to very complex solutions.
+
+As [Maxwell Swadling points out](https://github.com/wartremover/wartremover/issues/116#issuecomment-51172733) you could also break out separate methods for this:
+
+```{.scala .scrollx}
+def connectHTTP(host: String):  String //where port = 80, sslEncryption = false, localAddress = None
+def connectHTTPPort(host: String, port: Int):  String //where sslEncryption = false, localAddress = None
+def connectHTTPS(host: String):  String //where port = 443, sslEncryption = true, , localAddress = None
+def tcpConnect(host: String, port: Int, sslEncryption: Boolean, localAddress: Option[String]):  String //the normal connect with all the arguments.
+```
 
 If none of these alternates seem attractive, go ahead and use DPV but think hard about how it may introduce bugs into your code base.
 
 ## Parting Thoughts
 
-The following is a [summary](https://github.com/wartremover/wartremover/issues/116#issuecomment-51326211) of why not to use DPV by [Mark Hibberd](https://twitter.com/markhibberd):
+[Mark Hibberd](https://twitter.com/markhibberd) recommends not using DPV for the [following](https://github.com/wartremover/wartremover/issues/116#issuecomment-51326211):
 
-1. Allocation of resources (there are even examples of this in scalaz) - which is utterly wrong. Anything that is allocated by a default argument has no reasonable lifecycle and is unlikely (or impossible) to be closed properly.
-1. Default configurations - these are a developer convenience that lead to operational bugs. There is no such thing as a "safe" default, where it could mean forgetting to set something in production leads to an incorrect value rather than an error (this is closely related to what Minsky says as mentioned by Eric above).
-1. Common arguments through delegating methods - these are representative of what @maxpow4h originally stated. That if you have multiple methods with optional arguments, it is extremely easy for incorrect code to compile by forgetting to delegate one of the arguments.
-1. Faux overloading - it is cool to hate on overloading so I will avoid it by using named arguments with defaults, ending up with the exact same situation. Code that is subtly wrong (such as forgetting to pass argument) still compiles. This is not an acceptable situation.
+1. **Allocation of resources** (there are even examples of this in scalaz) - which is utterly wrong. Anything that is allocated by a default argument has no reasonable lifecycle and is unlikely (or impossible) to be closed properly.
+1. **Default configurations** - these are a developer convenience that lead to operational bugs. There is no such thing as a "safe" default, where it could mean forgetting to set something in production leads to an incorrect value rather than an error (this is closely related to what Minsky says as mentioned by Eric above).
+1. **Common arguments through delegating methods** - these are representative of what @maxpow4h originally stated. That if you have multiple methods with optional arguments, it is extremely easy for incorrect code to compile by forgetting to delegate one of the arguments.
+1. **Faux overloading** - it is cool to hate on overloading so I will avoid it by using named arguments with defaults, ending up with the exact same situation. Code that is subtly wrong (such as forgetting to pass argument) still compiles. This is not an acceptable situation.
 
-Eric Torreborre on when to use DPV:
+[Eric Torreborre on when to use DPV](https://github.com/wartremover/wartremover/issues/116#issuecomment-51268242):
 
 > So my own conclusion is that default arguments (and overloading) still have some value (for non-critical DSLs) but you need to be very careful where you use them.
 
-Mark Hibberd on focussing on correct programs:
+[Mark Hibberd on focussing on correct programs](https://github.com/wartremover/wartremover/issues/116#issuecomment-51280344):
 
 > But the most troublesome part of this thread, is that almost all of the discussion is about what developers find "convenient" and aesthetically pleasing, when we should be asking how a language feature adds or removes from our ability to build robust, correct programs - and, as quickly as possible. When held in this light, default arguments do not hold up. They are a mere syntactic convenience - that does not help us with this goal. This might be ok, if they didn't come with risk or issues, but even the gentler arguments in this thread should be enough to highlight their use in a linting tool - especially given their inherent lack of motivation to begin with.
 
 > But yeh. Everyone gets to live in their own teams codebases. I just prefer mine without these undue risks.
+
+So in summary:
+
+1. Don't use DPV in production code. This could lead to bugs that are hard to find
+1. Possibly use DPV in non-production code like such as test DSLs
+1. If DPV helps to reduce the number of methods or the complexity of your solution, consider using it but be aware of the consequences. Alternatively redesign your code so it does not require DPV.
