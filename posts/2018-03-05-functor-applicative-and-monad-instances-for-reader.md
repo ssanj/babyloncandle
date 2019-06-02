@@ -8,7 +8,7 @@ comments: true
 
 How do you define a Reader (-> r) instance of a __Functor__, __Applicative__ or even a __Monad__? A Reader is a function that takes some resource __r__ and returns another value. This has been something that has always confused me. After an initial peruse it all makes sense for a while but when next faced with the same problem I can't remember how these instances are implemented.
 
-I'd like to analyse how the Reader instances are derived for each of __Functor__, __Applicative__ and __Monad__ and test it against some examples to gain some intuition. Also note that (-> r) and (r ->) can be used interchangeably. Thanks to [Brian McKenna](https://www.youtube.com/watch?v=qH0EjlM9Cm4) for that useful titbit.
+I'd like to analyse how the Reader instances are derived for each of __Functor__, __Applicative__ and __Monad__ and test it against some examples to gain some intuition. Also note that ((->) r) and (r ->) can be used interchangeably. Thanks to [Brian McKenna](https://www.youtube.com/watch?v=qH0EjlM9Cm4) for that useful titbit.
 
 ## Functor
 
