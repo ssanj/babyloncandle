@@ -8,6 +8,8 @@ comments: true
 
 I've finally got [Scala Metals](https://scalameta.org/metals) working through Sublime Text 3 on MacOSX Mojave and I'm pretty happy about it! There are some quirks to getting it to work though, so I thought I'd document them here for anyone else who might be struggling to set this up.
 
+![Metal Works](/images/metals/metals-sample.gif)
+
 ## Installation
 
 - Use the package manager to install the *LSP* plugin from [tomv564/LSP](https://packagecontrol.io/packages/LSP) or from [Github](https://github.com/tomv564/LSP).
@@ -228,7 +230,7 @@ log_debug false show debug logging in the sublime console
   - **log_stderr** false show language server stderr output in the console
 log_payloads false show full JSON-RPC responses in the console
 
-## All Keybindings
+### All Keybindings
 
 ```{.json .scrollx}
 [
