@@ -74,3 +74,29 @@ td.sourceCode { padding-left: 5px; }
     color: #73715E;
 }
 
+/* Json */
+
+.post pre.sourceCode.json, .post code.sourceCode.json {
+    background-color: black;
+}
+
+.post code.sourceCode.json {
+    color: white;
+}
+
+.post code.sourceCode.json span.ot,
+.post code.sourceCode.json span.fu,
+.post code.sourceCode.json span.kw {
+    color: #F9266B;
+}
+
+.post code.sourceCode.json span.dt {
+    color: #66D9EF;
+}
+
+.post code.sourceCode.json span.st {
+    color: #E6DB74;
+}
+.post code.sourceCode.json span.co {
+    color: #73715E;
+}
