@@ -6,6 +6,8 @@ tags: scala
 comments: true
 ---
 
+## Either
+
 The `Either` data type allows us to represent a computation that may fail. A simplified definition of an `Either` is given below:
 
 
@@ -508,6 +510,4 @@ validateNonEmptyName("joe") match  {
 res22: String = you succeeded with joe
 ```
 
-### Semigroupal
-
-
+While it can seem like `Validated` is complex to use, in practise it is quite straight forward once you get used to the way it needs to be used. Hopefully this article has given you some confidence in using `Validated` the next time you need to accumulate some errors.
