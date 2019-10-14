@@ -129,7 +129,7 @@ So what do we do if we want to accumulate all the errors that have occurred?
 
 ## Validated
 
-This is where we need to lean on the `Validated` datatype. The `Validated` datatype also let's us represent a computation that may fail - but with one crucial difference. It accumulates any errors that may occur.
+This is where we need to lean on the [Validated](https://typelevel.org/cats/datatypes/validated.html) datatype. The `Validated` datatype also let's us represent a computation that may fail - but with one crucial difference. It accumulates any errors that may occur.
 
 The `Validated` datatype is not defined in the Scala standard library and has to be sourced from the [Cats](https://typelevel.org/cats/) functional programming library.
 
@@ -246,7 +246,7 @@ Let's see how we can answer our previous question:
 
 > So what is it about this datatype that makes it accumulate errors in the `Invalid` case?
 
-In order to combine errors in a `Validated` we need the types used as errors to have some behaviours such as `Functor` and `Semigroupal` (see later for details) or we need to put the errors in a type that has the above behaviours. One type that does have that behaviour already defined is [NonEmptyList](https://typelevel.org/cats/datatypes/nel.html). A NonEmptyList is as the name suggests a `List` that is guaranteed not to be empty (has at least one element), which means you can safely call `head` on it among other things.
+In order to combine errors in a `Validated` we need the types used as errors to have some behaviours such as [Functor](https://typelevel.org/cats/typeclasses/functor.html) and [Semigroupal](https://github.com/typelevel/cats/blob/master/core/src/main/scala/cats/Semigroupal.scala) or we need to put the errors in a type that has the above behaviours. One type that does have that behaviour already defined is [NonEmptyList](https://typelevel.org/cats/datatypes/nel.html). A NonEmptyList is as the name suggests a `List` that is guaranteed not to be empty (has at least one element), which means you can safely call `head` on it among other things.
 
 Cats already has a pre-build `Validated` type that uses `NonEmptyList` as its error type called `ValidatedNel`. The type definition of `ValidatedNel` reveals to us its form:
 
@@ -374,7 +374,7 @@ def validateEmail(email: String): AllErrorsOr[Email] = {
 
 That's very similar to how we modified the `validateName` function.
 
-Now let's try and implement the `validatePerson` function. As I said previously, `Validated` does not implement the `flatMap` function and hence it can't be used in a for-comprehension. (TODO:reasons => Applicatives not Monads. Explain)
+Now let's try and implement the `validatePerson` function. As I said previously, `Validated` does not implement the `flatMap` function and hence it [can't be used in a for-comprehension](https://stackoverflow.com/questions/35761043/how-to-make-your-own-for-comprehension-compliant-scala-monad).
 So how can we combine these three `Validated` instances? We can use the `andThen` method again but it gets quite messy:
 
 ```{.scala .scrollx}
@@ -455,11 +455,11 @@ def validateNameWithProduct(name: String): AllErrorsOr[Name] = {
 }
 ```
 
-There is an inverse method to `productR` called `productL` which uses the result of the validator on the left and ignores the result of the validator on the right. The important thing to realise is that both validators still get run, but only one of the results is used. This is a nice shorthand when you need to ignore one of the results from a validator. The `productL` and `productR` functions are available to any `Apply` typeclass and since the `Applicative` typeclass extends `Apply` - to any `Applicative` instance.
+There is an inverse method to `productR` called `productL` which uses the result of the validator on the left and ignores the result of the validator on the right. The important thing to realise is that both validators still get run, but only one of the results is used. This is a nice shorthand when you need to ignore one of the results from a validator. The `productL` and `productR` functions are available to any `Apply` [typeclass](https://typelevel.org/cats/typeclasses.html) and since the [Applicative](https://typelevel.org/cats/typeclasses/applicative.html) typeclass extends `Apply` - to any `Applicative` instance.
 
 #### combine
 
-Using `productL` and `productR` is similar to using the `combine` function available to any instance of the `Semigroup` typeclass - with one important difference: The successes are accumulated in the event of all the validators succeeding, if your success type has an instance for `Semigroup`.
+Using `productL` and `productR` is similar to using the `combine` function available to any instance of the [Semigroup](https://typelevel.org/cats/typeclasses/semigroup.html) typeclass - with one important difference: The successes are accumulated in the event of all the validators succeeding, if your success type has an instance for `Semigroup`.
 
 ```{.scala .scrollx}
 //captures all errors if there are any errors
@@ -476,7 +476,7 @@ This is just something to be aware of so you won't get tripped up when your succ
 #### combineK
 
 What if you want to choose between two or more validators, where you only want the one that passed?
-In this scenario you could use `combineK` which comes from the `SemigroupK` typeclass that works on type constructors (think containers) as opposed to concrete types:
+In this scenario you could use `combineK` which comes from the [SemigroupK](https://typelevel.org/cats/typeclasses/semigroupk.html) typeclass that works on type constructors (think containers) as opposed to concrete types:
 
 ```{.scala .scrollx}
 //returns the first validator that succeeds
@@ -507,16 +507,6 @@ validateNonEmptyName("joe") match  {
 }
 res22: String = you succeeded with joe
 ```
-
-## Typeclasses
-
-### Functor
-
-### Applicative
-
-### Semigroup
-
-### SemigroupK
 
 ### Semigroupal
 
