@@ -545,7 +545,7 @@ res18: net.ssanj.validated.ValidatedNelValidations.AllErrorsOr[String] = Invalid
 
 ### Extracting
 
-And finally you can run a `fold` on a `Validated` instance (just like you <canvas></canvas> for `Option` or `Either`) to extract the value of failure or success:
+And finally you can run a `fold` on a `Validated` instance (just like you for `Option` or `Either`) to extract the value of failure or success:
 
 ```{.scala .scrollx}
 sealed abstract class Validated[+E, +A] {

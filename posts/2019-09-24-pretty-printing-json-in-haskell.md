@@ -8,7 +8,7 @@ comments: true
 
 While working on [Milo](https://github.com/ssanj/milo) - a small twitter client, I came across an issue where I wanted to dump the full response Json I received from the Twitter API to the console. While I could write this response out as a `String`, it was very hard to read as it was not nicely indented. I had to resort to copying this text into Sublime Text and pretty printing the Json there using a plugin. Certainly not ideal.
 
-What would be nice is to be able to pretty print the Json content of the response directly to the console without the need for external tools. I got some hints on how to do it from [Adventures in pretty printing JSON in haskell](https://onoffswitch.net/2015/08/15/adventures-pretty-printing-json-haskell/)
+What would be nice is to be able to pretty print the Json content of the response directly to the console without the need for external tools. I got some hints on how to do it from [Adventures in pretty printing JSON in haskell](https://onoffswitch.net/2015/08/15/adventures-pretty-printing-json-haskell/).
 
 To do this I first had to convert the response text into a Json value. I was using [Aeson](https://www.stackage.org/lts-14.3/package/aeson-1.4.4.0) Json library in Haskell and all Json is presented by the [Value](https://www.stackage.org/haddock/lts-14.3/aeson-1.4.4.0/Data-Aeson.html#t:Value) data type:
 
@@ -19,7 +19,6 @@ data Value = Object !Object
            | Number !Scientific
            | Bool !Bool
            | Null
-             deriving (Eq, Read, Show, Typeable, Data, Generic)
 ```
 
 The primary way to convert some type `a` to a `Value` is by the use of the `ToJSON` typeclass:
@@ -86,7 +85,7 @@ Now that we have all the pieces we can convert from our lazy `ByteString` to `Te
 
 ```{.scrollx .haskell}
 import qualified Data.Text as T
-import Data.Text.Encoding as E
+import qualified Data.Text.Encoding as E
 import qualified Data.ByteString.Lazy as LBS
 import Data.Aeson.Encode.Pretty (encodePretty)
 
@@ -111,7 +110,7 @@ Here's the final code to write out pretty Json:
 
 ```{.scrollx .haskell}
 import qualified Data.Text as T
-import Data.Text.Encoding as E
+import qualified Data.Text.Encoding as E
 import qualified Data.ByteString.Lazy as LBS
 import Data.Aeson.Encode.Pretty (encodePretty)
 import qualified Data.Text.IO as TIO
