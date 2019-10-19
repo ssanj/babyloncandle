@@ -341,8 +341,15 @@ img {
   border-radius: 3px;
 }
 
-.post pre.terminal code { background-color: #333; }
-.post pre.command code { background-color: #333; color: darkorange; }
+.post pre.terminal code { 
+  background-color: #333; 
+  color: #FFF;
+}
+
+.post pre.command code { 
+  background-color: #333; 
+  color: darkorange; 
+}
 
 
 /* Modifications */

@@ -12,7 +12,7 @@ _These objects are logged to the Chrome console_
 
 Let's assume we have the following __contribs__ object in scope:
 
-```{.javascript .scrollx}
+```{.json .scrollx}
 const contribs = {
   "data": {
     "viewer": {
@@ -60,13 +60,13 @@ const contribs = {
 
 With
 
-```{.javascript .scrollx}
+```{.terminal .scrollx}
 console.log(contribs.toString());
 ```
 
 we get the following:
 
-```{.javascript .scrollx}
+```{.terminal .scrollx}
 "[object Object]"
 ```
 
@@ -76,25 +76,25 @@ And this is not very useful. If you do see this output when you are trying to lo
 
 With
 
-```{.javascript .scrollx}
+```{.terminal .scrollx}
 console.log(JSON.stringify(contribs));
 ```
 
 we get:
 
-```{.javascript .scrollx}
+```{.json .scrollx}
 "{"data":{"viewer":{"login":"ssanj","contributedRepositories":{"nodes":[{"name":"giter8"},{"name":"scalacheck"},{"name":"sbt-assembly"},{"name":"package_control_channel"},{"name":"dotty"},{"name":"scapegoat"},{"name":"website"},{"name":"ssanj.github.io"},{"name":"babyloncandle"},{"name":"ensime.github.io"}]}}}}"
 ```
 
 While that is more useful than the toString() option, it would be nice if we can pretty print the same information. Luckily that functionality is built into JSON.stringify:
 
-```{.javascript .scrollx}
+```{.terminal .scrollx}
 console.log(JSON.stringify(contribs, null, 2));
 ```
 
 which results in:
 
-```{.javascript .scrollx}
+```{.json .scrollx}
 "{
   "data": {
     "viewer": {
@@ -142,7 +142,7 @@ which results in:
 
 Finally if we directly log the object:
 
-```{.javascript .scrollx}
+```{.terminal .scrollx}
 console.log(contribs);
 ```
 

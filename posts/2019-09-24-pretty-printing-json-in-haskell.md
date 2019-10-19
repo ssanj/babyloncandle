@@ -145,7 +145,7 @@ tweetJson =
 
 The following output is printed:
 
-```{.json .haskell}
+```{.scrollx .json}
 {
     "user": {
         "screen_name": "tweetbot",

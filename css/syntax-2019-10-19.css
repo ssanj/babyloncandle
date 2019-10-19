@@ -17,6 +17,12 @@ td.sourceCode { padding-left: 5px; }
 .sourceCode span.re { }
 .sourceCode span.er { color: red; font-weight: bold; }
 
+.post code {
+    background-color: black;
+    color: fuchsia;
+    font-weight: bold;
+}
+
 /* Scala */
 
 .post pre.sourceCode.scala, .post code.sourceCode.scala {
@@ -72,6 +78,12 @@ td.sourceCode { padding-left: 5px; }
 }
 .post code.sourceCode.haskell span.co {
     color: #73715E;
+}
+
+/* Javascript */
+
+.post pre.sourceCode.javascript, .post code.sourceCode.javascript {
+    background-color: black;
 }
 
 /* Json */
