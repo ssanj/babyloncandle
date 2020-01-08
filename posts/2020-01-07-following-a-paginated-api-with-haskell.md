@@ -159,7 +159,7 @@ thing that stumped me was why the initial value `a` was not a `Maybe`. Surely th
 I would not have a cursor, so how could I represent it as an `a`?  Event if I did make `a` a `Maybe a`, how would I 
 distinguish between the initial call where I had no cursor and the final call where I would also have no cursor?!
 
-My friend [Adam](ajfitzpatrick) states the obvious so I could understand it:
+My friend [Adam](ajfitzpatrick) stated the obvious so I could understand it:
 
 > Obviously you need more than two states
 
@@ -170,10 +170,10 @@ I started off my creating the ADT for the states:
 
 ```{.haskell .scrollx}
 -- | An ADT to capture the three states of a cursor:
--- NewCursor - Initial cursor state
--- GoCursor - A state of having a cursor, typically used for iteration
--- StopCursor - The final cursor state
-data CursorState a = NewCursor | GoCursor (Cursor a) | StopCursor
+data CursorState a 
+    = NewCursor           -- NewCursor - Initial cursor state
+    | GoCursor (Cursor a) -- GoCursor - A state of having a cursor, typically used for iteration
+    | StopCursor          -- StopCursor - The final cursor state
 ```
 
 Now if I plug in my `CursorState` type into `unfoldrM` as `a` I get the following:
@@ -236,7 +236,8 @@ generalising the `callTwitterApi` function:
 
 ```{.haskell .scrollx}
 callTwitterApi :: Maybe Cursor -> IO (Either String DirectMessages)
--- IO (Either String) is m
+-- Since we need to reduce our Monad to an m, wrap the IO (Either String) in ExceptT
+-- ExceptT String IO is m (Essentially a wrapped (IO Either String))
 -- DirectMessages is a
 someApi :: Maybe Cursor -> m a
 
@@ -302,11 +303,16 @@ extractState (DirectMessages msgs _)  = (msgs, StopCursor)            -- Message
 
 Now I can call `unfoldrM` with:
 
+
 ```{.haskell .scrollx}
-unfoldrM (unfoldWith extractState callTwitterApi) NewCursor
+import qualified Control.Monad.Except as Ex
+getDirectMessages :: IO (Either String DirectMessages)
+getDirectMessages = Ex.runExceptT $ unfoldrM (unfoldWith extractState callTwitterApi) NewCursor
 ```
 
-and we get pagination!
+and we have pagination!
+
+_Note how we had to unwrap the `ExceptT` with `Ex.runExceptT` to retrieve the `IO (Either String DirectMessages)`_.
 
 ## A Simpler Example
 
@@ -353,5 +359,5 @@ code
 which prints out:
 
 ```{.haskell .scrollx}
-packet two,packet three,packet four
+packet one,packet two,packet three
 ```
