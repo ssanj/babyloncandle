@@ -1,7 +1,7 @@
 ---
-title: Following a Paginated API with Haskell
+title: Following a Paginated API with Haskell and UnfoldrM
 author: sanjiv sahayam
-description: ???
+description: How to use a paginated API through Haskell with unfoldrM.
 tags: haskell
 comments: true
 ---
