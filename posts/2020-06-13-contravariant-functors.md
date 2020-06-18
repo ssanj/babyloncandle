@@ -229,7 +229,7 @@ Now let's look at the definition of `Predicate` data type:
 
 ![Polarity of the Predicate data type](/images/contravariant/predicate-polarity.png)
 
-We can see that the type variable `a` within the definition of the `Predicate` data type occurs in a contravariant position. This would then indicate to us that we can create an instance of a (Covariant) Functor instance for this data type.
+We can see that the type variable `a` within the definition of the `Predicate` data type occurs in a contravariant position. This indicates that we can't create a (Covariant) Functor instance for this data type.
 
 But we want to map things! What do we do?
 
@@ -242,7 +242,7 @@ class Contravariant f where
   contramap :: (a -> b) -> f b -> f a
 ```
 
-Snazzy! Contravariant also takes some kind of type constructor `f` just like Functor but it has this weird `contramap` function instead of `fmap`.
+Snazzy! Contravariant also takes some kind of type constructor `f` just like Functor but it has this weirdly named `contramap` function instead of `fmap`.
 
 ```{.haskell .scrollx}
      fmap :: (a -> b) -> f a -> f b -- Functor
@@ -259,9 +259,9 @@ we can then read `contramap` as:
 > If you have a context that needs an `a` and a function that can convert `b`s to
 `a`s, I can give you a context that needs `b`s.
 
-But that probably doesn't make much sense. So let's try and look at this in terms of our non-Functor `Predicate`. `Predicate` has a **need** for `a`, which it then uses to tell if something about that `a` is True or False.
+But that probably doesn't make much sense. So let's try and look at this in terms of our non-Functor: `Predicate`. `Predicate` has a **need** for an `a`, which it then uses to tell if something about that `a` is True or False.
 
-Let's try and write a Contravariant instance for `Predicate`. We know that the type `a` in `Predicate` occurs in a contravariant position, so that should be possible.
+Let's try and write a Contravariant instance for `Predicate` given that we know that the type `a` in `Predicate` occurs in a contravariant position.
 
 ```{.haskell .scrollx}
 instance Contravariant Predicate where
@@ -272,16 +272,11 @@ instance Contravariant Predicate where
 
 Given that we have a function `a -> b` and essentially a function of type `b -> Bool` (wrapped inside a `Predicate b`), we can if given an `a`, convert it to a `b` using `aToB` and then give that `b` to `bToBool` to give us a `Bool`.
 
-We have gone from:
-
-```{.haskell .scrollx}
-a -> b -> Bool
-```
-
 Here's a slightly long-form implementation of Contravariant for `Predicate`:
 
 ```{.haskell .scrollx}
-  contramap (a -> b) -> Predicate b -> Predicate a
+instance Contravariant Predicate where
+  -- contramap :: (a -> b) -> Predicate b -> Predicate a
   contramap aToB (Predicate bToBool) =
     Predicate $ \a ->
       let b    = aToB a
@@ -289,14 +284,17 @@ Here's a slightly long-form implementation of Contravariant for `Predicate`:
       in bool
 ```
 
+![contramap on Predicate](/images/contravariant/contramap-predicate.png)
+
 or more succinctly:
 
 ```{.haskell .scrollx}
-contramap (a -> b) -> Predicate b -> Predicate a
-contramap f (Predicate b) = Predicate $ b . f
+instance Contravariant Predicate where
+  -- contramap :: (a -> b) -> Predicate b -> Predicate a
+  contramap f (Predicate b) = Predicate $ b . f
 ```
 
-We can see from the definition of `Predicate b` that all we are doing is running the supplied function `f` to `contramap` **before** the function within `Predicate b`. We run the function **before** some existing functionality to adapt new inputs types to match the existing inputs.
+We can see from the definition of `Predicate b` that all we are doing is running the supplied function `f` **before** the function within `Predicate b`. The reason we do that is to adapt a new input type to match an existing input type for some functionality.
 
 If we revisit the (Covariant) Functor instance for `Maybe`:
 
@@ -306,7 +304,9 @@ instance Functor Maybe where
   fmap aToB (Just a) = Just (aToB a)
 ```
 
-we can see that the function `aToB` is run **after** we have a value of `a`. We run the function **after** to convert a result of some type to another type.
+we can see that the function `aToB` is run **after** we have a value of `a`. We do that to convert a result of some type to another type.
+
+![fmap on Maybe](/images/contravariant/fmap-maybe.png)
 
 These are the essential differences between covariant and contravariant Functors:
 
@@ -316,19 +316,116 @@ These are the essential differences between covariant and contravariant Functors
 | Contravariant | before | adapt inputs |
 
 
+Now that we know the essential difference between Functor and Contravariant, let's look at how we can use contramap with your `Predicate` class.
+
+Given that we already have a `Predicate` that determines whether a number is greater than ten:
+
+```{.haskell .scrollx}
+numGreaterThanTen :: Predicate Int
+numGreaterThanTen = Predicate (\n -> n > 10)
+```
+
+say we want to write another `Predicate` that verifies that the length of String is greater than ten characters.
+
+```{.haskell .scrollx}
+strLengthGreaterThanTen :: Predicate String
+strLengthGreaterThanTen = Predicate (\s -> (length s) > 10)
+```
+
+Sure, that's pretty contrived but bear with me. Let's also say we have a `Person` data type and we want to know if a person's name is over ten characters long - if so we consider that to be a long name.
+
+```{.haskell .scrollx}
+data Person = Person { personName :: String, personAge :: Int }
+
+personLongName :: Predicate Person
+personLongName = Predicate (\p -> (length . personName $ p) > 10)
+```
+
+And we can run these `Predicate` as:
+
+```{.haskell .scrollx}
+getPredicate numGreaterThanTen 5 -- False
+getPredicate numGreaterThanTen 20 -- True
+
+getPredicate strLengthGreaterThanTen "hello" -- False
+getPredicate strLengthGreaterThanTen "hello world" -- True
+
+getPredicate personLongName $ Person "John" 30 -- False
+getPredicate personLongName $ Person "Bartholomew" 30 -- True
+```
+
+And this is fine, but there's some duplication across each of the `Predicate`s - namely the part where we compare a number to ten:
+
+```{.haskell .scrollx}
+(\n -> n > 10) -- Int
+(\s -> (length s) > 10) -- String
+(\p -> (length . personName $ p) > 10) -- Person
+```
+
+It would be nice if we didn't have to repeat ourselves.
+
+If we look at the differences between **numGreaterThanTen**, **strLengthGreaterThanTen** and **personLongName2** we can see that the only difference is that one works on a number and the others work on String and Person respectively and subsequently convert those types to a number to do the same comparison:
+
+```{.haskell .scrollx}
+Predicate (\(n :: Int) ->
+  let num = id n
+  in num > 10 -- (1)
+) -- numGreaterThanTen
+
+
+Predicate (\(s :: String) ->
+  let num = length s
+  in num > 10 -- (1)
+) -- strLengthGreaterThanTen
+
+Predicate (\(p :: Person) ->
+  let name = personName p
+      num  = length name
+  in num > 10 -- (1)
+) -- personLongName
+
+```
+
+The above expansion of the functions demonstrates that even though the `Predicate`s themselves have different input types, at the end they are all converted to a number which is compared against the number ten. This is tagged with `(1)` in the above example.
+
+We can also see that the only changes between the `Predicate`s is the conversion from one type to another **before** running our comparison function `(1)`. This is our clue that we can use **contramap** here to reuse some functionality.
+
+```{.haskell .scrollx}
+numGreaterThanTen :: Predicate Int
+numGreaterThanTen = Predicate (\n -> n > 10)
+
+strLengthGreaterThanTen2 :: Predicate String
+strLengthGreaterThanTen2 = contramap length numGreaterThanTen -- convert the String to an Int, then pass it to numGreaterThanTen
+
+personLongName2 :: Predicate Person
+personLongName2 = contramap (length . personName) numGreaterThanTen -- convert the Person to an Int, then pass it to numGreaterThanTen
+```
+
+We get the same results as before:
+
+```{.haskell .scrollx}
+getPredicate strLengthGreaterThanTen2 "hello" -- False
+getPredicate strLengthGreaterThanTen2 "hello world" -- True
+
+getPredicate personLongName2 $ Person "John" 30 -- False
+getPredicate personLongName2 $ Person "Bartholomew" 30 -- True
+```
+
+Now we have rewritten **strLengthGreaterThanTen** and **personLongName** in terms of **numGreaterThanTen** by just running a function before it to convert the types. This is a simple example of a Contravariant Functor where we can reuse some existing functionality for a given type if we can convert from our other types to that type through some mapping function.
+
+## Laws
+
 Just like Functor has laws around its instance, Contravariant also has laws around its instances.
 
 TODO: List Contravariant Laws
 TODO: Expand with an example to make them clear
 
-## More Polarity
+# More Polarity
 
 
 TODO: Add CallBack example from FP Complete
 TODO: Add Endo example
 TODO: Should we talk about Invariant at the end?
-
-# Variance
 
 
 Let's take a look at the `CallbackRunner` example from [FP Complete](https://tech.fpcomplete.com/blog/2016/11/covariance-contravariance/)
@@ -352,44 +449,6 @@ instance Functor CallbackRunner where
 ```
 
 ## Polarity
-
-[George Wilson](https://twitter.com/georgetalkscode) states that types in a type signature can  be in positive or negative position.
-
-Types on their own are positive position. Some examples are:
-
-- `number :: Int`
-- someStrings :: [String]
-- maybeInts :: Maybe Int
-
-Function return types are in positive position but function parameters are in negative position:
-
-- `length :: [a] -> Int`
-- `show :: Show a =>  a -> String`
-
-- Examples for each
-
-A typical example could be a function from `a -> b` where we focus our function on the "input" type `a` instead of the output type `b`.
-
-For `f` to be an instance of Functor, every `a` in `f a` must be in positive position. If that's so we say `f` is covariant in `a`.
-
-Spot the Covariant Functor
-
-```{.haskell .scrollx}
-data Maybe a = Nothing | Just a
-```
-
-Maybe is a Functor because `a` appears in a positive position
-
-```{.haskell .scrollx}
-newtype Endo a = Endo { appEndo :: a -> a}
-```
-Endo is not a Functor because `a` appears in both positive and negative position. It is Invariant.
-
-```{.haskell .scrollx}
-newtype Predicate a = Predicate { getPredicate :: a -> Bool }
-```
-
-`a` is in negative position and hence Predicate is not a Functor, but a Contravariant Functor.
 
 # Variant Types
 - Why do we need variance?
