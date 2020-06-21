@@ -20,7 +20,7 @@ comments: true
   - Logger (a -> String)
   - Equality/Comparison
 
-Before we get into what a Contravariant Functor is, it's useful to look at a Functor we already know love.
+Before we get into what a Contravariant Functor is, it's useful to look at the  Functor typeclass which we know and love.
 
 # Functor
 
@@ -36,7 +36,7 @@ We often understand a Functor to be a "container" or a "producer" of some type, 
 A simple example would be the `[]` type, that can represent zero or more values. Given a `[a]` we can turn it into a `[b]` when given a function `a -> b`.
 
 ```{.haskell .scrollx}
-data [a] = [] | a : [a]
+data [a] = [] | a : [a] -- an approximation of the the [] data type
 
 instance Functor [] where
   fmap _ [] = []
@@ -54,14 +54,14 @@ myInts = [1 .. 5]
 emptyInts :: [Int]
 emptyInts = []
 
-stringMyInt :: Int -> String
-stringMyInt n = (show n) <> "!"
+intToString :: Int -> String
+intToString n = (show n) <> "!"
 
 myStrings :: [String]
-myStrings = fmap stringMyInt myInts -- ["1!","2!","3!","4!","5!"]
+myStrings = fmap intToString myInts -- ["1!","2!","3!","4!","5!"]
 
 myEmptyString :: []
-myEmptyString = fmap stringMyInt emptyInts  -- []
+myEmptyString = fmap intToString emptyInts  -- []
 ```
 
 Another example would the `Maybe` data type, that represents a value that may or may not exist.
@@ -85,19 +85,19 @@ maybeInt = Just 10
 notInt :: Maybe Int
 notInt = Nothing
 
-stringMyInt :: Int -> String
-stringMyInt n = (show n) <> "!"
+intToString :: Int -> String
+intToString n = (show n) <> "!"
 
 maybeString :: Maybe String
-maybeString = fmap stringMyInt maybeInt -- Just "10!"
+maybeString = fmap intToString maybeInt -- Just "10!"
 
 notString :: Maybe String
-notString = fmap stringMyInt notInt -- Nothing
+notString = fmap intToString notInt -- Nothing
 ```
 
-## Laws
+The Functor typeclass has laws, that ensure Functor instances behave in a predictable way.
 
-Functor has laws, that ensure Functor instances behave as expected.
+## Laws
 
 ### Identity
 
@@ -114,6 +114,8 @@ fmap (f . g) == fmap f . fmap g
 ```
 
 If you convert the result of a Functor by `fmap`ing with function `g` and then `fmap`ing that result with subsequent function `f`, it's the same as composing functions `g` and `f` (`f . g`) and then `fmap`ing once.
+
+![Functor Laws in Category Theory](/images/contravariant/functor-laws-ct.png)
 
 Let's take `Maybe` as an example and try out the laws. The `Maybe` Functor is defined as:
 
@@ -139,28 +141,127 @@ maybeFiveInt = Just 5
 Using `fmap id` on the above:
 
 ```{.haskell .scrollx}
-fmap id notInt == notInt     -- Nothing
-fmap id maybeInt == maybeTenInt -- Just 10
+fmap id notInt   == notInt       -- Nothing
+fmap id maybeInt == maybeTenInt  -- Just 10
 fmap id maybeInt == maybeFiveInt -- Just 5
 ```
 
 Given that we have:
 
 ```{.haskell .scrollx}
-stringMyInt :: Int -> String
-stringMyInt n = (show n) <> "!"
+intToString :: Int -> String
+intToString n = (show n) <> "!"
 
-boolMyString :: String -> Bool
-boolMyString "5!" = True
-boolMyString _ = False
+stringToBool :: String -> Bool
+stringToBool "5!" = True
+stringToBool _ = False
 ```
 
-Using **stringMyInt** and then **boolMyString**:
+Using **intToString** and then **stringToBool**:
 
 ```{.haskell .scrollx}
-fmap (boolMyString . stringMyInt) notInt == fmap boolMyString . fmap stringMyInt $ notInt -- Nothing
-fmap (boolMyString . stringMyInt) maybeTenInt == fmap boolMyString . fmap stringMyInt $ maybeTenInt -- Just False
-fmap (boolMyString . stringMyInt) maybeFiveInt == fmap boolMyString . fmap stringMyInt $ maybeFiveInt -- Just True
+-- # Identity law
+-- ###############################
+
+-- ## for notInt
+fmap id notInt  == notInt
+fmap id Nothing == Nothing -- expanding notInt on both sides
+Nothing         == Nothing -- simplifying fmap on Nothing
+
+
+-- ## for maybeTenInt
+fmap id maybeTenInt == maybeTenInt
+fmap id (Just 10)   == Just 10  -- expanding maybeTenInt on both sides
+Just 10             == Just 10  -- simplifying fmap
+
+-- ## for maybeFiveInt
+fmap id maybeFiveInt == maybeFiveInt
+fmap id (Just 5)     == Just 5  -- expanding maybeFiveInt on both sides
+Just 5               == Just 5  -- simplifying fmap
+
+-- # Composition law
+-- ###############################
+
+-- ## for notInt
+fmap (stringToBool . intToString) notInt  == fmap stringToBool . fmap intToString $ notInt
+
+-- lhs
+fmap (stringToBool . intToString) notInt
+fmap (stringToBool . intToString) Nothing -- expanding notInt
+=> Nothing                                -- simplifying fmap on Nothing
+
+-- rhs
+fmap stringToBool . fmap intToString $ notInt
+fmap stringToBool . (fmap intToString Nothing) -- expanding notInt
+fmap stringToBool   (Nothing) -- simplifying fmap on Nothing for intToString
+fmap stringToBool    Nothing  -- simplifying fmap on Nothing for stringToBool
+=> Nothing
+
+lhs     == rhs
+Nothing == Nothing
+
+
+-- ## for maybeTenInt
+fmap (stringToBool . intToString) maybeTenInt == fmap stringToBool . fmap intToString $ maybeTenInt
+
+-- lhs
+fmap (stringToBool . intToString) maybeTenInt
+fmap (stringToBool . intToString) (Just 10)             -- expanding maybeTenInt
+fmap (stringToBool . (\n -> (show n) <> "!")) (Just 10) -- expanding intToString
+Just (stringToBool . ((show 10) <> "!"))                -- simplifying for n == 10
+(Just (stringToBool "10!"))                             -- applying stringToBool with "10!"
+(Just (\s ->
+        case s of
+          "5!" -> True
+          _    -> False -- branch chosen because s == "10!"
+      ))                -- expanding stringToBool
+= Just False
+
+-- rhs
+fmap stringToBool . fmap intToString (Just 10)             -- expanding maybeFiveInt
+fmap stringToBool . fmap (\n -> (show n) <> "!") (Just 10) -- expanding intToString
+Just (stringToBool . ((show 10) <> "!"))                   -- simplifying for n == 10
+(Just $ stringToBool "10!")                                -- applying stringToBool with "10!"
+Just ((\s ->
+        case s of
+          "5!" -> True
+          _    -> False -- branch chosen because s == "10!"
+      ))                -- expanding stringToBool
+= Just False
+
+lhs        == rhs
+Just False == Just False
+
+-- ## for maybeFiveInt
+fmap (stringToBool . intToString) maybeFiveInt == fmap stringToBool . fmap intToString $ maybeFiveInt
+
+-- lhs
+fmap (stringToBool . intToString) maybeFiveInt
+fmap (stringToBool . intToString) (Just 5)             -- expanding maybeFiveInt
+fmap (stringToBool . (\n -> (show n) <> "!")) (Just 5) -- expanding intToString
+Just (stringToBool . ((show 5) <> "!"))                -- simplifying for n == 5
+(Just (stringToBool "5!"))                             -- applying stringToBool with "5!"
+(Just (\s ->
+        case s of
+          "5!" -> True  -- branch chosen because s == "5!"
+          _    -> False
+      ))                -- expanding stringToBool
+= Just True
+
+-- rhs
+fmap stringToBool . fmap intToString (Just 5)             -- expanding maybeFiveInt
+fmap stringToBool . fmap (\n -> (show n) <> "!") (Just 5) -- expanding intToString
+Just (stringToBool . ((show 5) <> "!"))                   -- simplifying for n == 5
+(Just $ stringToBool "5!")                                -- applying stringToBool with "5!"
+Just ((\s ->
+        case s of
+          "5!" -> True  -- branch chosen because s == "5!"
+          _    -> False
+      ))                -- expanding stringToBool
+= Just True
+
+lhs       == rhs
+Just True == Just True
 ```
 
 TODO: George W quote on laws
