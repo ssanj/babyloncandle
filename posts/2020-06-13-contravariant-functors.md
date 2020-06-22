@@ -447,24 +447,24 @@ And we can run these `Predicate` as:
 getPredicate numGreaterThanTen 5 -- False
 getPredicate numGreaterThanTen 20 -- True
 
-getPredicate strLengthGreaterThanTen "hello" -- False
+getPredicate strLengthGreaterThanTen "hello"       -- False
 getPredicate strLengthGreaterThanTen "hello world" -- True
 
-getPredicate personLongName $ Person "John" 30 -- False
+getPredicate personLongName $ Person "John" 30        -- False
 getPredicate personLongName $ Person "Bartholomew" 30 -- True
 ```
 
 And this is fine, but there's some duplication across each of the `Predicate`s - namely the part where we compare a number to ten:
 
 ```{.haskell .scrollx}
-(\n -> n > 10) -- Int
+(\n -> n > 10)  -- Int
 (\s -> (length s) > 10) -- String
 (\p -> (length . personName $ p) > 10) -- Person
 ```
 
 It would be nice if we didn't have to repeat ourselves.
 
-If we look at the differences between **numGreaterThanTen**, **strLengthGreaterThanTen** and **personLongName2** we can see that the only difference is that one works on a number and the others work on String and Person respectively and subsequently convert those types to a number to do the same comparison:
+If we look at the differences between **numGreaterThanTen**, **strLengthGreaterThanTen** and **personLongName** we can see that the only difference is that one works on an Int and the others work on String and Person respectively. **strLengthGreaterThanTen** and **personLongName** each convert their input types to an Int and then do the same comparison:
 
 ```{.haskell .scrollx}
 Predicate (\(n :: Int) ->
@@ -512,6 +512,14 @@ getPredicate personLongName2 $ Person "Bartholomew" 30 -- True
 ```
 
 Now we have rewritten **strLengthGreaterThanTen** and **personLongName** in terms of **numGreaterThanTen** by just running a function before it to convert the types. This is a simple example of a Contravariant Functor where we can reuse some existing functionality for a given type if we can convert from our other types to that type through some mapping function.
+
+We can also go a little further and reuse even more:
+
+```{.haskell .scrollx}
+personLongName3 :: Predicate Person
+personLongName3 = contramap personName strLengthGreaterThanTen -- convert the Person to a String, then pass it to strLengthGreaterThanTen
+
+```
 
 ## Laws
 
@@ -567,10 +575,9 @@ Predicate (\n -> n > 10) == Predicate (\n -> n > 10)
 contramap f . contramap g = contramap (g . f)
 ```
 
-If you convert the adapt the input to some Contravariant Functor by `contramap`ing with function `g` and then `contramap`ing that result with subsequent function `f`, it's the same as composing functions `f` and `g` (`g . f`) and then `contramap`ing once.
+If you convert the input to some Contravariant Functor by `contramap`ing with function `g` and then convert its input to some other type by `contramap`ing again with a function `f`, it's the same as composing the functions `f` and `g` (`g . f`) and then `contramap`ing once. Notice the order of composition is switched as opposed to when we looked at the Functor laws.
 
-
-once again using `Predicate` as an example, let's explore the compositional law of Contravariance.
+Once again using `Predicate` as an example, let's explore the compositional law of Contravariance.
 
 Given that we have the following `Predicate`s:
 
@@ -578,11 +585,8 @@ Given that we have the following `Predicate`s:
 numGreaterThanTen :: Predicate Int
 numGreaterThanTen = Predicate (\n -> n > 10)
 
-strLengthGreaterThanTen :: Predicate String
-strLengthGreaterThanTen = contramap length numGreaterThanTen
-
-personLongName :: Predicate Person
-personLongName = contramap personName strLengthGreaterThanTen
+length :: [a] -> Int
+personName :: Person -> String
 ```
 
 Using **numGreaterThanTen**, with **length** and **personName**:
@@ -643,6 +647,28 @@ Predicate (\person ->
 
 ![Contravariant Functor Laws in Category Theory](/images/contravariant/contravariant-laws-ct.png)
 
+## Combinators
+```{.haskell .scrollx}
+-- infixl 4
+(>$<) :: Contravariant f => (a -> b) -> f b -> f a
+
+-- infixl 4
+(>$) :: b -> f b -> f a
+
+-- infixl 4
+($<) :: Contravariant f => f b -> b -> f a
+
+-- infixl 4
+(>$$<) :: Contravariant f => f b -> (a -> b) -> f a
+code
+```
+
+## More Examples
+
+### Aeson
+
+### Logger
+
 # More Polarity
 
 
@@ -671,12 +697,7 @@ instance Functor CallbackRunner where
             aCallbackRunner (bCallback . f)
 ```
 
-## Polarity
-
-# Variant Types
-- Why do we need variance?
-- Enzymes vs Antibodies
-- Table from Typed-Driven Development
+## Polarity Multiplication Table
 
 # What is the motivation for it?
 
@@ -685,17 +706,8 @@ instance Functor CallbackRunner where
 # Why are they useful? Why do we need it
 
 # Contravariant
-- Signature
-- Diagram (cat theory diagrams, diagrams similar to Kleisli blog)
-- Laws
-- Typeclassopedia
-- Combinators
+- Typeclassopedia (from George W)
 - Similar to Adaptor pattern?
-
-# Examples
-- Predicate
-- Logger
-- Json
 
 # Links
 - [George Wilson](https://twitter.com/georgetalkscode   )'s Presentations:
