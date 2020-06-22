@@ -124,7 +124,6 @@ instance Functor Maybe where
   fmap _ Nothing = Nothing
   fmap f (Just x) = Just (f x)
 ```
-
 Given that we have:
 
 ```{.haskell .scrollx}
@@ -516,10 +515,133 @@ Now we have rewritten **strLengthGreaterThanTen** and **personLongName** in term
 
 ## Laws
 
-Just like Functor has laws around its instance, Contravariant also has laws around its instances.
+Just like Functor has laws, Contravariant also has laws around its instances.
 
-TODO: List Contravariant Laws
-TODO: Expand with an example to make them clear
+### Identity
+
+```{.haskell .scrollx}
+contramap id == id
+```
+
+Essentially if you do not change the value of a Contravariant Functor, you get the same Contravariant Functor you started with.
+
+Let's take `Predicate` as an example and try out the identity law. The `Predicate` Contravariant Functor is defined as:
+
+```{.haskell .scrollx}
+ instance Contravariant Predicate where
+   -- contramap :: (a -> b) -> f b -> f a
+   contramap f (Predicate p) = Predicate (p . f)
+```
+
+Given that we have a `Predicate Int`:
+
+```{.haskell .scrollx}
+numGreaterThanTen :: Predicate Int
+numGreaterThanTen = Predicate (\n -> n > 10)
+```
+
+Using `contramap id` on the above:
+
+```{.haskell .scrollx}
+-- identity law
+contramap id numGreaterThanTen == numGreaterThanTen
+
+-- lhs
+Predicate (p . f) -- applying contramap
+Predicate (p . id) -- expanding f
+Predicate (p) -- applying f
+Predicate (\n -> n > 10) -- expanding p
+
+-- rhs
+numGreaterThanTen
+Predicate (\n -> n > 10) -- expanding numGreaterThanTen
+
+-- equality
+lhs                      == rhs
+Predicate (\n -> n > 10) == Predicate (\n -> n > 10)
+```
+
+### Composition
+
+```{.haskell .scrollx}
+contramap f . contramap g = contramap (g . f)
+```
+
+If you convert the adapt the input to some Contravariant Functor by `contramap`ing with function `g` and then `contramap`ing that result with subsequent function `f`, it's the same as composing functions `f` and `g` (`g . f`) and then `contramap`ing once.
+
+
+once again using `Predicate` as an example, let's explore the compositional law of Contravariance.
+
+Given that we have the following `Predicate`s:
+
+```{.haskell .scrollx}
+numGreaterThanTen :: Predicate Int
+numGreaterThanTen = Predicate (\n -> n > 10)
+
+strLengthGreaterThanTen :: Predicate String
+strLengthGreaterThanTen = contramap length numGreaterThanTen
+
+personLongName :: Predicate Person
+personLongName = contramap personName strLengthGreaterThanTen
+```
+
+Using **numGreaterThanTen**, with **length** and **personName**:
+
+```{.haskell .scrollx}
+-- composition law
+contramap personName . contramap length $ numGreaterThanTen = contramap (length . personName) numGreaterThanTen
+
+
+-- lhs
+contramap personName . contramap length $ numGreaterThanTen
+contramap personName . contramap length $ Predicate (\n -> n > 10) -- expanding numGreaterThanTen
+contramap personName (Predicate $ \str ->
+  let num  = length str
+     bool  = num > 10
+  in bool
+) -- applying length
+Predicate $ \person ->
+  let str = personName person
+      num = length str
+     bool = num > 10
+  in bool
+) -- applying personName
+=> Predicate Person
+
+-- rhs
+contramap (length . personName) numGreaterThanTen
+contramap (\person ->
+    let str = personName person
+        num = length str
+    in num
+) numGreaterThanTen -- expanding length . personName
+Predicate (\person ->
+   let str  = personName person
+       num  = length str
+       bool = num > 10 -- expanding numGreaterThanTen
+   in bool
+)
+=> Predicate Person
+
+-- equality
+lhs == rhs
+
+Predicate (\person ->
+  let str  = personName person
+      num  = length str
+      bool = num > 10
+  in bool
+
+) ==
+Predicate (\person ->
+   let str  = personName person
+       num  = length str
+       bool = num > 10
+   in bool
+)
+```
+
+![Contravariant Functor Laws in Category Theory](/images/contravariant/contravariant-laws-ct.png)
 
 # More Polarity
 
