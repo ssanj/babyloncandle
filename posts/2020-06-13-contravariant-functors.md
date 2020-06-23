@@ -6,25 +6,13 @@ tags: Haskell
 comments: true
 ---
 
-# Contravariant Functors
+Contravariant Functors are odd aren't they? Functors are so straight forward but **Contra**variant as its name implies is the complete opposite.
 
-- Overview of Functors as containers
-  - Some common Functors with their implementations [x]
-  - Introduce a type that can't have a Functor instance (Predicate) [x]
-  - Functor Laws
-
-- Variance/Polarity
-
-- Contravariant Instances
-  - Predicate
-  - Logger (a -> String)
-  - Equality/Comparison
-
-Before we get into what a Contravariant Functor is, it's useful to look at the  Functor typeclass which we know and love.
+Before we get into what a Contravariant Functor is, it's useful to look at the  Functor [typeclass](https://wiki.haskell.org/Typeclassopedia) which we know and love.
 
 # Functor
 
-Functor is probably one of the simplest [type classes](https://wiki.haskell.org/Typeclassopedia) in the Haskell ecosystem. It's defined as:
+A Functor is defined as:
 
 ```{.haskell .scrollx}
 class Functor f where
@@ -40,7 +28,7 @@ data [a] = [] | a : [a] -- an approximation of the the [] data type
 
 instance Functor [] where
   fmap _ [] = []
-  fmap f (x:xs) = f x : map f xs
+  fmap f (x:xs) = f x : fmap f xs
 ```
 
 In the example below we convert a `[Int]` into a `[String]` given a function  `Int -> String`:
@@ -113,9 +101,9 @@ Essentially if you do nothing to the value of a Functor, you get the same Functo
 fmap (f . g) == fmap f . fmap g
 ```
 
-If you convert the result of a Functor by `fmap`ing with function `g` and then `fmap`ing that result with subsequent function `f`, it's the same as composing functions `g` and `f` (`f . g`) and then `fmap`ing once.
+If you convert the result of a Functor by `fmap`ing with a function `g` and then `fmap`ing that result with subsequent function `f`, it's the same as composing functions `g` and `f` (`f . g`) and then `fmap`ing once.
 
-![Functor Laws in Category Theory](/images/contravariant/functor-laws-ct.png)
+![Functor Laws](/images/contravariant/functor-laws-ct.png)
 
 Let's take `Maybe` as an example and try out the laws. The `Maybe` Functor is defined as:
 
@@ -219,7 +207,7 @@ Just (stringToBool . ((show 10) <> "!"))                -- simplifying for n == 
 -- rhs
 fmap stringToBool . fmap intToString (Just 10)             -- expanding maybeFiveInt
 fmap stringToBool . fmap (\n -> (show n) <> "!") (Just 10) -- expanding intToString
-Just (stringToBool . ((show 10) <> "!"))                   -- simplifying for n == 10
+fmap stringToBool $ Just ((show 10) <> "!")                -- simplifying for n == 10
 (Just $ stringToBool "10!")                                -- applying stringToBool with "10!"
 Just ((\s ->
         case s of
@@ -250,7 +238,7 @@ Just (stringToBool . ((show 5) <> "!"))                -- simplifying for n == 5
 -- rhs
 fmap stringToBool . fmap intToString (Just 5)             -- expanding maybeFiveInt
 fmap stringToBool . fmap (\n -> (show n) <> "!") (Just 5) -- expanding intToString
-Just (stringToBool . ((show 5) <> "!"))                   -- simplifying for n == 5
+fmap stringToBool $ Just ((show 5) <> "!")                -- simplifying for n == 5
 (Just $ stringToBool "5!")                                -- applying stringToBool with "5!"
 Just ((\s ->
         case s of
@@ -263,7 +251,7 @@ lhs       == rhs
 Just True == Just True
 ```
 
-TODO: George W quote on laws
+## The Wrong Type of fmap
 
 Now let's look at something a little different. Let's create a data type to wrap a predicate of some sort. A predicate is something that will evaluate to a `Bool`:
 
@@ -271,7 +259,7 @@ Now let's look at something a little different. Let's create a data type to wrap
 newtype Predicate a = Predicate { getPredicate :: a -> Bool }
 ```
 
-An example of a Predicate could be **greaterThanTen**:
+An example of a Predicate is **greaterThanTen**:
 
 ```{.haskell .scrollx}
 greaterThanTen :: Predicate Int
@@ -523,7 +511,7 @@ personLongName3 = contramap personName strLengthGreaterThanTen -- convert the Pe
 
 ## Laws
 
-Just like Functor has laws, Contravariant also has laws around its instances.
+Just like Functor has laws, Contravariant also has laws. Laws and people with bad taste - there's no escaping them.
 
 ### Identity
 
@@ -532,6 +520,16 @@ contramap id == id
 ```
 
 Essentially if you do not change the value of a Contravariant Functor, you get the same Contravariant Functor you started with.
+
+### Composition
+
+```{.haskell .scrollx}
+contramap f . contramap g = contramap (g . f)
+```
+
+If you convert the input to some Contravariant Functor by `contramap`ing with function `g` and then convert its input to some other type by `contramap`ing again with a function `f`, it's the same as composing the functions `f` and `g` (`g . f`) and then `contramap`ing once. Notice the order of composition is switched as opposed to when we looked at the Functor laws.
+
+![Contravariant Functor Laws](/images/contravariant/contravariant-laws-ct.png)
 
 Let's take `Predicate` as an example and try out the identity law. The `Predicate` Contravariant Functor is defined as:
 
@@ -568,14 +566,6 @@ Predicate (\n -> n > 10) -- expanding numGreaterThanTen
 lhs                      == rhs
 Predicate (\n -> n > 10) == Predicate (\n -> n > 10)
 ```
-
-### Composition
-
-```{.haskell .scrollx}
-contramap f . contramap g = contramap (g . f)
-```
-
-If you convert the input to some Contravariant Functor by `contramap`ing with function `g` and then convert its input to some other type by `contramap`ing again with a function `f`, it's the same as composing the functions `f` and `g` (`g . f`) and then `contramap`ing once. Notice the order of composition is switched as opposed to when we looked at the Functor laws.
 
 Once again using `Predicate` as an example, let's explore the compositional law of Contravariance.
 
@@ -645,8 +635,6 @@ Predicate (\person ->
 )
 ```
 
-![Contravariant Functor Laws in Category Theory](/images/contravariant/contravariant-laws-ct.png)
-
 ## Combinators
 ```{.haskell .scrollx}
 -- infixl 4
@@ -667,10 +655,13 @@ code
 
 ### Aeson
 
+### Serialiser
+
 ### Logger
 
-# More Polarity
+### Equality/Comparison
 
+# More Polarity
 
 TODO: Add CallBack example from FP Complete
 TODO: Add Endo example
