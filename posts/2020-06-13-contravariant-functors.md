@@ -651,11 +651,200 @@ Predicate (\person ->
 code
 ```
 
-## More Examples
+## LogAction
+
+Let's look at another example of Contravariant. Imagine you have the following data type that encapsulates performing some side effect on some polymorphic type `a`:
+
+```{.haskell .scrollx}
+newtype LogAction a = LogAction { unlog :: a -> IO () }
+```
+
+For our purposes we can assume that we are going to use this to log some value either to the console or to a file or some other medium. This example has been adapted from the [LogAction](https://github.com/kowainik/co-log/blob/master/co-log-core/src/Colog/Core/Action.hs#L105) class of the [CO-LOG](https://kowainik.github.io/posts/2018-09-25-co-log) logging library. Definitely check out the library for real-world uses of Contravariant and friends.
+
+As we can see the type variable `a` occurs in input position so we should be able to define a Contravariant instance for it:
+
+```{.haskell .scrollx}
+instance Contravariant LogAction where
+  contramap :: (b -> a) -> LogAction a -> LogAction b
+  contramap f logActionA = LogAction $ \b -> unlog logActionA (f b)
+```
+
+There should be no surprises here; we run the supplied function `f` on the input *before* passing it to the log action.
+
+Here's a slightly simplied implementation of the above:
+
+```{.haskell .scrollx}
+instance Contravariant LogAction where
+  contramap f logActionA = LogAction $ unlog logActionA . f
+```
+
+So how can we use `LogAction`? Let's define a couple of implementations:
+
+```{.haskell .scrollx}
+putStrLog :: LogAction String
+putStrLog = LogAction putStr
+
+putStrLnLog :: LogAction String
+putStrLnLog = LogAction putStrLn
+```
+
+`putStrLog` and `putStrLn` are just wrappers around `putStr` and `putStrLn` from `base`. Both log a String to the console, the difference being that `putStrLn` sends a newline character to the console after each call.
+
+Here's how we'd use `putStrLnLog`:
+
+```{.haskell .scrollx}
+unlog putStrLnLog "Hello World"
+-- Hello World
+```
+
+Remember that `LogAction` *needs* an `a` which in this case is a `String`.
+
+Now because we have the power of contravariance, we should be able to log out other types if we can convert them to a `String`.
+
+Here are some examples:
+
+```{.haskell .scrollx}
+-- simple function around contramp for LogAction
+putStringlyLnLog :: (a -> String) -> LogAction a
+putStringlyLnLog f = contramap f putStrLnLog
+
+-- Now we can log Ints
+putStrLnInt :: LogAction Int
+putStrLnInt = putStringlyLnLog show
+
+data Person = Person { name :: String, age :: Int }
+
+-- custom String representation of Person
+showPerson :: Person -> String
+showPerson (Person name age) = "Person(name:" <> name <> ", age: " <> (show age) <> ")"
+
+-- Now we can log people
+putStrLnPerson :: LogAction Person
+putStrLnPerson = putStringlyLnLog showPerson
+
+-- custom String representation of Person that only displays age
+showPersonAge :: Person -> String
+showPersonAge person =  "age: " <> (show $ age person)
+
+-- Additional Person LogAction which outputs only age
+putStrLnPersonAge :: LogAction Person
+putStrLnPersonAge = putStringlyLnLog showPersonAge
+```
+
+Here's how we can run the above:
+
+```{.haskell .scrollx}
+unlog putStrLnInt 42
+-- 42
+
+unlog putStrLnPerson $ Person "Neelix" 60
+-- Person(name:Neelix, age: 60)
+
+unlog putStrLnPersonAge $ Person "Tovak" 240
+-- age: 240
+```
+
+We can see that `LogAction` for `Person`, *needs* a `Person` instance as input to perform the log action.
+
+Something that might not be obvious is that we can also adapt an input type to itself. It's not necessary to always convert from one type to another.
+
+Here are some example functions which we can use with `contramap`:
+
+```{.haskell .scrollx}
+hello :: String -> String
+hello = ("Hello" <>)
+
+there :: String -> String
+there = ("there" <>)
+
+doctor :: String -> String
+doctor = ("Doctor" <>)
+
+space :: String -> String
+space = (" " <>)
+```
+
+Here's how we compose the above functions into a `LogAction`:
+
+```{.haskell .scrollx}
+putStrLnGreeting :: LogAction String
+putStrLnGreeting = contramap space . contramap doctor .contramap space . contramap there . contramap space . contramap hello $ putStrLnLog
+```
+
+Whoa! That's even hard to read. What does it do? Remember from the second law of contravariance that:
+
+```{.haskell .scrollx}
+contramap f . contramap g = contramap (g . f)
+```
+
+Given that, we can rewrite our highly compositional `LogAction` like so:
+
+```{.haskell .scrollx}
+putStrLnGreeting :: LogAction String
+putStrLnGreeting = contramap  (hello . space . there . space . doctor . space) $ putStrLnLog
+```
+
+At least this is somewhat more readable - but the great thing is that knowing the laws helped us make our code more legible. But still - what does this do?
+
+The trick is to remember that Contravaraint compose works in **reverse** to normal composition:
+
+```{.haskell .scrollx}
+contramap f . contramap g = contramap (g . f) -- notice the (g . f) instead of (f. g)
+```
+
+This is how `putStrLnGreeting` is evaluated:
+
+```{.haskell .scrollx}
+putStrLnGreeting :: LogAction String
+putStrLnGreeting = contramap  (hello . space . there . space . doctor . space) $ putStrLnLog
+
+unlog putStrLnGreeting "Switzer" -- run the logger with "Switzer" as the input
+
+-- the input is going to go through this sequence of functions:
+-- (hello . space . there . space . doctor . space)
+
+-- applying space
+" " <> Switzer
+-- applying doctor
+"Doctor" <> " " <> Switzer
+-- applying space
+" " <> "Doctor" <> " " <> Switzer
+-- applying there
+"there" <> " " <> "Doctor" <> " " <> Switzer
+-- applying space
+" " <> "there" <> " " <> "Doctor" <> " " <> Switzer
+-- applying hello
+"Hello" <> " " <> "there" <> " " <> "Doctor" <> " " <> Switzer
+-- final output:
+-- Hello there Doctor Switzer
+```
+
+Let's look at one more `LogAction` which might be interesting; One where we ignore the input and return some constant output:
+
+```{.haskell .scrollx}
+override :: a -> a -> a
+override value = const value
+```
+
+`const` is defined as `a -> b -> a`, where it accepts two inputs but returns the
+value of the first input (ignoring the second input).
+
+Here's how we use it with `LogAction`:
+
+```{.haskell .scrollx}
+qPutStrLn ::LogAction String
+qPutStrLn = contramap (override "This is Q!!") putStrLnLog
+
+-- run it
+unlog qPutStrLn "Picard J L"
+-- This is Q!!
+```
 
 ### Aeson
 
 ### Serialiser
+
+### Fold
 
 ### Logger
 
@@ -691,6 +880,8 @@ instance Functor CallbackRunner where
 ## Polarity Multiplication Table
 
 # What is the motivation for it?
+
+## What's an example of a (Contravariant f, Functor f) => (microlens-contra)
 
 # What is it?
 
