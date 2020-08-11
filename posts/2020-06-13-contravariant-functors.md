@@ -293,11 +293,13 @@ The problem is that we can't. It's because of something called "polarity" of the
 
 # Polarity
 
-Polarity is a way of representing [variance]() using the position of type variables. Let's take a simple function `a -> b` as an example.
+Polarity is a way of representing [variance](https://en.wikipedia.org/wiki/Covariance_and_contravariance_(computer_science)) using the position of type variables. Let's take a simple function `a -> b` as an example.
 
 ![Function Polarity](/images/contravariant/function-polarity.png)
 
-If a type variable is in **input** position like `a` it is given a **negative** polarity. If it is in an **output** position like `b` then it is given a **positive** polarity. These polarities map directly to variant types.
+If a type variable is in **input** position like `a` it is given a **negative** polarity. If it is in an **output** position like `b` then it is given a **positive** polarity.
+
+These polarities map directly to variant types.
 
 | Polarity | Variance |
 | -------- | -------- |
@@ -305,19 +307,19 @@ If a type variable is in **input** position like `a` it is given a **negative** 
 | Negative | Contravariant |
 | Both | Invariant |
 
-What this means is that Functors (which are actually Covariant Functors) require a data type that has a type variable in the covariant position in order for you to define a Functor instance for that type.
+What this means is that Functors (which are actually Covariant Functors) require a type constructor (data type that needs a type variable to be fully defined) in a covariant position in order for you to define a Functor instance for that type.
 
 Let's look at a type that we know has a Functor instance like `Maybe`:
 
-![Polarity of the Maybe data type](/images/contravariant/maybe-polarity.png)
+![Polarity of the Maybe Type Constructor](/images/contravariant/maybe-polarity.png)
 
-We can see that the type variable `a` occurs in a covariant position within the definition of the `Maybe` data type.
+We can see that the type variable `a` occurs in a covariant position within the definition of the `Maybe` type constructor.
 
 Now let's look at the definition of `Predicate` data type:
 
-![Polarity of the Predicate data type](/images/contravariant/predicate-polarity.png)
+![Polarity of the Predicate Type Constructor](/images/contravariant/predicate-polarity.png)
 
-We can see that the type variable `a` within the definition of the `Predicate` data type occurs in a contravariant position. This indicates that we can't create a (Covariant) Functor instance for this data type.
+We can see that the type variable `a` within the definition of the `Predicate` type constructor occurs in a contravariant position. This indicates that we can't create a (Covariant) Functor instance for this data type.
 
 But we want to map things! What do we do?
 
@@ -786,7 +788,7 @@ putStrLnGreeting = contramap  (hello . space . there . space . doctor . space) $
 
 At least this is somewhat more readable - but the great thing is that knowing the laws helped us make our code more legible. But still - what does this do?
 
-The trick is to remember that Contravaraint compose works in **reverse** to normal composition:
+The trick is to remember that Contravaraint composition works in **reverse** to normal composition:
 
 ```{.haskell .scrollx}
 contramap f . contramap g = contramap (g . f) -- notice the (g . f) instead of (f. g)
@@ -840,21 +842,296 @@ unlog qPutStrLn "Picard J L"
 -- This is Q!!
 ```
 
-### Aeson
+## Equality and Ordering
 
-### Serialiser
+Now let's look at two somewhat related concepts: equality and ordering
 
-### Fold
+### Equivalence
 
-### Logger
+Let's imagine that we have a datatype called `Equivalence` that wraps an equality expression:
 
-### Equality/Comparison
+```{.haskell .scrollx}
+newtype Equivalence a = Equivalence { getEquivalence :: a -> a -> Bool }
+```
+
+Given two values of type `a` the `getEquivalence` function will return a `Bool` indicating if they are equal or not.
+
+Now we can see that both `a` type variables are in input position. Let's define a `Contravariant` instance for it:
+
+```{.haskell .scrollx}
+instance Contravariant Equivalence where
+  contramap :: (b -> a) -> Equivalence a -> Equivalence b
+  contramap bToA (Equivalence eqA1A2) = Equivalence $ \b1 b2 ->
+    let a1 = bToA b1
+        a2 = bToA b2
+    in eqA1A2 a1 a2
+```
+
+Given an `Equivalence` for `Int`:
+
+```{.haskell .scrollx}
+intEq :: Equivalence Int
+intEq = Equivalence (==)
+```
+
+We can run it as:
+
+```{.haskell .scrollx}
+getEquivalence intEq 1 2
+-- False
+
+getEquivalence intEq 1 1
+-- True
+```
+
+We can calculate the equivalence of other types using `contramap`:
+
+```{.haskell .scrollx}
+strLengthEq :: Equivalence String
+strLengthEq = contramap length intEq
+
+data Person = Person { name :: String, age :: Int }
+
+personAgeEq :: Equivalence Person -- equality by age
+personAgeEq = contramap age intEq
+
+personNameLengthEq :: Equivalence Person -- equality by length of name
+personNameLengthEq = contramap name strLengthEq
+```
+
+Here's how we can run the above:
+
+```{.haskell .scrollx}
+-- t1 = Person "Tovak1" 240
+-- t2 = Person "Tovak2" 340
+-- t3 = Person "Neelix" 60
+-- t4 = Person "Janeway" 40
+
+getEquivalence personAgeEq t1 t2
+-- False
+
+getEquivalence personAgeEq t1 t1
+-- True
+
+getEquivalence personAgeEq t2 t2
+-- True
+
+getEquivalence personAgeEq t2 t3
+-- False
+
+getEquivalence personNameLengthEq t1 t2
+-- True
+
+getEquivalence personNameLengthEq t3 t4
+-- False
+
+getEquivalence personNameLengthEq t1 t4
+-- False
+
+```
+
+
+### Comparison
+
+Let's imagine that we have a datatype called `Comparison` that wraps a comparison expression:
+
+```{.haskell .scrollx}
+newtype Comparison a = Comparison { getComparison :: a -> a -> Ordering }
+```
+
+Given two values of type `a` the `getComparison` function will return an `Ordering` (`LT`, `GT` or `EQ`) with respect to each other.
+
+Now we can see that both `a` type variables are in input position as before. Let's define a `Contravariant` instance for it:
+
+```{.haskell .scrollx}
+instance Contravariant Comparison where
+  contramap :: (b -> a) -> Comparison a -> Comparison b
+  contramap bToA (Comparison cmpA1A2) = Comparison $ \b1 b2 ->
+    let a1 = bToA b1
+        a2 = bToA b2
+    in cmpA1A2 a1 a2code
+```
+
+We can see that the wrappers for `Equivalence` and `Comparison` are almost the same, as are their `Contravariant` instances.
+
+Given a `Comparison` for Int as:
+
+```{.haskell .scrollx}
+intCmp :: Comparison Int
+intCmp = Comparison compare
+```
+
+We can run it as:
+
+```{.haskell .scrollx}
+getComparison intCmp 1 1
+-- EQ
+
+getComparison intCmp 1 2
+-- LT
+
+getComparison intCmp 2 1
+-- GT
+```
+
+We can now calculate the comparison of other types using `contramap`:
+
+```{.haskell .scrollx}
+strCmp :: Comparison String
+strCmp = contramap length intCmp
+
+personAgeCmp :: Comparison Person
+personAgeCmp = contramap age intCmp
+
+fstCmp :: Comparison a -> Comparison (a, b)
+fstCmp compA = contramap fst compA
+```
+
+Nothing new here. Let's have a look at how to sort numbers. We use the `sortBy` function defined in `Data.List` from the `base` package:
+
+```{.haskell .scrollx}
+sortBy :: (a -> a -> Ordering) -> [a] -> [a]
+```
+
+We can see from the `sortBy` function definition that it can accept the data wrapped in the `Comparison` data type:
+
+```{.haskell .scrollx}
+sortBy        :: (a -> a -> Ordering) -> [a] -> [a]
+getComparison ::  a -> a -> Ordering
+```
+
+Sorting numbers with the above function:
+
+```{.haskell .scrollx}
+-- unsortedNumbers = [3, 5, 1, 4, 2]
+
+-- ascending sort
+sortBy (getComparison intCmp) unsortedNumbers
+-- [1,2,3,4,5]
+
+-- descending sort
+sortBy (flip $ getComparison intCmp) unsortedNumbers
+-- [5,4,3,2,1]
+```
+
+Notice how we just use the `flip` function to change between ascending and descending sort:
+
+```{.haskell .scrollx}
+flip :: (a -> b -> c) -> b -> a -> c
+```
+
+`flip` just changes the order of input parameters. `flip` is awesome :) I saw this technique first used at [Roman Cheplyaka](https://ro-che.info/articles/2016-04-02-descending-sort-haskell)'s blog.
+
+But here's something interesting: since we know how to sort `Int`s we also know how to sort people by age via `personAgeCmp`! Let's see that in action:
+
+```{.haskell .scrollx}
+-- unsortedPeople = [Person "Tovak1" 240, Person "Janeway" 40, Person "Neelix" 60]
+
+-- ascending sort
+sortBy (getComparison personAgeCmp) unsortedPeople
+-- [Person {name = "Janeway", age = 40},Person {name = "Neelix", age = 60},Person {name = "Tovak1", age = 240}]
+
+-- descending sort
+sortBy (flip $ getComparison personAgeCmp)
+-- [Person {name = "Tovak1", age = 240},Person {name = "Neelix", age = 60},Person {name = "Janeway", age = 40}]
+```
+
+-- TODO: Add a diagram for the multiple contramaps
+
+## Function Types
+
+A regular function can be though of being defined as:
+
+```{.haskell .scrollx}
+newtype RegularFunc a b = RegularFunc { getRegular :: a -> b }
+```
+
+The position of the `b` in the type definition `RegularFunc a b` allows us to define (Covariant) Functor instances for `RegularFunc` because `b` is in output position. The type variable `a` which is in the input position. Given that `a` is in input position can we use this to define a Contravariant on `a`?
+
+Let's recall what the definition of the `Functor` type class looks like:
+
+```{.haskell .scrollx}
+class Functor f where
+  fmap :: (a -> b) -> f a -> f b
+```
+
+In the above declaration, `f` is a type constuctor with one type hole. Given `RegularFunc` which has two type holes, we need to fill one in, in order to use it with the `Functor` instance implementation. To do this we fix `a` and get the type constructor `RegularFunc a`, allowing us to vary `b`:
+
+```{.haskell .scrollx}
+instance Functor (RegularFunc a) where
+  fmap :: (b -> c) -> f b -> f c
+  fmap = (.)
+```
+
+We can't define a `Contravariant` instance for `a` because we have to fix `a`. Oh! Come on! If only we didn't have to fix `a`. What if we could fix `b` instead. We don't care about `b`. `b` is dead to us.
+
+Let's dream up such a type and call it `Op` - for **op**posite of regular:
+
+```{.haskell .scrollx}
+newtype Op a b = Op { getOp :: b -> a }
+```
+
+Now we can see that the type `b` is in input position within the data type. This can be a little confusing because we have switched our inputs and outputs with respect to `RegularFunc`; `a` is the output and `b` is the input.
+
+And guess what? We can define a `Contravariant` instance for it!
+
+```{.haskell .scrollx}
+instance Contravariant (Op a) where
+  contramap :: (c -> b) -> (Op a b)  -> (Op a c)
+  contramap cToB opBToA = Op $ \c ->
+    let b = cToB c
+    in opBToA b
+```
+
+Here's a simple example of how to use:
+
+```{.haskell .scrollx}
+stringsLength :: Op Int [String]
+stringsLength = Op $ sum . fmap length
+
+unqiueStringsLength :: Op Int (S.Set String)
+unqiueStringsLength = contramap S.toList stringsLength
+```
+
+If we know how to sum all the lengths of a `List` of `String` we can adapt that function to sum the lengths of a `Set` of `String`:
+
+
+```{.haskell .scrollx}
+import Data.Set (fromList)
+
+namesList = ["Paris", "Kim", "Belanna", "Seven"]
+namesSet  = fromList namesList
+
+getOp stringsLength $ namesList
+-- 20
+
+getOp unqiueStringsLength $ namesSet
+-- 20
+```
+
+Now Predicate, Comparison, Equivalence and Op seem like useful data structures. The good news is that they already exist in the `Data.Functor.Contravariant` package from `base` so you don't have to write them yourselves.
+
+One interesting implementation detail on `Comparison` and `Equivalence` `Contravariant` instaces is that they are implemented using the `on` function:
+
+
+```{.haskell .scrollx}
+newtype Equivalence a = Equivalence { getEquivalence :: a -> a -> Bool }
+
+instance Contravariant Equivalence where
+  contramap f g = Equivalence $ on (getEquivalence g) f
+
+```
+
+The `on` function is [defined](https://hackage.haskell.org/package/base-4.14.0.0/docs/src/Data.Function.html#on) as:
+
+```{.haskell .scrollx}
+on :: (b -> b -> c) -> (a -> b) -> a -> a -> c
+(.*.) `on` f = \x y -> f x .*. f y
+```
+
+Essentially given a function `b -> b -> c` and a function `a -> b`, the second function will be applied to each input of type `a` converting it to a `b` and then the first function is applied on the transformed inputs. Such reuse. :)
 
 # More Polarity
-
-TODO: Add CallBack example from FP Complete
-TODO: Add Endo example
-TODO: Should we talk about Invariant at the end?
 
 
 Let's take a look at the `CallbackRunner` example from [FP Complete](https://tech.fpcomplete.com/blog/2016/11/covariance-contravariance/)
@@ -877,23 +1154,25 @@ instance Functor CallbackRunner where
             aCallbackRunner (bCallback . f)
 ```
 
-## Polarity Multiplication Table
 
-# What is the motivation for it?
-
-## What's an example of a (Contravariant f, Functor f) => (microlens-contra)
-
-# What is it?
-
-# Why are they useful? Why do we need it
-
-# Contravariant
-- Typeclassopedia (from George W)
-- Similar to Adaptor pattern?
+TODO: Polarity Multipliction table
+TODO: Contravariant operator examples
+TODO: mention Invariant at the end. Link to other resources and possible future post
+TODO: Typeclassopedia from George W?
 
 # Links
-- [George Wilson](https://twitter.com/georgetalkscode   )'s Presentations:
+- [George Wilson](https://twitter.com/georgetalkscode)'s Presentations:
     - [The Extended Functor Family](https://www.youtube.com/watch?v=JZPXzJ5tp9w)
     - [Contravariant Functors - The Other Side of the Coin](https://www.youtube.com/watch?v=IJ_bVVsQhvc&t)
 - [Covariance and Contravariance](https://tech.fpcomplete.com/blog/2016/11/covariance-contravariance/)
 - [Contravariant Package](http://hackage.haskell.org/package/contravariant-1.5.2)
+- [CO-LOG](https://kowainik.github.io/posts/2018-09-25-co-log)
+- [Understanding contravariance](https://typeclasses.com/contravariance)
+- [FP Complete](https://tech.fpcomplete.com/blog/2016/11/covariance-contravariance/)
+- [24 days of Hackage - Contravariant](https://ocharles.org.uk/blog/guest-posts/2013-12-21-24-days-of-hackage-contravariant.html)
+- [Reddit - The motivation behind Contravariant](https://www.reddit.com/r/haskell/comments/4rvtzy/what_is_the_motivation_behind_contravariant/)
+- [Reddit - datafunctorcontravariant some simple applications](https://www.reddit.com/r/haskelltil/comments/bqiyr9/datafunctorcontravariant_some_simple_applications/)
+- [Functor Optics](http://oleg.fi/gists/posts/2017-12-23-functor-optics.html#t:Contravariant)
+- [A Fistful of Functors - Itamar Ravid](https://www.youtube.com/watch?v=SxfZ_6ynhi0)
+- [Reddit - Looking for an abstraction to compose](https://www.reddit.com/r/haskell/comments/2p7toa/looking_for_an_abstraction_to_compose/)
+- [Fun with Profunctors - Phil Freeman](https://www.youtube.com/watch?v=OJtGECfksds)
