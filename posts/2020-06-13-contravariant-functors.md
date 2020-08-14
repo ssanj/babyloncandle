@@ -1046,7 +1046,7 @@ A regular function can be though of being defined as:
 newtype RegularFunc a b = RegularFunc { getRegular :: a -> b }
 ```
 
-The position of the `b` in the type definition `RegularFunc a b` allows us to define (Covariant) Functor instances for `RegularFunc` because `b` is in output position. The type variable `a` which is in the input position. Given that `a` is in input position can we use this to define a Contravariant on `a`?
+We can define a (Covariant) Functor instance for `RegularFunc` because `b` is in output position.
 
 Let's recall what the definition of the `Functor` type class looks like:
 
@@ -1055,7 +1055,7 @@ class Functor f where
   fmap :: (a -> b) -> f a -> f b
 ```
 
-In the above declaration, `f` is a type constuctor with one type hole. Given `RegularFunc` which has two type holes, we need to fill one in, in order to use it with the `Functor` instance implementation. To do this we fix `a` and get the type constructor `RegularFunc a`, allowing us to vary `b`:
+In the above declaration, `f` is a type constuctor with one type hole. Given `RegularFunc` which has two type holes (`a` and `b`), we need to fill one in, in order to use it with the `Functor` instance implementation. To do this we fix `a` and get the type constructor `RegularFunc a`, allowing us to vary `b`:
 
 ```{.haskell .scrollx}
 instance Functor (RegularFunc a) where
@@ -1063,7 +1063,9 @@ instance Functor (RegularFunc a) where
   fmap = (.)
 ```
 
-We can't define a `Contravariant` instance for `a` because we have to fix `a`. Oh! Come on! If only we didn't have to fix `a`. What if we could fix `b` instead. We don't care about `b`. `b` is dead to us.
+We can't define a `Contravariant` instance for `a` because we have to fix `a`.
+
+Oh! Come on! If only we didn't have to fix `a`. What if we could fix `b` instead? We don't care about `b`. `b` is dead to us.
 
 Let's dream up such a type and call it `Op` - for **op**posite of regular:
 
@@ -1071,16 +1073,16 @@ Let's dream up such a type and call it `Op` - for **op**posite of regular:
 newtype Op a b = Op { getOp :: b -> a }
 ```
 
-Now we can see that the type `b` is in input position within the data type. This can be a little confusing because we have switched our inputs and outputs with respect to `RegularFunc`; `a` is the output and `b` is the input.
+Now we can see that the type `b` is in input position within the data type. This can be a little confusing because we have switched the position of type parameters `a` and `b` in `RegularFunc`; `a` is the output and `b` is the input.
 
-And guess what? We can define a `Contravariant` instance for it!
+And guess what? We can now fix `a` (which is now our output) and can define a `Contravariant` instance for `Op`:
 
 ```{.haskell .scrollx}
 instance Contravariant (Op a) where
-  contramap :: (c -> b) -> (Op a b)  -> (Op a c)
-  contramap cToB opBToA = Op $ \c ->
+  contramap :: (c -> b) -> Op a b -> Op a c
+  contramap cToB (Op bToA) = Op $ \c ->
     let b = cToB c
-    in opBToA b
+    in bToA b
 ```
 
 Here's a simple example of how to use:
@@ -1109,9 +1111,9 @@ getOp unqiueStringsLength $ namesSet
 -- 20
 ```
 
-Now Predicate, Comparison, Equivalence and Op seem like useful data structures. The good news is that they already exist in the `Data.Functor.Contravariant` package from `base` so you don't have to write them yourselves.
+Now `Predicate`, `Comparison`, `Equivalence` and `Op` seem like useful data structures. The good news is that they already exist in the `Data.Functor.Contravariant` package from `base` so you don't have to write them yourself.
 
-One interesting implementation detail on `Comparison` and `Equivalence` `Contravariant` instaces is that they are implemented using the `on` function:
+One interesting implementation detail of the `Comparison` and `Equivalence` `Contravariant` instances is that they are implemented using the `on` function:
 
 
 ```{.haskell .scrollx}
@@ -1134,31 +1136,110 @@ Essentially given a function `b -> b -> c` and a function `a -> b`, the second f
 # More Polarity
 
 
-Let's take a look at the `CallbackRunner` example from [FP Complete](https://tech.fpcomplete.com/blog/2016/11/covariance-contravariance/)
+Let's take a look at the `CallbackRunner` example from [FP Complete](https://tech.fpcomplete.com/blog/2016/11/covariance-contravariance/):
 
 ```{.haskell .scrollx}
-newtype CallbackRunner a = CallbackRunner
-    {
-        runCallback :: (a -> IO ()) -> IO ()
-    } -- what is the polarity of a?
-
--- in the callback `(a -> IO ())` a is in negative position
--- in the overall function `(a -> IO ()) -> IO ()`, `(a -> IO ())` is in
--- negative position also, therefore multiplying a negative with a negative is
--- going to give us a positive. This means that we should be able to write a
--- Functor instance for  `CallbackRunner`:
-
-instance Functor CallbackRunner where
-    fmap f (CallbackRunner aCallbackRunner) =
-        CallbackRunner $ \bCallback ->
-            aCallbackRunner (bCallback . f)
+newtype CallbackRunner a =
+  CallbackRunner {
+    runCallback :: (a -> IO ()) -> IO ()
+  }
 ```
 
+Type variable `a` is in input position so we should be able to write a `Contravariant` instance for it:
 
-TODO: Polarity Multipliction table
-TODO: Contravariant operator examples
-TODO: mention Invariant at the end. Link to other resources and possible future post
-TODO: Typeclassopedia from George W?
+```{.haskell .scrollx}
+instance Contravariant CallbackRunner where
+  contramap :: (a -> b) -> CallbackRunner b -> CallbackRunner a
+  contramap aToB (CallbackRunner runCallbackB) = CallbackRunner $ \aToIO ->
+    runCallbackB $ \b ->
+      let a = undefined -- where do we get an `a` from?
+      in aToIO a
+
+-- if we had a (b -> a) we could convert the `b` to an `a`
+```
+
+Hmm. Now it looks like we have a problem. There doesn't seem to anyway for us to get an `a` to pass to `aToIO` to complete the implementation. We have a `b` and if there was a function `b -> a` instead of our `a -> b`, we could convert that `b` to an `a` and it would all work.
+
+This is because there's more to the polarity story than I've shared up until now. While `a` is in input position in `a -> IO()`, it's polarity changes when it's also used as an input to the function `(a -> IO ()) -> IO ()`. I mentioned that an `input` position is a `negative` polarity and an `output` position is a `positive` polarity in [Polarity](#Polarity).
+
+To figure out the final polarity of something we need to multiply its polarities at every context it is used within in the function definition. More on this below.
+
+Polarity multiplication is similar to the multiplication of positive and negative numbers:
+
+## Polarity Multiplication Table
+
+| Polarity1 | x | Polarity2  | Polarity |
+| --------  | - | --------    | -------- |
+| Positive  | x | Positive    | Positive |
+| Positive  | x | Negative    | Negative |
+| Negative  | x | Positive    | Negative |
+| Negative  | x | Negative    | Positive |
+
+Let's try and figure out the polarity of `a` given our new found multiplication skills. Given `runCallback`:
+
+```{.haskell .scrollx}
+runCallback :: (a -> IO ()) -> IO ()
+```
+
+`a` is in input or negative position in:
+
+```{.haskell .scrollx}
+a -> IO ()
+```
+
+but within this function:
+
+```{.haskell .scrollx}
+-- x = (a -> IO ())
+x -> IO ()
+```
+We can see that `x` in the above example is in input or negative position as well. Given that `x` is `a -> IO ()`:
+
+```{.haskell .scrollx}
+(a -> IO ()) -> IO ()
+-- a -> IO (a is negative)
+-- (a -> IO ()) (the whole parenthesis are in negative position)
+-- polarity of a: negative * negative = positive
+```
+
+![Polarity Multiplication](/images/contravariant/callbackRunner-polarity.png)
+
+Given that `a` is now in output or positive position, we should be able to write a (Covariant) `Functor` instance for it:
+
+```{.haskell .scrollx}
+instance Functor CallbackRunner where
+  fmap :: (a -> b) -> CallbackRunner a -> CallbackRunner b
+  fmap aToB (CallbackRunner runCallbackA) = CallbackRunner $ \bToIO ->
+    runCallbackA $ \a ->
+      let b      = aToB a
+          result = bToIO b
+      in result
+```
+
+And we can!! If you want to dig more into polarities there are some good exercises at the [FP Complete article](https://tech.fpcomplete.com/blog/2016/11/covariance-contravariance/).
+
+
+# Invariant Functors
+
+We briefly mentioned `Invariant` Functors when talking about [Polarity](#Polarity) but never mentioned them again until now. `Invariant` Functor is the parent typeclass of all Functors (`Covariant` and `Contravariant`)
+
+![Functor Hierarchy](/images/contravariant/functor-hierarchy.png)
+
+Given that this post is quite long, the only thing I'm going to mention about Invariant Functors is that it has both covariant and contravariant functions passed to it in its definition:
+
+```{.haskell .scrollx}
+class Invariant f where
+  invmap :: (a -> b) -> (b -> a) -> f a -> f b
+```
+
+where `a -> b` is the covariant function to  use if `f a` is a `Covariant` Functor and `b -> a` is the function to use if `f a` is a `Contravariant` Functor.
+
+I may write another article about Invariant Functors if I feel the need for it, but in the meantime [checkout](https://cvlad.info/functor-of/) [these](http://oleg.fi/gists/posts/2017-12-23-functor-optics.html#t:Invariant) [articles](https://stackoverflow.com/questions/22103445/example-of-invariant-functor) to get you [started](https://www.lesswrong.com/posts/KRb2x2RJjGbBMbE4M/my-functor-is-rich).
+
+
+# Summary
+
+Hopefully this has shed some light onto `Contravariant` Functors and how they are used and how they can be implemented. In a future article I hope to cover `Divisible` and `Decidable` typeclasses that build up from `Contravariant` Functors.
 
 # Links
 - [George Wilson](https://twitter.com/georgetalkscode)'s Presentations:
