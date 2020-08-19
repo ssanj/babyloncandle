@@ -537,7 +537,7 @@ Let's take `Predicate` as an example and try out the identity law. The `Predicat
 
 ```{.haskell .scrollx}
  instance Contravariant Predicate where
-   -- contramap :: (a -> b) -> f b -> f a
+   contramap :: (a -> b) -> f b -> f a
    contramap f (Predicate p) = Predicate (p . f)
 ```
 
@@ -638,16 +638,89 @@ Predicate (\person ->
 ```
 
 ## Combinators
+
+There are some built-in combinators that go with `Contravariant`.
+
+### Infix contramap
+
+Similar to the contramap function the following functions can be used infix.
+
+Same as `contramap`:
+
 ```{.haskell .scrollx}
 -- infixl 4
-(>$<) :: Contravariant f => (a -> b) -> f b -> f a
+(>$<)        :: Contravariant f => (a -> b) -> f b -> f a
+-- contramap :: Contravariant f => (a -> b) -> f b -> f a
+```
 
+A simple example of it in use:
+
+```{.haskell .scrollx}
+p5 :: Predicate Int
+p5 = Predicate $ \n -> n == 5
+
+pLength5 :: Predicate [a]
+pLength5 = length >$< p5
+
+getPredicate pLength5 "hello"
+-- True
+
+getPredicate pLength5 "hello world"
+-- False
+```
+
+Same as `contramap` but with the parameters switched:
+
+```{.haskell .scrollx}
 -- infixl 4
-(>$$<) :: Contravariant f => f b -> (a -> b) -> f a
+(>$$<)       :: Contravariant f => f b      -> (a -> b) -> f a
+-- contramap :: Contravariant f => (a -> b) -> f b     -> f a
+```
 
+### Infix const
+
+These combinators take in a constant input and completely ignore the input supplied when running the `Contravariant` instance.
+
+```{.haskell .scrollx}
 -- infixl 4
 (>$) :: b -> f b -> f a
+```
 
+It has a default implementation of:
+
+```{.haskell .scrollx}
+(>$) :: b -> f b -> f a
+(>$) = contramap . const
+```
+
+A simple example of it in use:
+
+```{.haskell .scrollx}
+p5 :: Predicate Int
+p5 = Predicate $ \n -> n == 5
+
+pLength5 :: Predicate [a]
+pLength5 = contramap length p5
+
+getPredicate pLength5 "hello"
+-- True
+
+getPredicate pLength5 "hello world"
+-- False
+
+pAlwaysFalse :: Predicate [a]
+pAlwaysFalse = 10 >$ p5
+
+getPredicate pAlwaysFalse "hello"
+-- False (because 10 /= 5)
+
+getPredicate pAlwaysFalse "hello world"
+-- False
+```
+
+Same as above but with the parameters switched:
+
+```{.haskell .scrollx}
 -- infixl 4
 ($<) :: Contravariant f => f b -> b -> f a
 ```
