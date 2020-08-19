@@ -1,7 +1,7 @@
 ---
 title: Contravariant Functors
 author: sanjiv sahayam
-description: ???
+description: What are Contravariant Functors?
 tags: Haskell
 comments: true
 ---
@@ -643,14 +643,13 @@ Predicate (\person ->
 (>$<) :: Contravariant f => (a -> b) -> f b -> f a
 
 -- infixl 4
+(>$$<) :: Contravariant f => f b -> (a -> b) -> f a
+
+-- infixl 4
 (>$) :: b -> f b -> f a
 
 -- infixl 4
 ($<) :: Contravariant f => f b -> b -> f a
-
--- infixl 4
-(>$$<) :: Contravariant f => f b -> (a -> b) -> f a
-code
 ```
 
 ## LogAction
@@ -860,12 +859,16 @@ Now we can see that both `a` type variables are in input position. Let's define 
 
 ```{.haskell .scrollx}
 instance Contravariant Equivalence where
-  contramap :: (b -> a) -> Equivalence a -> Equivalence b
-  contramap bToA (Equivalence eqA1A2) = Equivalence $ \b1 b2 ->
-    let a1 = bToA b1
-        a2 = bToA b2
-    in eqA1A2 a1 a2
+  contramap :: (a -> b) -> Equivalence b -> Equivalence a
+  contramap aToB (Equivalence eqB1B2) = Equivalence $ \a1 a2 ->
+    let b1 = aToB a1
+        b2 = aToB a2
+    in eqB1B2 b1 b2
 ```
+
+Something important to note is that the function we supply to `contramap` (`a -> b`) is run on twice - once on each of the input parameters (`b`).
+
+![Polarity of Equivalence](/images/contravariant/equivalence-polarity.png)
 
 Given an `Equivalence` for `Int`:
 
@@ -945,12 +948,14 @@ Now we can see that both `a` type variables are in input position as before. Let
 
 ```{.haskell .scrollx}
 instance Contravariant Comparison where
-  contramap :: (b -> a) -> Comparison a -> Comparison b
-  contramap bToA (Comparison cmpA1A2) = Comparison $ \b1 b2 ->
-    let a1 = bToA b1
-        a2 = bToA b2
-    in cmpA1A2 a1 a2code
+  contramap :: (a -> b) -> Comparison b -> Comparison a
+  contramap aToB (Comparison cmpB1B2) = Comparison $ \a1 a2 ->
+    let b1 = aToB a1
+        b2 = aToB a2
+    in cmpB1B2 b1 b2
 ```
+
+![Polarity of Comparison](/images/contravariant/comparison-polarity.png)
 
 We can see that the wrappers for `Equivalence` and `Comparison` are almost the same, as are their `Contravariant` instances.
 
@@ -1035,8 +1040,6 @@ sortBy (getComparison personAgeCmp) unsortedPeople
 sortBy (flip $ getComparison personAgeCmp)
 -- [Person {name = "Tovak1", age = 240},Person {name = "Neelix", age = 60},Person {name = "Janeway", age = 40}]
 ```
-
--- TODO: Add a diagram for the multiple contramaps
 
 ## Function Types
 
