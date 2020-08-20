@@ -1,14 +1,18 @@
 ---
-title: Contravariant Functors
+title: Contravariant Functors are Weird
 author: sanjiv sahayam
 description: What are Contravariant Functors?
 tags: Haskell
 comments: true
 ---
 
+-- TODO Correct spelling of all star trek crew
+-- TODO Remove covariant laws
+-- TODO Verify partial application of types occur left to right
+
 Contravariant Functors are odd aren't they? Functors are so straight forward but **Contra**variant as its name implies is the complete opposite.
 
-Before we get into what a Contravariant Functor is, it's useful to look at the  Functor [typeclass](https://wiki.haskell.org/Typeclassopedia) which we know and love.
+Before we get into what a Contravariant Functor is, it's useful to look at the  `Functor` [typeclass](https://wiki.haskell.org/Typeclassopedia) which we know and love.
 
 # Functor
 
@@ -24,7 +28,7 @@ We often understand a Functor to be a "container" or a "producer" of some type, 
 A simple example would be the `[]` type, that can represent zero or more values. Given a `[a]` we can turn it into a `[b]` when given a function `a -> b`.
 
 ```{.haskell .scrollx}
-data [a] = [] | a : [a] -- an approximation of the the [] data type
+data [] a = [] | a : [a] -- an approximation of the [] data type
 
 instance Functor [] where
   fmap _ [] = []
@@ -287,9 +291,13 @@ instance Functor Predicate where
 
 Now we've run into a small problem:
 
-> How do we compose (a -> Bool) with (a -> b) to give us a (b -> Bool) ?
+> How do we compose (a -> Bool) and (a -> b) to give us a (b -> Bool) ?
 
-The problem is that we can't. It's because of something called "polarity" of the type variable `a`. No Functor instance for you Predicate. :sad-panda:
+We are given a `b` but we don't have access to any functions that actually use a `b`.
+
+The problem is that we can't. It's because of something called "polarity" of the type variable `a`. No Functor instance for you Predicate.
+
+![sad-panda by [Nick Bluth](https://thenounproject.com/nickbluth/collection/pandas)](/images/contravariant/sad-panda.png)
 
 # Polarity
 
@@ -319,7 +327,7 @@ Now let's look at the definition of `Predicate` data type:
 
 ![Polarity of the Predicate Type Constructor](/images/contravariant/predicate-polarity.png)
 
-We can see that the type variable `a` within the definition of the `Predicate` type constructor occurs in a contravariant position. This indicates that we can't create a (Covariant) Functor instance for this data type.
+We can see that the type variable `a` within the definition of the `Predicate` type constructor occurs in an input position. This indicates that we can't create a (Covariant) Functor instance for this data type.
 
 But we want to map things! What do we do?
 
@@ -351,7 +359,7 @@ we can then read `contramap` as:
 
 But that probably doesn't make much sense. So let's try and look at this in terms of our non-Functor: `Predicate`. `Predicate` has a **need** for an `a`, which it then uses to tell if something about that `a` is True or False.
 
-Let's try and write a Contravariant instance for `Predicate` given that we know that the type `a` in `Predicate` occurs in a contravariant position.
+Let's try and write a Contravariant instance for `Predicate` given that we know that the type `a` in `Predicate` occurs in an input position.
 
 ```{.haskell .scrollx}
 instance Contravariant Predicate where
@@ -362,11 +370,11 @@ instance Contravariant Predicate where
 
 Given that we have a function `a -> b` and essentially a function of type `b -> Bool` (wrapped inside a `Predicate b`), we can if given an `a`, convert it to a `b` using `aToB` and then give that `b` to `bToBool` to give us a `Bool`.
 
-Here's a slightly long-form implementation of Contravariant for `Predicate`:
+Here's a slightly long-form implementation of the Contravariant instance  for `Predicate`:
 
 ```{.haskell .scrollx}
 instance Contravariant Predicate where
-  -- contramap :: (a -> b) -> Predicate b -> Predicate a
+  contramap :: (a -> b) -> Predicate b -> Predicate a
   contramap aToB (Predicate bToBool) =
     Predicate $ \a ->
       let b    = aToB a
@@ -380,7 +388,7 @@ or more succinctly:
 
 ```{.haskell .scrollx}
 instance Contravariant Predicate where
-  -- contramap :: (a -> b) -> Predicate b -> Predicate a
+  contramap :: (a -> b) -> Predicate b -> Predicate a
   contramap f (Predicate b) = Predicate $ b . f
 ```
 
@@ -406,7 +414,7 @@ These are the essential differences between covariant and contravariant Functors
 | Contravariant | before | adapt inputs |
 
 
-Now that we know the essential difference between Functor and Contravariant, let's look at how we can use contramap with your `Predicate` class.
+Now that we know the essential difference between `Functor` and `Contravariant`, let's look at how we can use `contramap` with our `Predicate` class.
 
 Given that we already have a `Predicate` that determines whether a number is greater than ten:
 
@@ -454,7 +462,7 @@ And this is fine, but there's some duplication across each of the `Predicate`s -
 
 It would be nice if we didn't have to repeat ourselves.
 
-If we look at the differences between **numGreaterThanTen**, **strLengthGreaterThanTen** and **personLongName** we can see that the only difference is that one works on an Int and the others work on String and Person respectively. **strLengthGreaterThanTen** and **personLongName** each convert their input types to an Int and then do the same comparison:
+If we look at the differences between `numGreaterThanTen`, `strLengthGreaterThanTen` and `personLongName` we can see that the only difference is that one works on an `Int` and the others work on `String` and `Person` respectively. `strLengthGreaterThanTen` and `personLongName` each convert their input types to an `Int` and then do the same comparison:
 
 ```{.haskell .scrollx}
 Predicate (\(n :: Int) ->
@@ -501,7 +509,7 @@ getPredicate personLongName2 $ Person "John" 30 -- False
 getPredicate personLongName2 $ Person "Bartholomew" 30 -- True
 ```
 
-Now we have rewritten **strLengthGreaterThanTen** and **personLongName** in terms of **numGreaterThanTen** by just running a function before it to convert the types. This is a simple example of a Contravariant Functor where we can reuse some existing functionality for a given type if we can convert from our other types to that type through some mapping function.
+Now we have rewritten `strLengthGreaterThanTen` and `personLongName` in terms of `numGreaterThanTen` by just running a function before it to convert the types. This is a simple example of a `Contravariant Functor` where we can reuse some existing functionality for a given type if we can convert from our other types to that type through some mapping function.
 
 We can also go a little further and reuse even more:
 
@@ -513,7 +521,7 @@ personLongName3 = contramap personName strLengthGreaterThanTen -- convert the Pe
 
 ## Laws
 
-Just like Functor has laws, Contravariant also has laws. Laws and people with bad taste - there's no escaping them.
+Just like `Functor` has laws, `Contravariant` also has laws. Laws and people with bad taste - there's no escaping them.
 
 ### Identity
 
@@ -521,7 +529,7 @@ Just like Functor has laws, Contravariant also has laws. Laws and people with ba
 contramap id == id
 ```
 
-Essentially if you do not change the value of a Contravariant Functor, you get the same Contravariant Functor you started with.
+Essentially if you do not change the value of a `Contravariant Functor`, you get the same `Contravariant Functor` you started with.
 
 ### Composition
 
@@ -529,11 +537,11 @@ Essentially if you do not change the value of a Contravariant Functor, you get t
 contramap f . contramap g = contramap (g . f)
 ```
 
-If you convert the input to some Contravariant Functor by `contramap`ing with function `g` and then convert its input to some other type by `contramap`ing again with a function `f`, it's the same as composing the functions `f` and `g` (`g . f`) and then `contramap`ing once. Notice the order of composition is switched as opposed to when we looked at the Functor laws.
+If you convert the input to some `Contravariant Functor` by `contramap`ing with function `g` and then convert its input to some other type by `contramap`ing again with a function `f`, it's the same as composing the functions `f` and `g` (`g . f`) and then `contramap`ing once. Notice the order of composition is switched as opposed to when we looked at the `Functor` laws.
 
 ![Contravariant Functor Laws](/images/contravariant/contravariant-laws-ct.png)
 
-Let's take `Predicate` as an example and try out the identity law. The `Predicate` Contravariant Functor is defined as:
+Let's take `Predicate` as an example and try out the identity law. The `Predicate` `Contravariant Functor` instance is defined as:
 
 ```{.haskell .scrollx}
  instance Contravariant Predicate where
@@ -581,7 +589,7 @@ length :: [a] -> Int
 personName :: Person -> String
 ```
 
-Using **numGreaterThanTen**, with **length** and **personName**:
+Using `numGreaterThanTen`, with `length` and `personName`:
 
 ```{.haskell .scrollx}
 -- composition law
@@ -643,9 +651,7 @@ There are some built-in combinators that go with `Contravariant`.
 
 ### Infix contramap
 
-Similar to the contramap function the following functions can be used infix.
-
-Same as `contramap`:
+Similar to the `contramap` function the following functions can be used infix:
 
 ```{.haskell .scrollx}
 -- infixl 4
@@ -674,7 +680,7 @@ Same as `contramap` but with the parameters switched:
 ```{.haskell .scrollx}
 -- infixl 4
 (>$$<)       :: Contravariant f => f b      -> (a -> b) -> f a
--- contramap :: Contravariant f => (a -> b) -> f b     -> f a
+-- contramap :: Contravariant f => (a -> b) -> f b      -> f a
 ```
 
 ### Infix const
@@ -691,6 +697,23 @@ It has a default implementation of:
 ```{.haskell .scrollx}
 (>$) :: b -> f b -> f a
 (>$) = contramap . const
+```
+
+Let's see how that works:
+
+```{.haskell .scrollx}
+-- const when given two values returns the first value ignoring the second
+const :: a -> b -> a
+const x _ =  x
+
+contramap :: Contravariant f => (a -> b) -> f b -> f a
+
+(>$) :: b -> f b -> f a
+(>$)      = contramap . const
+(>$) b    = contramap (const b)   -- simplifying with b
+(>$) b    = contramap (a -> b)    -- applying `const b`
+(>$) b fb = contramap (a -> b) fb -- simplifying fb
+(>$) b fb = fa                    -- simplifying `contramap (a -> b) fb`
 ```
 
 A simple example of it in use:
@@ -727,23 +750,23 @@ Same as above but with the parameters switched:
 
 ## LogAction
 
-Let's look at another example of Contravariant. Imagine you have the following data type that encapsulates performing some side effect on some polymorphic type `a`:
+Let's look at another example of `Contravariant`. Imagine you have the following data type that encapsulates performing some side effect on some polymorphic type `a`:
 
 ```{.haskell .scrollx}
 newtype LogAction a = LogAction { unlog :: a -> IO () }
 ```
 
-For our purposes we can assume that we are going to use this to log some value either to the console or to a file or some other medium. This example has been adapted from the [LogAction](https://github.com/kowainik/co-log/blob/master/co-log-core/src/Colog/Core/Action.hs#L105) class of the [CO-LOG](https://kowainik.github.io/posts/2018-09-25-co-log) logging library. Definitely check out the library for real-world uses of Contravariant and friends.
+For our purposes we can assume that we are going to use this to log some value either to the console or to a file or some other medium. This example has been adapted from the [LogAction](https://github.com/kowainik/co-log/blob/master/co-log-core/src/Colog/Core/Action.hs#L105) class of the [CO-LOG](https://kowainik.github.io/posts/2018-09-25-co-log) logging library. Definitely check out the library for real-world uses of `Contravariant` and friends.
 
-As we can see the type variable `a` occurs in input position so we should be able to define a Contravariant instance for it:
+As we can see the type variable `a` occurs in input position so we should be able to define a `Contravariant` instance for it:
 
 ```{.haskell .scrollx}
 instance Contravariant LogAction where
   contramap :: (b -> a) -> LogAction a -> LogAction b
-  contramap f logActionA = LogAction $ \b -> unlog logActionA (f b)
+  contramap bToA logActionA = LogAction $ \b -> unlog logActionA (bToA b)
 ```
 
-There should be no surprises here; we run the supplied function `f` on the input *before* passing it to the log action.
+There should be no surprises here; we run the supplied function `bToA` on the input *before* passing it to the log action.
 
 Here's a slightly simplied implementation of the above:
 
@@ -778,7 +801,7 @@ Now because we have the power of contravariance, we should be able to log out ot
 Here are some examples:
 
 ```{.haskell .scrollx}
--- simple function around contramp for LogAction
+-- simple function around contramap for LogAction
 putStringlyLnLog :: (a -> String) -> LogAction a
 putStringlyLnLog f = contramap f putStrLnLog
 
@@ -860,7 +883,7 @@ putStrLnGreeting = contramap  (hello . space . there . space . doctor . space) $
 
 At least this is somewhat more readable - but the great thing is that knowing the laws helped us make our code more legible. But still - what does this do?
 
-The trick is to remember that Contravaraint composition works in **reverse** to normal composition:
+The trick is to remember that `Contravaraint` composition works in **reverse** to normal composition:
 
 ```{.haskell .scrollx}
 contramap f . contramap g = contramap (g . f) -- notice the (g . f) instead of (f. g)
@@ -900,8 +923,7 @@ override :: a -> a -> a
 override value = const value
 ```
 
-`const` is defined as `a -> b -> a`, where it accepts two inputs but returns the
-value of the first input (ignoring the second input).
+A we mentioned previously, `const` is defined as `a -> b -> a`, where it accepts two inputs but returns the value of the first input (ignoring the second input).
 
 Here's how we use it with `LogAction`:
 
@@ -911,6 +933,17 @@ qPutStrLn = contramap (override "This is Q!!") putStrLnLog
 
 -- run it
 unlog qPutStrLn "Picard J L"
+-- This is Q!!
+```
+
+Now if our memory serves, we should be able to do the same with `>$`:
+
+```{.haskell .scrollx}
+qPutStrLnOp :: LogAction String
+qPutStrLnOp = "This is Q!!" >$ putStrLnLog
+
+-- run it
+unlog qPutStrLnOp "Sisko B L"
 -- This is Q!!
 ```
 
@@ -1122,7 +1155,7 @@ A regular function can be though of being defined as:
 newtype RegularFunc a b = RegularFunc { getRegular :: a -> b }
 ```
 
-We can define a (Covariant) Functor instance for `RegularFunc` because `b` is in output position.
+We can define a (Covariant) `Functor` instance for `RegularFunc` because `b` is in output position.
 
 Let's recall what the definition of the `Functor` type class looks like:
 
@@ -1131,7 +1164,7 @@ class Functor f where
   fmap :: (a -> b) -> f a -> f b
 ```
 
-In the above declaration, `f` is a type constuctor with one type hole. Given `RegularFunc` which has two type holes (`a` and `b`), we need to fill one in, in order to use it with the `Functor` instance implementation. To do this we fix `a` and get the type constructor `RegularFunc a`, allowing us to vary `b`:
+In the above declaration, `f` is a type constructor with one type hole. Given `RegularFunc` which has two type holes (`a` and `b`), we need to fill one in, in order to use it with the `Functor` instance implementation. To do this we fix `a` and get the type constructor `RegularFunc a`. We can't fix `b` as partial application of types is done from left to right (holes can only be on the right).
 
 ```{.haskell .scrollx}
 instance Functor (RegularFunc a) where
@@ -1139,7 +1172,7 @@ instance Functor (RegularFunc a) where
   fmap = (.)
 ```
 
-We can't define a `Contravariant` instance for `a` because we have to fix `a`.
+We can't define a `Contravariant` instance for `a` because we have to fix `a` (we can't define behaviour over it).
 
 Oh! Come on! If only we didn't have to fix `a`. What if we could fix `b` instead? We don't care about `b`. `b` is dead to us.
 
@@ -1161,7 +1194,7 @@ instance Contravariant (Op a) where
     in bToA b
 ```
 
-Here's a simple example of how to use:
+Here's a simple example of how to use it:
 
 ```{.haskell .scrollx}
 stringsLength :: Op Int [String]
@@ -1171,7 +1204,7 @@ unqiueStringsLength :: Op Int (S.Set String)
 unqiueStringsLength = contramap S.toList stringsLength
 ```
 
-If we know how to sum all the lengths of a `List` of `String` we can adapt that function to sum the lengths of a `Set` of `String`:
+If we know how to sum all the lengths of a `[String]` we can adapt that function to sum the lengths of a `Set` of `String`:
 
 
 ```{.haskell .scrollx}
@@ -1187,7 +1220,7 @@ getOp unqiueStringsLength $ namesSet
 -- 20
 ```
 
-Now `Predicate`, `Comparison`, `Equivalence` and `Op` seem like useful data structures. The good news is that they already exist in the `Data.Functor.Contravariant` package from `base` so you don't have to write them yourself.
+Now `Predicate`, `Comparison`, `Equivalence` and `Op` seem like useful data structures. The good news is that they already exist in the [Data.Functor.Contravariant](https://hackage.haskell.org/package/base-4.14.0.0/docs/Data-Functor-Contravariant.html) package from `base` so you don't have to write them yourself.
 
 One interesting implementation detail of the `Comparison` and `Equivalence` `Contravariant` instances is that they are implemented using the `on` function:
 
@@ -1299,23 +1332,22 @@ And we can!! If you want to dig more into polarities there are some good exercis
 
 We briefly mentioned `Invariant` Functors when talking about [Polarity](#Polarity) but never mentioned them again until now. `Invariant` Functor is the parent typeclass of all Functors (`Covariant` and `Contravariant`)
 
-![Functor Hierarchy](/images/contravariant/functor-hierarchy.png)
+![Functor Hierarchy](/images/contravariant/functor-hierarchy-aligned.png)
 
-Given that this post is quite long, the only thing I'm going to mention about Invariant Functors is that it has both covariant and contravariant functions passed to it in its definition:
+Given that this post is quite long, I'm only going to mention that `Invariant Functor` has both covariant and contravariant functions in its definition:
 
 ```{.haskell .scrollx}
 class Invariant f where
   invmap :: (a -> b) -> (b -> a) -> f a -> f b
 ```
 
-where `a -> b` is the covariant function to  use if `f a` is a `Covariant` Functor and `b -> a` is the function to use if `f a` is a `Contravariant` Functor.
+where `a -> b` is the covariant function to  use if `f a` is a `Covariant Functor` and `b -> a` is the function to use if `f a` is a `Contravariant Functor`.
 
-I may write another article about Invariant Functors if I feel the need for it, but in the meantime [checkout](https://cvlad.info/functor-of/) [these](http://oleg.fi/gists/posts/2017-12-23-functor-optics.html#t:Invariant) [articles](https://stackoverflow.com/questions/22103445/example-of-invariant-functor) to get you [started](https://www.lesswrong.com/posts/KRb2x2RJjGbBMbE4M/my-functor-is-rich).
-
+I may write another article about `Invariant Functor` s if I feel the need for it, but in the meantime [checkout](http://oleg.fi/gists/posts/2017-12-23-functor-optics.html#t:Invariant) [these](https://stackoverflow.com/questions/22103445/example-of-invariant-functor) [articles](  https://cvlad.info/functor-of/) to get you [started](https://www.lesswrong.com/posts/KRb2x2RJjGbBMbE4M/my-functor-is-rich).
 
 # Summary
 
-Hopefully this has shed some light onto `Contravariant` Functors and how they are used and how they can be implemented. In a future article I hope to cover `Divisible` and `Decidable` typeclasses that build up from `Contravariant` Functors.
+Hopefully this has shed some light onto `Contravariant Functor`s and how they are used and how they can be implemented. In a future article I hope to cover `Divisible` and `Decidable` typeclasses that build up from `Contravariant` Functors.
 
 # Links
 - [George Wilson](https://twitter.com/georgetalkscode)'s Presentations:
