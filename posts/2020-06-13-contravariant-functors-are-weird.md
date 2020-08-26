@@ -6,13 +6,9 @@ tags: Haskell
 comments: true
 ---
 
--- TODO Correct spelling of all star trek crew
--- TODO Remove covariant laws
--- TODO Verify partial application of types occur left to right
+Contravariant Functors are odd aren't they? Functors are so straightforward but **Contra**variant as its name implies is the complete opposite.
 
-Contravariant Functors are odd aren't they? Functors are so straight forward but **Contra**variant as its name implies is the complete opposite.
-
-Before we get into what a Contravariant Functor is, it's useful to look at the  `Functor` [typeclass](https://wiki.haskell.org/Typeclassopedia) which we know and love.
+Before we get into what a Contravariant Functor is, it's useful to look at the  Functor [typeclass](https://wiki.haskell.org/Typeclassopedia) which we know and love.
 
 # Functor
 
@@ -23,12 +19,12 @@ class Functor f where
   fmap :: (a -> b) -> f a -> f b
 ```
 
-We often understand a Functor to be a "container" or a "producer" of some type, where the function supplied to `fmap` is applied to the elements that are "contained" or "produced" in some type constructor `f`.
+  We often understand a Functor to be a "container" or a "producer" of some type, where the function supplied to `fmap` is applied to the elements that are "contained" or "produced" in some type constructor[<sup>1</sup>](#type-constructor-1) `f`.
 
-A simple example would be the `[]` type, that can represent zero or more values. Given a `[a]` we can turn it into a `[b]` when given a function `a -> b`.
+A simple example would be the List (`[]`) type, that can represent zero or more values. Given a `[a]` we can turn it into a `[b]` when given a function `a -> b`.
 
 ```{.haskell .scrollx}
-data [] a = [] | a : [a] -- an approximation of the [] data type
+data [] a = [] | a : [a]  -- an approximation of the [] data type
 
 instance Functor [] where
   fmap _ [] = []
@@ -105,155 +101,9 @@ Essentially if you do nothing to the value of a Functor, you get the same Functo
 fmap (f . g) == fmap f . fmap g
 ```
 
-If you convert the result of a Functor by `fmap`ing with a function `g` and then `fmap`ing that result with subsequent function `f`, it's the same as composing functions `g` and `f` (`f . g`) and then `fmap`ing once.
+If you convert the result of a Functor by `fmap`ing with a function `g` and then `fmap`ing that result with a subsequent function `f`, it's the same as composing functions `g` and `f` (`f . g`) and then `fmap`ing once.
 
 ![Functor Laws](/images/contravariant/functor-laws-ct.png)
-
-Let's take `Maybe` as an example and try out the laws. The `Maybe` Functor is defined as:
-
-```{.haskell .scrollx}
-instance Functor Maybe where
-  fmap _ Nothing = Nothing
-  fmap f (Just x) = Just (f x)
-```
-Given that we have:
-
-```{.haskell .scrollx}
-notInt :: Maybe Int
-notInt = Nothing
-
-maybeTenInt :: Maybe Int
-maybeTenInt = Just 10
-
-maybeFiveInt :: Maybe Int
-maybeFiveInt = Just 5
-```
-
-Using `fmap id` on the above:
-
-```{.haskell .scrollx}
-fmap id notInt   == notInt       -- Nothing
-fmap id maybeInt == maybeTenInt  -- Just 10
-fmap id maybeInt == maybeFiveInt -- Just 5
-```
-
-Given that we have:
-
-```{.haskell .scrollx}
-intToString :: Int -> String
-intToString n = (show n) <> "!"
-
-stringToBool :: String -> Bool
-stringToBool "5!" = True
-stringToBool _ = False
-```
-
-Using **intToString** and then **stringToBool**:
-
-```{.haskell .scrollx}
--- # Identity law
--- ###############################
-
--- ## for notInt
-fmap id notInt  == notInt
-fmap id Nothing == Nothing -- expanding notInt on both sides
-Nothing         == Nothing -- simplifying fmap on Nothing
-
-
--- ## for maybeTenInt
-fmap id maybeTenInt == maybeTenInt
-fmap id (Just 10)   == Just 10  -- expanding maybeTenInt on both sides
-Just 10             == Just 10  -- simplifying fmap
-
--- ## for maybeFiveInt
-fmap id maybeFiveInt == maybeFiveInt
-fmap id (Just 5)     == Just 5  -- expanding maybeFiveInt on both sides
-Just 5               == Just 5  -- simplifying fmap
-
--- # Composition law
--- ###############################
-
--- ## for notInt
-fmap (stringToBool . intToString) notInt  == fmap stringToBool . fmap intToString $ notInt
-
--- lhs
-fmap (stringToBool . intToString) notInt
-fmap (stringToBool . intToString) Nothing -- expanding notInt
-=> Nothing                                -- simplifying fmap on Nothing
-
--- rhs
-fmap stringToBool . fmap intToString $ notInt
-fmap stringToBool . (fmap intToString Nothing) -- expanding notInt
-fmap stringToBool   (Nothing) -- simplifying fmap on Nothing for intToString
-fmap stringToBool    Nothing  -- simplifying fmap on Nothing for stringToBool
-=> Nothing
-
-lhs     == rhs
-Nothing == Nothing
-
-
--- ## for maybeTenInt
-fmap (stringToBool . intToString) maybeTenInt == fmap stringToBool . fmap intToString $ maybeTenInt
-
--- lhs
-fmap (stringToBool . intToString) maybeTenInt
-fmap (stringToBool . intToString) (Just 10)             -- expanding maybeTenInt
-fmap (stringToBool . (\n -> (show n) <> "!")) (Just 10) -- expanding intToString
-Just (stringToBool . ((show 10) <> "!"))                -- simplifying for n == 10
-(Just (stringToBool "10!"))                             -- applying stringToBool with "10!"
-(Just (\s ->
-        case s of
-          "5!" -> True
-          _    -> False -- branch chosen because s == "10!"
-      ))                -- expanding stringToBool
-= Just False
-
--- rhs
-fmap stringToBool . fmap intToString (Just 10)             -- expanding maybeFiveInt
-fmap stringToBool . fmap (\n -> (show n) <> "!") (Just 10) -- expanding intToString
-fmap stringToBool $ Just ((show 10) <> "!")                -- simplifying for n == 10
-(Just $ stringToBool "10!")                                -- applying stringToBool with "10!"
-Just ((\s ->
-        case s of
-          "5!" -> True
-          _    -> False -- branch chosen because s == "10!"
-      ))                -- expanding stringToBool
-= Just False
-
-lhs        == rhs
-Just False == Just False
-
--- ## for maybeFiveInt
-fmap (stringToBool . intToString) maybeFiveInt == fmap stringToBool . fmap intToString $ maybeFiveInt
-
--- lhs
-fmap (stringToBool . intToString) maybeFiveInt
-fmap (stringToBool . intToString) (Just 5)             -- expanding maybeFiveInt
-fmap (stringToBool . (\n -> (show n) <> "!")) (Just 5) -- expanding intToString
-Just (stringToBool . ((show 5) <> "!"))                -- simplifying for n == 5
-(Just (stringToBool "5!"))                             -- applying stringToBool with "5!"
-(Just (\s ->
-        case s of
-          "5!" -> True  -- branch chosen because s == "5!"
-          _    -> False
-      ))                -- expanding stringToBool
-= Just True
-
--- rhs
-fmap stringToBool . fmap intToString (Just 5)             -- expanding maybeFiveInt
-fmap stringToBool . fmap (\n -> (show n) <> "!") (Just 5) -- expanding intToString
-fmap stringToBool $ Just ((show 5) <> "!")                -- simplifying for n == 5
-(Just $ stringToBool "5!")                                -- applying stringToBool with "5!"
-Just ((\s ->
-        case s of
-          "5!" -> True  -- branch chosen because s == "5!"
-          _    -> False
-      ))                -- expanding stringToBool
-= Just True
-
-lhs       == rhs
-Just True == Just True
-```
 
 ## The Wrong Type of fmap
 
@@ -283,7 +133,7 @@ It could be useful to define a Functor for Predicate - say if we have a `Predica
 
 ```{.haskell .scrollx}
 instance Functor Predicate where
-  -- fmap (a -> b) -> Predicate a -> Predicate b
+  fmap (a -> b) -> Predicate a -> Predicate b
   fmap f (Predicate p) = Predicate (\b -> undefined)
   fmap f (Predicate (a -> Bool)) = Predicate (\b -> undefined)  -- expanding p
   fmap (a -> b) (Predicate (a -> Bool)) = Predicate (\b -> undefined) -- expanding f
@@ -315,19 +165,19 @@ These polarities map directly to variant types.
 | Negative | Contravariant |
 | Both | Invariant |
 
-What this means is that Functors (which are actually Covariant Functors) require a type constructor (data type that needs a type variable to be fully defined) in a covariant position in order for you to define a Functor instance for that type.
+  What this means is that Functors (which are actually Covariant Functors) require a type constructor  in a covariant position in order for you to define a Functor instance for that type.
 
 Let's look at a type that we know has a Functor instance like `Maybe`:
 
 ![Polarity of the Maybe Type Constructor](/images/contravariant/maybe-polarity.png)
 
-We can see that the type variable `a` occurs in a covariant position within the definition of the `Maybe` type constructor.
+We can see that the type variable `a` occurs in a covariant (or output) position within the definition of the `Maybe` type constructor.
 
 Now let's look at the definition of `Predicate` data type:
 
 ![Polarity of the Predicate Type Constructor](/images/contravariant/predicate-polarity.png)
 
-We can see that the type variable `a` within the definition of the `Predicate` type constructor occurs in an input position. This indicates that we can't create a (Covariant) Functor instance for this data type.
+We can see that the type variable `a` occurs in a contravariant (or input) position. This indicates that we can't create a (Covariant) Functor instance for this data type.
 
 But we want to map things! What do we do?
 
@@ -357,20 +207,20 @@ we can then read `contramap` as:
 > If you have a context that needs an `a` and a function that can convert `b`s to
 `a`s, I can give you a context that needs `b`s.
 
-But that probably doesn't make much sense. So let's try and look at this in terms of our non-Functor: `Predicate`. `Predicate` has a **need** for an `a`, which it then uses to tell if something about that `a` is True or False.
+But that probably doesn't make much sense. So let's try and look at this in terms of our non-Functor: Predicate. Predicate has a **need** for an `a`, which it then uses to tell if something about that `a` is True or False.
 
-Let's try and write a Contravariant instance for `Predicate` given that we know that the type `a` in `Predicate` occurs in an input position.
+Let's try and write a `Contravariant` instance for `Predicate` given that we know that the type `a` in `Predicate` occurs in an input position.
 
 ```{.haskell .scrollx}
 instance Contravariant Predicate where
   -- contramp (a -> b) -> f b -> f a
-  contramap (a -> b) -> Predicate b -> Predicate a
+  contramap (a -> b) -> Predicate b -> Predicate a -- substituting for `f` for Predicate
   contramap aToB (Predicate bToBool) = Predicate (\a -> undefined)
 ```
 
 Given that we have a function `a -> b` and essentially a function of type `b -> Bool` (wrapped inside a `Predicate b`), we can if given an `a`, convert it to a `b` using `aToB` and then give that `b` to `bToBool` to give us a `Bool`.
 
-Here's a slightly long-form implementation of the Contravariant instance  for `Predicate`:
+Here's a slightly long-form implementation of the `Contravariant` instance  for `Predicate`:
 
 ```{.haskell .scrollx}
 instance Contravariant Predicate where
@@ -392,7 +242,7 @@ instance Contravariant Predicate where
   contramap f (Predicate b) = Predicate $ b . f
 ```
 
-We can see from the definition of `Predicate b` that all we are doing is running the supplied function `f` **before** the function within `Predicate b`. The reason we do that is to adapt a new input type to match an existing input type for some functionality.
+We can see from the definition of `Predicate a` that all we are doing is running the supplied function `f` **before** the function within `Predicate b`. The reason we do that is to adapt a new input type to match an existing input type to gain some functionality.
 
 If we revisit the (Covariant) Functor instance for `Maybe`:
 
@@ -411,7 +261,7 @@ These are the essential differences between covariant and contravariant Functors
 | Functor | Function runs | Purpose |
 | ------- | ------------ | ---------- |
 | Covariant | after | Convert results |
-| Contravariant | before | adapt inputs |
+| Contravariant | before | Adapt inputs |
 
 
 Now that we know the essential difference between `Functor` and `Contravariant`, let's look at how we can use `contramap` with our `Predicate` class.
@@ -439,7 +289,7 @@ personLongName :: Predicate Person
 personLongName = Predicate (\p -> (length . personName $ p) > 10)
 ```
 
-And we can run these `Predicate` as:
+And we can run these `Predicate`s as:
 
 ```{.haskell .scrollx}
 getPredicate numGreaterThanTen 5 -- False
@@ -502,14 +352,14 @@ personLongName2 = contramap (length . personName) numGreaterThanTen -- convert t
 We get the same results as before:
 
 ```{.haskell .scrollx}
-getPredicate strLengthGreaterThanTen2 "hello" -- False
+getPredicate strLengthGreaterThanTen2 "hello"       -- False
 getPredicate strLengthGreaterThanTen2 "hello world" -- True
 
-getPredicate personLongName2 $ Person "John" 30 -- False
+getPredicate personLongName2 $ Person "John" 30        -- False
 getPredicate personLongName2 $ Person "Bartholomew" 30 -- True
 ```
 
-Now we have rewritten `strLengthGreaterThanTen` and `personLongName` in terms of `numGreaterThanTen` by just running a function before it to convert the types. This is a simple example of a `Contravariant Functor` where we can reuse some existing functionality for a given type if we can convert from our other types to that type through some mapping function.
+Now we have rewritten `strLengthGreaterThanTen` and `personLongName` in terms of `numGreaterThanTen` by just running a function before it to convert the types. This is a simple example of a Contravariant Functor where we can reuse some existing functionality for a given type if we can convert from our other types to that type through some mapping function.
 
 We can also go a little further and reuse even more:
 
@@ -521,7 +371,7 @@ personLongName3 = contramap personName strLengthGreaterThanTen -- convert the Pe
 
 ## Laws
 
-Just like `Functor` has laws, `Contravariant` also has laws. Laws and people with bad taste - there's no escaping them.
+Just like Functor has laws, Contravariant also has laws. This is awesome - because laws make our lives easier.
 
 ### Identity
 
@@ -529,7 +379,7 @@ Just like `Functor` has laws, `Contravariant` also has laws. Laws and people wit
 contramap id == id
 ```
 
-Essentially if you do not change the value of a `Contravariant Functor`, you get the same `Contravariant Functor` you started with.
+Essentially if you do not change the value of a Contravariant Functor, you get the same Contravariant Functor you started with.
 
 ### Composition
 
@@ -537,11 +387,11 @@ Essentially if you do not change the value of a `Contravariant Functor`, you get
 contramap f . contramap g = contramap (g . f)
 ```
 
-If you convert the input to some `Contravariant Functor` by `contramap`ing with function `g` and then convert its input to some other type by `contramap`ing again with a function `f`, it's the same as composing the functions `f` and `g` (`g . f`) and then `contramap`ing once. Notice the order of composition is switched as opposed to when we looked at the `Functor` laws.
+If you convert the input to some Contravariant Functor by `contramap`ing with function `g` and then convert its input to some other type by `contramap`ing again with a function `f`, it's the same as composing the functions `f` and `g` (`g . f`) and then `contramap`ing once. Notice the order of composition is switched as opposed to when we looked at the `Functor` laws.
 
 ![Contravariant Functor Laws](/images/contravariant/contravariant-laws-ct.png)
 
-Let's take `Predicate` as an example and try out the identity law. The `Predicate` `Contravariant Functor` instance is defined as:
+Let's take `Predicate` as an example and try out the identity law. The `Predicate` `Contravariant` Functor instance is defined as:
 
 ```{.haskell .scrollx}
  instance Contravariant Predicate where
@@ -837,7 +687,7 @@ unlog putStrLnInt 42
 unlog putStrLnPerson $ Person "Neelix" 60
 -- Person(name:Neelix, age: 60)
 
-unlog putStrLnPersonAge $ Person "Tovak" 240
+unlog putStrLnPersonAge $ Person "Tuvok" 240
 -- age: 240
 ```
 
@@ -1011,8 +861,8 @@ personNameLengthEq = contramap name strLengthEq
 Here's how we can run the above:
 
 ```{.haskell .scrollx}
--- t1 = Person "Tovak1" 240
--- t2 = Person "Tovak2" 340
+-- t1 = Person "Tuvok1" 240
+-- t2 = Person "Tuvok2" 340
 -- t3 = Person "Neelix" 60
 -- t4 = Person "Janeway" 40
 
@@ -1136,15 +986,15 @@ flip :: (a -> b -> c) -> b -> a -> c
 But here's something interesting: since we know how to sort `Int`s we also know how to sort people by age via `personAgeCmp`! Let's see that in action:
 
 ```{.haskell .scrollx}
--- unsortedPeople = [Person "Tovak1" 240, Person "Janeway" 40, Person "Neelix" 60]
+-- unsortedPeople = [Person "Tuvok1" 240, Person "Janeway" 40, Person "Neelix" 60]
 
 -- ascending sort
 sortBy (getComparison personAgeCmp) unsortedPeople
--- [Person {name = "Janeway", age = 40},Person {name = "Neelix", age = 60},Person {name = "Tovak1", age = 240}]
+-- [Person {name = "Janeway", age = 40},Person {name = "Neelix", age = 60},Person {name = "Tuvok1", age = 240}]
 
 -- descending sort
 sortBy (flip $ getComparison personAgeCmp)
--- [Person {name = "Tovak1", age = 240},Person {name = "Neelix", age = 60},Person {name = "Janeway", age = 40}]
+-- [Person {name = "Tuvok1", age = 240},Person {name = "Neelix", age = 60},Person {name = "Janeway", age = 40}]
 ```
 
 ## Function Types
@@ -1349,19 +1199,40 @@ I may write another article about `Invariant Functor` s if I feel the need for i
 
 Hopefully this has shed some light onto `Contravariant Functor`s and how they are used and how they can be implemented. In a future article I hope to cover `Divisible` and `Decidable` typeclasses that build up from `Contravariant` Functors.
 
+The [source](https://github.com/ssanj/contravariant-functors) for this article can be found on Github.
+
 # Links
-- [George Wilson](https://twitter.com/georgetalkscode)'s Presentations:
-    - [The Extended Functor Family](https://www.youtube.com/watch?v=JZPXzJ5tp9w)
-    - [Contravariant Functors - The Other Side of the Coin](https://www.youtube.com/watch?v=IJ_bVVsQhvc&t)
-- [Covariance and Contravariance](https://tech.fpcomplete.com/blog/2016/11/covariance-contravariance/)
-- [Contravariant Package](http://hackage.haskell.org/package/contravariant-1.5.2)
-- [CO-LOG](https://kowainik.github.io/posts/2018-09-25-co-log)
-- [Understanding contravariance](https://typeclasses.com/contravariance)
-- [FP Complete](https://tech.fpcomplete.com/blog/2016/11/covariance-contravariance/)
-- [24 days of Hackage - Contravariant](https://ocharles.org.uk/blog/guest-posts/2013-12-21-24-days-of-hackage-contravariant.html)
-- [Reddit - The motivation behind Contravariant](https://www.reddit.com/r/haskell/comments/4rvtzy/what_is_the_motivation_behind_contravariant/)
-- [Reddit - datafunctorcontravariant some simple applications](https://www.reddit.com/r/haskelltil/comments/bqiyr9/datafunctorcontravariant_some_simple_applications/)
-- [Functor Optics](http://oleg.fi/gists/posts/2017-12-23-functor-optics.html#t:Contravariant)
-- [A Fistful of Functors - Itamar Ravid](https://www.youtube.com/watch?v=SxfZ_6ynhi0)
-- [Reddit - Looking for an abstraction to compose](https://www.reddit.com/r/haskell/comments/2p7toa/looking_for_an_abstraction_to_compose/)
+
+## Articles
+
+- [Functor Optics - Oleg's Gists](http://oleg.fi/gists/posts/2017-12-23-functor-optics.html#t:Contravariant)
+- [24 days of Hackage - Contravariant - Ocharles](https://ocharles.org.uk/blog/guest-posts/2013-12-21-24-days-of-hackage-contravariant.html)
+- [Covariance and Contravariance - FP Complete](https://tech.fpcomplete.com/blog/2016/11/covariance-contravariance/)
+- [Understanding Contravariance - Type classes](https://typeclasses.com/contravariance)
+- [CO-LOG - Kowainik](https://kowainik.github.io/posts/2018-09-25-co-log)
+
+## Video
+
+- [The Extended Functor Family - George Wilson](https://www.youtube.com/watch?v=JZPXzJ5tp9w)
+- [Contravariant Functors - The Other Side of the Coin - George Wilson](https://www.youtube.com/watch?v=IJ_bVVsQhvc&t)
 - [Fun with Profunctors - Phil Freeman](https://www.youtube.com/watch?v=OJtGECfksds)
+- [A Fistful of Functors - Itamar Ravid](https://www.youtube.com/watch?v=SxfZ_6ynhi0)
+
+## Books
+- [Category Theory for Programmers - Bartosz Milewski](https://github.com/hmemcpy/milewski-ctfp-pdf)
+- [Thinking in Types - Sandy Maguire](https://leanpub.com/thinking-with-types)
+
+## Questions and Answers
+
+- [Looking for an abstraction to compose - Reddit](https://www.reddit.com/r/haskell/comments/2p7toa/looking_for_an_abstraction_to_compose/)
+- [datafunctorcontravariant some simple applications - Reddit](https://www.reddit.com/r/haskelltil/comments/bqiyr9/datafunctorcontravariant_some_simple_applications/)
+- [The motivation behind Contravariant - Reddit](https://www.reddit.com/r/haskell/comments/4rvtzy/what_is_the_motivation_behind_contravariant/)
+
+## Packages
+- [Contravariant Package](http://hackage.haskell.org/package/contravariant-1.5.2)
+
+# Definitions
+
+## Type constructor (1)
+
+A data type that needs one or more type variables to be fully defined.
