@@ -336,7 +336,7 @@ Predicate (\(p :: Person) ->
 
 The above expansion of the functions demonstrates that even though the `Predicate`s themselves have different input types, at the end they are all converted to a number which is compared against the number ten. This is tagged with `(1)` in the above example.
 
-We can also see that the only changes between the `Predicate`s is the conversion from one type to another **before** running our comparison function `(1)`. This is our clue that we can use **contramap** here to reuse some functionality.
+We can also see that the only changes between the `Predicate`s is the conversion from one type to another **before** running our comparison function `(1)`. This is our clue that we can use `contramap` here to reuse some functionality.
 
 ```{.haskell .scrollx}
 numGreaterThanTen :: Predicate Int
@@ -387,7 +387,7 @@ Essentially if you do not change the value of a Contravariant Functor, you get t
 contramap f . contramap g = contramap (g . f)
 ```
 
-If you convert the input to some Contravariant Functor by `contramap`ing with function `g` and then convert its input to some other type by `contramap`ing again with a function `f`, it's the same as composing the functions `f` and `g` (`g . f`) and then `contramap`ing once. Notice the order of composition is switched as opposed to when we looked at the `Functor` laws.
+If you convert the input to some Contravariant Functor by `contramap`ing with function `g` and then convert its input to some other type by `contramap`ing again with a function `f`, it's the same as composing the functions `f` and `g` (`g . f`) and then `contramap`ing once. Notice the order of composition is switched as opposed to when we looked at the Functor laws.
 
 ![Contravariant Functor Laws](/images/contravariant/contravariant-laws-ct.png)
 
@@ -1246,3 +1246,5 @@ A big "Thank You" to [George Wilson](https://twitter.com/georgetalkscode) for in
 ## Type constructor (1)
 
 A data type that needs one or more type variables to be fully defined.
+
+For example, `Maybe` is a type constructor and `Maybe Int` is a type.
