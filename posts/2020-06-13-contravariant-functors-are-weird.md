@@ -562,7 +562,7 @@ contramap :: Contravariant f => (a -> b) -> f b -> f a
 (>$)      = contramap . const
 (>$) b    = contramap (const b)   -- simplifying with b
 (>$) b    = contramap (a -> b)    -- applying `const b`
-(>$) b fb = contramap (a -> b) fb -- simplifying fb
+(>$) b fb = contramap (a -> b) fb -- simplifying with fb
 (>$) b fb = fa                    -- simplifying `contramap (a -> b) fb`
 ```
 
@@ -618,7 +618,7 @@ instance Contravariant LogAction where
 
 There should be no surprises here; we run the supplied function `bToA` on the input *before* passing it to the log action.
 
-Here's a slightly simplied implementation of the above:
+Here's a slightly simplified implementation of the above:
 
 ```{.haskell .scrollx}
 instance Contravariant LogAction where
@@ -715,7 +715,7 @@ Here's how we compose the above functions into a `LogAction`:
 
 ```{.haskell .scrollx}
 putStrLnGreeting :: LogAction String
-putStrLnGreeting = contramap space . contramap doctor .contramap space . contramap there . contramap space . contramap hello $ putStrLnLog
+putStrLnGreeting = contramap space . contramap doctor . contramap space . contramap there . contramap space . contramap hello $ putStrLnLog
 ```
 
 Whoa! That's even hard to read. What does it do? Remember from the second law of contravariance that:
@@ -898,7 +898,7 @@ Let's imagine that we have a datatype called `Comparison` that wraps a compariso
 newtype Comparison a = Comparison { getComparison :: a -> a -> Ordering }
 ```
 
-Given two values of type `a` the `getComparison` function will return an `Ordering` (`LT`, `GT` or `EQ`) with respect to each other.
+Given two values of type `a` the `getComparison` function will return an [Ordering](https://hackage.haskell.org/package/base-4.14.0.0/docs/Prelude.html#t:Ordering) (`LT`, `GT` or `EQ`) with respect to each other.
 
 Now we can see that both `a` type variables are in input position as before. Let's define a `Contravariant` instance for it:
 
@@ -954,7 +954,7 @@ Nothing new here. Let's have a look at how to sort numbers. We use the `sortBy` 
 sortBy :: (a -> a -> Ordering) -> [a] -> [a]
 ```
 
-We can see from the `sortBy` function definition that it can accept the data wrapped in the `Comparison` data type:
+We can see from the [sortBy](https://hackage.haskell.org/package/base-4.14.0.0/docs/Data-List.html#v:sortBy) function definition that it can accept the data wrapped in the `Comparison` data type:
 
 ```{.haskell .scrollx}
 sortBy        :: (a -> a -> Ordering) -> [a] -> [a]
@@ -975,7 +975,7 @@ sortBy (flip $ getComparison intCmp) unsortedNumbers
 -- [5,4,3,2,1]
 ```
 
-Notice how we just use the `flip` function to change between ascending and descending sort:
+Notice how we just use the [flip](https://hackage.haskell.org/package/base-4.14.0.0/docs/Prelude.html#v:flip) function to change between ascending and descending sort:
 
 ```{.haskell .scrollx}
 flip :: (a -> b -> c) -> b -> a -> c
@@ -1005,7 +1005,7 @@ A regular function can be though of being defined as:
 newtype RegularFunc a b = RegularFunc { getRegular :: a -> b }
 ```
 
-We can define a (Covariant) `Functor` instance for `RegularFunc` because `b` is in output position.
+We can define a (Covariant) Functor instance for `RegularFunc` because `b` is in output position. But what about `a`, which is in input position? More on that below.
 
 Let's recall what the definition of the `Functor` type class looks like:
 
@@ -1022,7 +1022,7 @@ instance Functor (RegularFunc a) where
   fmap = (.)
 ```
 
-We can't define a `Contravariant` instance for `a` because we have to fix `a` (we can't define behaviour over it).
+We can't define a `Contravariant` instance for `a` because we have to fix `a` (we can't define behaviour over it). All we have to play with is `b` which is in output position (and hence covariant)
 
 Oh! Come on! If only we didn't have to fix `a`. What if we could fix `b` instead? We don't care about `b`. `b` is dead to us.
 
@@ -1032,7 +1032,14 @@ Let's dream up such a type and call it `Op` - for **op**posite of regular:
 newtype Op a b = Op { getOp :: b -> a }
 ```
 
-Now we can see that the type `b` is in input position within the data type. This can be a little confusing because we have switched the position of type parameters `a` and `b` in `RegularFunc`; `a` is the output and `b` is the input.
+Now we can see that the type `b` is in input position within the data type. It's also on the right of `Op a b` which means we don't have to fix it.
+
+`Op a b` can be a little confusing because we have switched the position of type parameters `a` and `b` as they were in `RegularFunc`; `a` is the output and `b` is the input.
+
+| Data type | Polarity of a | Polarity of b |
+| --------- | ------------- | ------------- |
+| RegularFunc a b | Input | Output |
+| Op a b | Output | Input |
 
 And guess what? We can now fix `a` (which is now our output) and can define a `Contravariant` instance for `Op`:
 
@@ -1060,14 +1067,14 @@ If we know how to sum all the lengths of a `[String]` we can adapt that function
 ```{.haskell .scrollx}
 import Data.Set (fromList)
 
-namesList = ["Paris", "Kim", "Belanna", "Seven"]
+namesList = ["Paris", "Kim", "B'Elanna", "Seven"]
 namesSet  = fromList namesList
 
 getOp stringsLength $ namesList
--- 20
+-- 21
 
 getOp unqiueStringsLength $ namesSet
--- 20
+-- 21
 ```
 
 Now `Predicate`, `Comparison`, `Equivalence` and `Op` seem like useful data structures. The good news is that they already exist in the [Data.Functor.Contravariant](https://hackage.haskell.org/package/base-4.14.0.0/docs/Data-Functor-Contravariant.html) package from `base` so you don't have to write them yourself.
@@ -1119,7 +1126,7 @@ instance Contravariant CallbackRunner where
 
 Hmm. Now it looks like we have a problem. There doesn't seem to anyway for us to get an `a` to pass to `aToIO` to complete the implementation. We have a `b` and if there was a function `b -> a` instead of our `a -> b`, we could convert that `b` to an `a` and it would all work.
 
-This is because there's more to the polarity story than I've shared up until now. While `a` is in input position in `a -> IO()`, it's polarity changes when it's also used as an input to the function `(a -> IO ()) -> IO ()`. I mentioned that an `input` position is a `negative` polarity and an `output` position is a `positive` polarity in [Polarity](#Polarity).
+This is because there's more to the polarity story than I've shared up until now. While `a` is in input position in `a -> IO()`, it's polarity changes when it's also used as an input to the function `(a -> IO ()) -> IO ()`. I [previously mentioned](#Polarity) that an input position is a `negative` polarity and an output position is a `positive` polarity.
 
 To figure out the final polarity of something we need to multiply its polarities at every context it is used within in the function definition. More on this below.
 
@@ -1149,8 +1156,9 @@ a -> IO ()
 but within this function:
 
 ```{.haskell .scrollx}
--- x = (a -> IO ())
-x -> IO ()
+(a -> IO ()) -> IO ()
+x = (a -> IO ()) -- assigning (a -> IO ()) to x
+x -> IO ()       -- substituting x
 ```
 We can see that `x` in the above example is in input or negative position as well. Given that `x` is `a -> IO ()`:
 
@@ -1180,26 +1188,28 @@ And we can!! If you want to dig more into polarities there are some good exercis
 
 # Invariant Functors
 
-We briefly mentioned `Invariant` Functors when talking about [Polarity](#Polarity) but never mentioned them again until now. `Invariant` Functor is the parent typeclass of all Functors (`Covariant` and `Contravariant`)
+We briefly mentioned `Invariant` Functors when talking about [Polarity](#Polarity) but never mentioned them again until now. `Invariant` Functor is the parent typeclass of all Functors (Covariant and Contravariant)
 
-![Functor Hierarchy](/images/contravariant/functor-hierarchy-aligned.png)
+![Simplified Functor Hierarchy](/images/contravariant/functor-hierarchy-aligned.png)
 
-Given that this post is quite long, I'm only going to mention that `Invariant Functor` has both covariant and contravariant functions in its definition:
+Given that this post is quite long, I'm only going to mention that `Invariant` Functor has both covariant and contravariant functions in its definition:
 
 ```{.haskell .scrollx}
 class Invariant f where
   invmap :: (a -> b) -> (b -> a) -> f a -> f b
 ```
 
-where `a -> b` is the covariant function to  use if `f a` is a `Covariant Functor` and `b -> a` is the function to use if `f a` is a `Contravariant Functor`.
+where `a -> b` is the covariant function to  use if `f a` is a `Covariant` Functor and `b -> a` is the function to use if `f a` is a `Contravariant` Functor.
 
-I may write another article about `Invariant Functor` s if I feel the need for it, but in the meantime [checkout](http://oleg.fi/gists/posts/2017-12-23-functor-optics.html#t:Invariant) [these](https://stackoverflow.com/questions/22103445/example-of-invariant-functor) [articles](  https://cvlad.info/functor-of/) to get you [started](https://www.lesswrong.com/posts/KRb2x2RJjGbBMbE4M/my-functor-is-rich).
+I may write another article about `Invariant` Functors if I feel the need for it, but in the meantime [checkout](http://oleg.fi/gists/posts/2017-12-23-functor-optics.html#t:Invariant) [these](https://stackoverflow.com/questions/22103445/example-of-invariant-functor) [articles](  https://cvlad.info/functor-of/) to get you [started](https://www.lesswrong.com/posts/KRb2x2RJjGbBMbE4M/my-functor-is-rich).
 
 # Summary
 
-Hopefully this has shed some light onto `Contravariant Functor`s and how they are used and how they can be implemented. In a future article I hope to cover `Divisible` and `Decidable` typeclasses that build up from `Contravariant` Functors.
+Hopefully this has shed some light onto Contravariant Functors and how they are used and how they can be implemented. In a future article I hope to cover `Divisible` and `Decidable` typeclasses that build up from `Contravariant`.
 
 The [source](https://github.com/ssanj/contravariant-functors) for this article can be found on Github.
+
+A big "Thank You" to [George Wilson](https://twitter.com/georgetalkscode) for inspiring me with his excellent [presentations](#video) on Functors to dig deeper into this topic.
 
 # Links
 
