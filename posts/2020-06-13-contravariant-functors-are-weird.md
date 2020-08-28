@@ -1,8 +1,8 @@
 ---
-title: contravariant functors are Weird
+title: Contravariant functors are Weird
 author: sanjiv sahayam
 description: What are contravariant functors?
-tags: Haskell
+tags: haskell
 comments: true
 ---
 
@@ -16,13 +16,13 @@ and `Functor` and `Contravariant` to specify the typeclass encodings of functors
 
 Let's begin!
 
-contravariant functors are odd aren't they? covariant functors are so straightforward but **contra**variant functors as their name implies are the complete opposite.
+Contravariant functors are odd aren't they? Covariant functors (which are modelled  by the `Functor` typeclass) are quite straightforward but **contra**variant functors as their name implies seem to be the complete opposite.
 
-Before we get into what a contravariant functor is, it's useful to look at the  Functor [typeclass](https://wiki.haskell.org/Typeclassopedia) which we know and love.
+Before we get into what a contravariant functor is, it's useful to look at the  `Functor` [typeclass](https://wiki.haskell.org/Typeclassopedia) which we know and love.
 
 # Functor
 
-A Functor is defined as:
+A `Functor` is defined as:
 
 ```{.haskell .scrollx}
 class Functor f where
