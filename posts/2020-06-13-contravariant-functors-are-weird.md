@@ -1015,7 +1015,7 @@ A regular function can be though of being defined as:
 newtype RegularFunc a b = RegularFunc { getRegular :: a -> b }
 ```
 
-We can define a (Covariant) Functor instance for `RegularFunc` because `b` is in output position. But what about `a`, which is in input position? More on that below.
+We can define a `Functor` instance for `RegularFunc` because `b` is in output position. But what about `a`, which is in input position? More on that below.
 
 Let's recall what the definition of the `Functor` type class looks like:
 
@@ -1163,25 +1163,25 @@ runCallback :: (a -> IO ()) -> IO ()
 a -> IO ()
 ```
 
-but within this function:
+but within whole function it's a slightly different story:
 
 ```{.haskell .scrollx}
-(a -> IO ()) -> IO ()
-x = (a -> IO ()) -- assigning (a -> IO ()) to x
-x -> IO ()       -- substituting x
+(a -> IO ()) -> IO () -- func
+x = (a -> IO ())      -- assigning (a -> IO ()) to x in func
+x -> IO ()            -- substituting x in func
 ```
 We can see that `x` in the above example is in input or negative position as well. Given that `x` is `a -> IO ()`:
 
 ```{.haskell .scrollx}
 (a -> IO ()) -> IO ()
 -- a -> IO (a is negative)
--- (a -> IO ()) (the whole parenthesis are in negative position)
+-- (a -> IO ()) -> IO () (the whole parenthesis are in negative position)
 -- polarity of a: negative * negative = positive
 ```
 
 ![Polarity Multiplication](/images/contravariant/callbackRunner-polarity.png)
 
-Given that `a` is now in output or positive position, we should be able to write a (Covariant) `Functor` instance for it:
+Given that `a` is now in output or positive position, we should be able to write a `Functor` instance for it:
 
 ```{.haskell .scrollx}
 instance Functor CallbackRunner where
@@ -1198,28 +1198,30 @@ And we can!! If you want to dig more into polarities there are some good exercis
 
 # Invariant Functors
 
-We briefly mentioned `Invariant` Functors when talking about [Polarity](#Polarity) but never mentioned them again until now. `Invariant` Functor is the parent typeclass of all Functors (Covariant and Contravariant)
+We briefly mentioned invariant functors when talking about [Polarity](#Polarity) but never mentioned them again until now. The `Invariant` typeclass is the parent typeclass of both `Functor` and `Contravariant`)
 
 ![Simplified Functor Hierarchy](/images/contravariant/functor-hierarchy-aligned.png)
 
-Given that this post is quite long, I'm only going to mention that `Invariant` Functor has both covariant and contravariant functions in its definition:
+Given that this post is quite long, I'm only going to mention that `Invariant` has both covariant and contravariant functions in its definition:
 
 ```{.haskell .scrollx}
 class Invariant f where
   invmap :: (a -> b) -> (b -> a) -> f a -> f b
 ```
 
-where `a -> b` is the covariant function to  use if `f a` is a `Covariant` Functor and `b -> a` is the function to use if `f a` is a `Contravariant` Functor.
+where `a -> b` is the function to  use if `f a` is a `Functor` and `b -> a` is the function to use if `f a` is `Contravariant`.
 
-I may write another article about `Invariant` Functors if I feel the need for it, but in the meantime [checkout](http://oleg.fi/gists/posts/2017-12-23-functor-optics.html#t:Invariant) [these](https://stackoverflow.com/questions/22103445/example-of-invariant-functor) [articles](  https://cvlad.info/functor-of/) to get you [started](https://www.lesswrong.com/posts/KRb2x2RJjGbBMbE4M/my-functor-is-rich).
+I may write another article about invariant functors if I feel the need for it, but in the meantime [checkout](http://oleg.fi/gists/posts/2017-12-23-functor-optics.html#t:Invariant) [these](https://stackoverflow.com/questions/22103445/example-of-invariant-functor) [articles](  https://cvlad.info/functor-of/) to get you [started](https://www.lesswrong.com/posts/KRb2x2RJjGbBMbE4M/my-functor-is-rich).
 
 # Summary
 
-Hopefully this has shed some light onto Contravariant Functors and how they are used and how they can be implemented. In a future article I hope to cover `Divisible` and `Decidable` typeclasses that build up from `Contravariant`.
+Hopefully this has shed some light onto contravariant functors and how they are used and how they can be implemented. In a future article I hope to cover `Divisible` and `Decidable` typeclasses that build up from `Contravariant`.
 
 The [source](https://github.com/ssanj/contravariant-functors) for this article can be found on Github.
 
-A big "Thank You" to [George Wilson](https://twitter.com/georgetalkscode) for inspiring me with his excellent [presentations](#video) on Functors to dig deeper into this topic.
+A big "Thank You" to [George Wilson](https://twitter.com/georgetalkscode) for inspiring me to dig deeper into this topic with his excellent [presentations](#video) on Functors.
+
+A big thanks also to [Andrew Newman](https://twitter.com/andrewfnewman) who reviewed this article.
 
 # Links
 
