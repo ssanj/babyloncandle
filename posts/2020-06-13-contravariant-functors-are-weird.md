@@ -1,14 +1,24 @@
 ---
-title: Contravariant Functors are Weird
+title: contravariant functors are Weird
 author: sanjiv sahayam
-description: What are Contravariant Functors?
+description: What are contravariant functors?
 tags: Haskell
 comments: true
 ---
 
-Contravariant Functors are odd aren't they? Functors are so straightforward but **Contra**variant as its name implies is the complete opposite.
+Just a note about nomenclature before we start; I'll use "functor" to represent the [categorical meaning](https://bartoszmilewski.com/2015/01/20/functors/) of the concept:
 
-Before we get into what a Contravariant Functor is, it's useful to look at the  Functor [typeclass](https://wiki.haskell.org/Typeclassopedia) which we know and love.
+> A functor is a mapping between categories
+
+and `Functor` and `Contravariant` to specify the typeclass encodings of functors.
+
+---
+
+Let's begin!
+
+contravariant functors are odd aren't they? covariant functors are so straightforward but **contra**variant functors as their name implies are the complete opposite.
+
+Before we get into what a contravariant functor is, it's useful to look at the  Functor [typeclass](https://wiki.haskell.org/Typeclassopedia) which we know and love.
 
 # Functor
 
@@ -19,9 +29,9 @@ class Functor f where
   fmap :: (a -> b) -> f a -> f b
 ```
 
-  We often understand a Functor to be a "container" or a "producer" of some type, where the function supplied to `fmap` is applied to the elements that are "contained" or "produced" in some type constructor[<sup>1</sup>](#type-constructor-1) `f`.
+  We often understand a `Functor` to be a "container" or a "producer" of some type, where the function supplied to `fmap` is applied to the elements that are "contained" or "produced" in some type constructor[<sup>1</sup>](#type-constructor-1) `f`.
 
-A simple example would be the List (`[]`) type, that can represent zero or more values. Given a `[a]` we can turn it into a `[b]` when given a function `a -> b`.
+A simple example would be the list (`[]`) type, that can represent zero or more values. Given a `[a]` we can turn it into a `[b]` when given a function `a -> b`.
 
 ```{.haskell .scrollx}
 data [] a = [] | a : [a]  -- an approximation of the [] data type
@@ -83,7 +93,7 @@ notString :: Maybe String
 notString = fmap intToString notInt -- Nothing
 ```
 
-The Functor typeclass has laws, that ensure Functor instances behave in a predictable way.
+The `Functor` typeclass has laws, that ensure `Functor` instances behave in a predictable way.
 
 ## Laws
 
@@ -93,7 +103,7 @@ The Functor typeclass has laws, that ensure Functor instances behave in a predic
 fmap id == id
 ```
 
-Essentially if you do nothing to the value of a Functor, you get the same Functor you started with.
+Essentially if you do nothing to the value of a `Functor`, you get the same `Functor` you started with.
 
 ### Composition
 
@@ -129,11 +139,11 @@ getPredicate greateThanTen 5  -- False
 getPredicate greateThanTen 11 -- True
 ```
 
-It could be useful to define a Functor for Predicate - say if we have a `Predicate Int` and we want to convert it into a `Predicate String` when we have a `Int -> String` function. Let's try and implement that:
+It could be useful to define a `Functor` instance for Predicate - say if we have a `Predicate Int` and we want to convert it into a `Predicate String` when we have a `Int -> String` function. Let's try and implement that:
 
 ```{.haskell .scrollx}
 instance Functor Predicate where
-  fmap (a -> b) -> Predicate a -> Predicate b
+  -- fmap (a -> b) -> Predicate a -> Predicate b
   fmap f (Predicate p) = Predicate (\b -> undefined)
   fmap f (Predicate (a -> Bool)) = Predicate (\b -> undefined)  -- expanding p
   fmap (a -> b) (Predicate (a -> Bool)) = Predicate (\b -> undefined) -- expanding f
@@ -145,7 +155,7 @@ Now we've run into a small problem:
 
 We are given a `b` but we don't have access to any functions that actually use a `b`.
 
-The problem is that we can't. It's because of something called "polarity" of the type variable `a`. No Functor instance for you Predicate.
+The problem is that we can't. It's because of something called "polarity" of the type variable `a`. No `Functor` instance for you `Predicate`.
 
 ![sad-panda by [Nick Bluth](https://thenounproject.com/nickbluth/collection/pandas)](/images/contravariant/sad-panda.png)
 
@@ -165,32 +175,32 @@ These polarities map directly to variant types.
 | Negative | Contravariant |
 | Both | Invariant |
 
-  What this means is that Functors (which are actually Covariant Functors) require a type constructor  in a covariant position in order for you to define a Functor instance for that type.
+  What this means is that `Functor`s (which are actually covariant functors) require a type constructor  in a covariant position in order for you to define a `Functor` instance for that type.
 
-Let's look at a type that we know has a Functor instance like `Maybe`:
+Let's look at a type that we know has a `Functor` instance like `Maybe`:
 
-![Polarity of the Maybe Type Constructor](/images/contravariant/maybe-polarity.png)
+![Polarity of the Maybe data type](/images/contravariant/maybe-polarity.png)
 
-We can see that the type variable `a` occurs in a covariant (or output) position within the definition of the `Maybe` type constructor.
+We can see that the type variable `a` occurs in a covariant (or output) position within the definition of the `Just` constructor.
 
 Now let's look at the definition of `Predicate` data type:
 
-![Polarity of the Predicate Type Constructor](/images/contravariant/predicate-polarity.png)
+![Polarity of the Predicate data type](/images/contravariant/predicate-polarity.png)
 
-We can see that the type variable `a` occurs in a contravariant (or input) position. This indicates that we can't create a (Covariant) Functor instance for this data type.
+We can see that the type variable `a` occurs in a contravariant (or input) position. This indicates that we can't create a (covariant) `Functor` instance for this data type.
 
 But we want to map things! What do we do?
 
 # Contravariant
 
-Welcome the Contravariant Functor to the stage! It is defined as:
+Welcome the `Contravariant` typeclass to the stage! It's defined as:
 
 ```{.haskell .scrollx}
 class Contravariant f where
   contramap :: (a -> b) -> f b -> f a
 ```
 
-Snazzy! Contravariant also takes some kind of type constructor `f` just like Functor but it has this weirdly named `contramap` function instead of `fmap`.
+Snazzy! `Contravariant` also takes some kind of type constructor `f` just like `Functor` but it has this weirdly named `contramap` function instead of `fmap`.
 
 ```{.haskell .scrollx}
      fmap :: (a -> b) -> f a -> f b -- Functor
@@ -207,7 +217,7 @@ we can then read `contramap` as:
 > If you have a context that needs an `a` and a function that can convert `b`s to
 `a`s, I can give you a context that needs `b`s.
 
-But that probably doesn't make much sense. So let's try and look at this in terms of our non-Functor: Predicate. Predicate has a **need** for an `a`, which it then uses to tell if something about that `a` is True or False.
+But that probably doesn't make much sense. So let's try and look at this in terms of our non-`Functor`: `Predicate`. `Predicate` has a **need** for an `a`, which it then uses to tell if something about that `a` is True or False.
 
 Let's try and write a `Contravariant` instance for `Predicate` given that we know that the type `a` in `Predicate` occurs in an input position.
 
@@ -244,7 +254,7 @@ instance Contravariant Predicate where
 
 We can see from the definition of `Predicate a` that all we are doing is running the supplied function `f` **before** the function within `Predicate b`. The reason we do that is to adapt a new input type to match an existing input type to gain some functionality.
 
-If we revisit the (Covariant) Functor instance for `Maybe`:
+If we revisit the (covariant) `Functor` instance for `Maybe`:
 
 ```{.haskell .scrollx}
 instance Functor Maybe where
@@ -256,11 +266,11 @@ we can see that the function `aToB` is run **after** we have a value of `a`. We 
 
 ![fmap on Maybe](/images/contravariant/fmap-maybe.png)
 
-These are the essential differences between covariant and contravariant Functors:
+These are the essential differences between covariant and contravariant functors:
 
-| Functor | Function runs | Purpose |
+| Typeclass | Function runs | Purpose |
 | ------- | ------------ | ---------- |
-| Covariant | after | Convert results |
+| Functor | after | Convert results |
 | Contravariant | before | Adapt inputs |
 
 
@@ -371,7 +381,7 @@ personLongName3 = contramap personName strLengthGreaterThanTen -- convert the Pe
 
 ## Laws
 
-Just like Functor has laws, Contravariant also has laws. This is awesome - because laws make our lives easier.
+Just like `Functor` has laws, `Contravariant` also has laws. This is awesome - because laws make our lives easier.
 
 ### Identity
 
@@ -379,7 +389,7 @@ Just like Functor has laws, Contravariant also has laws. This is awesome - becau
 contramap id == id
 ```
 
-Essentially if you do not change the value of a Contravariant Functor, you get the same Contravariant Functor you started with.
+Essentially if you do not change the value of a `Contravariant` functor, you get the same `Contravariant` functor you started with.
 
 ### Composition
 
@@ -387,11 +397,11 @@ Essentially if you do not change the value of a Contravariant Functor, you get t
 contramap f . contramap g = contramap (g . f)
 ```
 
-If you convert the input to some Contravariant Functor by `contramap`ing with function `g` and then convert its input to some other type by `contramap`ing again with a function `f`, it's the same as composing the functions `f` and `g` (`g . f`) and then `contramap`ing once. Notice the order of composition is switched as opposed to when we looked at the Functor laws.
+If you convert the input to some `Contravariant` functor by `contramap`ing with function `g` and then convert its input to some other type by `contramap`ing again with a function `f`, it's the same as composing the functions `f` and `g` (`g . f`) and then `contramap`ing once. Notice the order of composition is switched as opposed to when we looked at the `Functor` laws.
 
-![Contravariant Functor Laws](/images/contravariant/contravariant-laws-ct.png)
+![Contravariant Laws](/images/contravariant/contravariant-laws-ct.png)
 
-Let's take `Predicate` as an example and try out the identity law. The `Predicate` `Contravariant` Functor instance is defined as:
+Let's take `Predicate` as an example and try out the identity law. The `Contravariant` instance for `Predicate` is defined as:
 
 ```{.haskell .scrollx}
  instance Contravariant Predicate where
@@ -427,7 +437,7 @@ lhs                      == rhs
 Predicate (\n -> n > 10) == Predicate (\n -> n > 10)
 ```
 
-Once again using `Predicate` as an example, let's explore the compositional law of Contravariance.
+Once again using `Predicate` as an example, let's explore the compositional law of `Contravariant`.
 
 Given that we have the following `Predicate`s:
 
@@ -718,7 +728,7 @@ putStrLnGreeting :: LogAction String
 putStrLnGreeting = contramap space . contramap doctor . contramap space . contramap there . contramap space . contramap hello $ putStrLnLog
 ```
 
-Whoa! That's even hard to read. What does it do? Remember from the second law of contravariance that:
+Whoa! That's even hard to read. What does it do? Remember from the second law of `Contravariant` that:
 
 ```{.haskell .scrollx}
 contramap f . contramap g = contramap (g . f)
