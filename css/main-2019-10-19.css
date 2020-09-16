@@ -281,6 +281,7 @@ img {
   margin: 40px 0 20px;
   font-weight: bold;
   font-family: Helvetica, sans-serif;
+  text-align: center;
 }
 
 .post-content h2 {
@@ -346,7 +347,7 @@ img {
 
 .post pre.command code {
   background-color: #333;
-  color: darkorange;
+  color: #9dac92;
 }
 
 
