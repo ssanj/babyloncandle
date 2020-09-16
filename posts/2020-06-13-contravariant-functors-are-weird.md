@@ -1255,7 +1255,7 @@ A big thanks also to [Andrew Newman](https://twitter.com/andrewfnewman) who revi
 
 # Definitions
 
-## Type constructor (1)
+### Type constructor (1)
 
 A data type that needs one or more type variables to be fully defined.
 

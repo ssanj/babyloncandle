@@ -244,12 +244,10 @@ img {
 }
 
 .post-header h1 {
-  font-family: Baskerville, Courier New, Serif;
+  font-weight: 700;
+  font-family: Helvetica, sans-serif;
   font-size: 6em;
-  /*font-size: 42px;*/
-  letter-spacing: -1.75px;
   line-height: 1.25;
-  font-weight: 300;
 }
 
 .post-header .meta {
@@ -266,7 +264,7 @@ img {
 .post-content {
   margin: 0 0 30px;
   font-family: Courier New, Serif;
-  font-size: 1.5em;
+  font-size: 1em;
   text-align: justify;
 }
 
@@ -280,24 +278,25 @@ img {
 .post-content h5,
 .post-content h6 {
   line-height: 1;
-  font-weight: 300;
   margin: 40px 0 20px;
+  font-weight: bold;
+  font-family: Helvetica, sans-serif;
 }
 
 .post-content h2 {
-  font-size: 1.4em;
-  letter-spacing: -1.25px;
+  font-size: 4em;
 }
 
 .post-content h3 {
-  font-size: 26px;
-  letter-spacing: -1px;
-  text-decoration: underline;
+  font-size: 3em;
 }
 
 .post-content h4 {
-  font-size: 20px;
-  letter-spacing: -1px;
+  font-size: 2em;
+}
+
+.post-content h5 {
+  font-size: 1.2em;
 }
 
 .post-content blockquote {
@@ -305,7 +304,6 @@ img {
   padding-left: 20px;
   font-size: 18px;
   opacity: .6;
-  letter-spacing: -1px;
   font-style: italic;
   margin: 30px 0;
 }
@@ -341,14 +339,14 @@ img {
   border-radius: 3px;
 }
 
-.post pre.terminal code { 
-  background-color: #333; 
+.post pre.terminal code {
+  background-color: #333;
   color: #FFF;
 }
 
-.post pre.command code { 
-  background-color: #333; 
-  color: darkorange; 
+.post pre.command code {
+  background-color: #333;
+  color: darkorange;
 }
 
 
@@ -407,6 +405,7 @@ img {
 
 .caption {
   text-align: center;
+  font-size: x-small;
 }
 
 .section {
