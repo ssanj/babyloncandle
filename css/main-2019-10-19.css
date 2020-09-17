@@ -190,11 +190,11 @@ img {
 .posts li { margin-bottom: 30px; }
 
 .posts .post-link {
-  font-size: 1.75em;
-  letter-spacing: -1px;
-  line-height: 1;
+  font-size: 3em;
+  line-height: 1.25;
   text-decoration: none;
   color: black;
+  font-weight: 600;
 }
 
 .posts .post-date, .posts .post-author {
@@ -301,7 +301,7 @@ img {
 }
 
 .post-content blockquote {
-  border-left: 4px solid #e8e8e8;
+  border-left: 4px solid #ff8989;
   padding-left: 20px;
   font-size: 18px;
   opacity: .6;
@@ -419,19 +419,10 @@ img {
 
 .quote {
   /*font-size: 250%;*/
-  background-color: black;
-  color: white;
+  background-color: #e5fff3;
   font-size: 1em;
   text-align: center;
   padding: 5px;
-}
-
-.quote::before {
-  content: open-quote;
-}
-
-.quote::after {
-  content: close-quote;
 }
 
 .attribution:before {

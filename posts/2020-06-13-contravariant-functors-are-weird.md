@@ -123,7 +123,7 @@ Now let's look at something a little different. Let's create a data type to wrap
 newtype Predicate a = Predicate { getPredicate :: a -> Bool }
 ```
 
-An example of a Predicate is **greaterThanTen**:
+An example of a Predicate is `greaterThanTen`:
 
 ```{.haskell .scrollx}
 greaterThanTen :: Predicate Int
@@ -132,7 +132,7 @@ greaterThanTen = Predicate (\n -> n > 10)
 
 that tests whether a number is greater than ten.
 
-We can run with it **getPredicate** and an `Int`:
+We can run with it `getPredicate` and an `Int`:
 
 ```{.haskell .scrollx}
 getPredicate greateThanTen 5  -- False
@@ -1222,6 +1222,10 @@ The [source](https://github.com/ssanj/contravariant-functors) for this article c
 A big "Thank You" to [George Wilson](https://twitter.com/georgetalkscode) for inspiring me to dig deeper into this topic with his excellent [presentations](#video) on Functors.
 
 A big thanks also to [Andrew Newman](https://twitter.com/andrewfnewman) who reviewed this article.
+
+# Epilogue
+
+Just when you thought you'd learned all there is to learn about variance, there appears to be a variance of the [fourth kind](https://en.wikipedia.org/wiki/Close_Encounters_of_the_Third_Kind). It's known as [phantom variance](https://www.benjamin.pizza/posts/2019-01-11-the-fourth-type-of-variance.html) or [bivariance](https://en.wikipedia.org/wiki/Covariance_and_contravariance_(computer_science)) as pointed by [emilypii](https://www.reddit.com/user/emilypii/) and [dbramucci](https://www.reddit.com/user/dbramucci/) on [reddit](https://www.reddit.com/r/haskell/comments/iqpbnz/blog_post_learning_about_contravariant_functors/). dbramucci also linked to a nice Scala [slidedeck](https://speakerdeck.com/mpilquist/explorations-in-variance?slide=17) from [Michael Pilquist](https://twitter.com/mpilquist)
 
 # Links
 
