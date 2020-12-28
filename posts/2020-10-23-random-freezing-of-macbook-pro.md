@@ -8,7 +8,7 @@ comments: true
 
 Quite recently my 2017 MacBook Pro would freeze up for anywhere between five to thirty seconds. And what I mean by "freeze up" is that it would not accept any keyboard commands at all. I checked to see if the keyboard was working by pressing the `Capslock` button and it was - I could see the `Capslock` light turning on and off. Surprisingly I could still move the mouse pointer around the screen but I couldn't click on any of the UIs and make them do anything.
 
-As you can imagine this was quite frustrating and I was wondering if I should upgrade my `Mojave` to `Big Sur`. I had been dreading this upgrade because usually ending breaking something and then I have to waste my time tending to those issues.
+As you can imagine this was quite frustrating and I was wondering if I should upgrade my Macosx from `Mojave` to `Catalina`. I had been dreading this upgrade because Apple usually ends up breaking something and then I have to waste my time tending to those issues.
 
 I also seemed to be able to quite regularly make the system freeze by switching between windows in [Sublime Text](https://www.sublimetext.com/) or moving to another window or typing in the terminal. Almost anything really, but nothing conclusive.
 
@@ -25,7 +25,7 @@ Some people had [different](https://apple.stackexchange.com/questions/342706/com
 
 ## Alfred
 
-The freezes were getting progressively more frequently. Suddenly one day I couldn't launch [Alfred](https://www.alfredapp.com/) with my usual key combination. I could see that `Alfred` was working and I could manually launch it by clicking on its icon in the system tray but my key combinations no longer worked :(
+The freezes were getting progressively more frequent. Suddenly one day I couldn't launch [Alfred](https://www.alfredapp.com/) with my usual key combination. I could see that `Alfred` was working and I could manually launch it by clicking on its icon in the system tray but my key combinations no longer worked :(
 
 
 ## Keyboard
@@ -81,11 +81,11 @@ So there you have it. If you have similar issues NVRAM might be the culprit! Als
 
 # Links
 
-- whats-causing-my-macbook-to-freeze-and-reset-keyboard-settings-when-i-bring-it
-- https://support.apple.com/en-au/HT202731
-- https://www.ifixit.com/Answers/View/141693/Why+is+my+keyboard-trackpad+not+working
-- https://discussions.apple.com/thread/251312151
-- https://support.apple.com/en-au/HT204063
-- https://apple.stackexchange.com/questions/342706/com-apple-hiservices-xpcservice-results-in-frequent-hangs-and-freezes-in-my-mac
-- https://discussions.apple.com/thread/7370642
-- https://discussions.apple.com/thread/6777878
+- [whats-causing-my-macbook-to-freeze-and-reset-keyboard-settings-when-i-bring-it](https://apple.stackexchange.com/questions/348876/whats-causing-my-macbook-to-freeze-and-reset-keyboard-settings-when-i-bring-it)
+- [https://support.apple.com/en-au/HT202731](https://support.apple.com/en-au/HT202731)
+- [https://www.ifixit.com/Answers/View/141693/Why+is+my+keyboard-trackpad+not+working](https://www.ifixit.com/Answers/View/141693/Why+is+my+keyboard-trackpad+not+working)
+- [https://discussions.apple.com/thread/251312151](https://discussions.apple.com/thread/251312151)
+- [https://support.apple.com/en-au/HT204063](https://support.apple.com/en-au/HT204063)
+- [https://apple.stackexchange.com/questions/342706/com-apple-hiservices-xpcservice-results-in-frequent-hangs-and-freezes-in-my-mac](https://apple.stackexchange.com/questions/342706/com-apple-hiservices-xpcservice-results-in-frequent-hangs-and-freezes-in-my-mac)
+- [https://discussions.apple.com/thread/7370642](https://discussions.apple.com/thread/7370642)
+- [https://discussions.apple.com/thread/6777878](https://discussions.apple.com/thread/6777878)
