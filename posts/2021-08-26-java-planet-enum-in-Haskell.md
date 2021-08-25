@@ -124,7 +124,6 @@ That solves one problem, but there's another. It has to do with retrieving all t
 
 ```{.java .scrollx}
 for (Planet p : Planet.values())
-  System.out.printf("Your weight on %s is %f%n", p, p.surfaceWeight(mass));
 ```
 
 How do we get all the values of an enumeration in Haskell?
@@ -136,9 +135,9 @@ planetValues :: [Planet]
 planetValues = [(minBound :: Planet) .. (maxBound :: Planet)]
 ```
 
-The above code, grabs the first (`minBound`) and last (`maxBound`) values of the `Planet` data type and the range syntax (`..`) makes it possible to enumerate all the values in between. Pretty nifty! The range syntax is made possible by having an `Enum` instance for a data type.
+The above code, grabs the first (`minBound`) and last (`maxBound`) values of the `Planet` sum type and the range syntax (`..`) makes it possible to enumerate all the values in between. Pretty nifty! The range syntax is made possible by having an `Enum` instance for a data type. See the `enumFrom`, `enumFromThen`, `enumFromThenTo` and `enumFromTo` functions on the `Enum` type class for more information.
 
-It's starting to look like we've got this solved pretty easily. But unfortunately we have another small problem. The `planetValues` function only gives us the `Planet` sum type - essentially the names of the planets. We also need to retrieve the mass and radius for each planet as per Java:
+It's starting to look like we've got this solved pretty easily. Unfortunately we have another small problem. The `planetValues` function only gives us the `Planet` sum type - essentially the names of the planets. We also need to retrieve the mass and radius for each planet as per Java:
 
 ```{.java .scrollx}
 public enum Planet {
@@ -155,11 +154,23 @@ public enum Planet {
 
 How do we go about doing this?
 
-We could create a [Map](https://hackage.haskell.org/package/containers-0.6.5.1/docs/Data-Map-Strict.html) with `Planet` as the key and `PlanetStat` as the value. The main issue with this approach is that we will have to deal with the optionality of not finding a `Planet` in the `Map Planet PlanetStat`. We know this is impossible because we have a sum type for `Planet`, but because we are using a `Map` we need to deal with the [Maybe](https://hackage.haskell.org/package/base-4.14.1.0/docs/Data-Maybe.html#t:Maybe) type returned by [lookup](https://hackage.haskell.org/package/containers-0.6.5.1/docs/Data-Map-Strict.html#g:9):
+We could create a [Map](https://hackage.haskell.org/package/containers-0.6.5.1/docs/Data-Map-Strict.html) with `Planet` as the key and `PlanetStat` as the value. So far so good. But when we go to look up a value we have to use the [lookup](https://hackage.haskell.org/package/containers-0.6.5.1/docs/Data-Map-Strict.html#g:9) function:
 
 ```{.haskell .scrollx}
 lookup :: Ord k => k -> Map k a -> Maybe a
 ```
+
+The return type of the `lookup` function is a [Maybe](https://hackage.haskell.org/package/base-4.14.1.0/docs/Data-Maybe.html#t:Maybe). This means we have to deal with the possibility of not finding a particular `Planet` (the `Nothing` case):
+
+```{.haskell .scrollx}
+-- planetMap :: Map Planet PlanetStat
+
+case (lookup somePlanet planetMap) of
+  Just planet -> -- cool planet-related stuff
+  Nothing     -> -- this should never happen!
+```
+
+We know this is impossible because we have a sum type for `Planet`, but because we are using a `Map` we need to deal with it.
 
 Another way to encode this mapping is like this:
 
@@ -177,7 +188,7 @@ planetStat NEPTUNE = PlanetStat (Mass 1.024e+26) (Radius 2.4746e7 )
 
 This way we don't have to deal with any optionality - this is a total function.
 
-What is interesting to realise is that Java gives this mapping to us for "free" because it combines state and behaviour. In Haskell you need to bring state and behaviour together as required. A big thanks to my friend [Adam](http://twitter.com/ajfitzpatrick) for pointing this out. In hindsight it seems obvious.
+It's interesting that Java gives us this mapping for "free" because it combines state and behaviour. In Haskell you need to bring state and behaviour together as required. A big thanks to my friend [Adam](http://twitter.com/ajfitzpatrick) for pointing this out. In hindsight it seems obvious.
 
 And that's about it for surprises. Here's the full solution:
 
