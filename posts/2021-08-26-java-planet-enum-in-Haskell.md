@@ -51,7 +51,7 @@ public enum Planet {
 }
 ```
 
-This seems fairly easy. I started off by modelling a Planet and associated data:
+This seemed fairly easy. I started off by modelling a Planet and associated data:
 
 
 ```{.haskell .scrollx}
@@ -86,14 +86,14 @@ gConstant :: Double
 gConstant = 6.67300E-11
 ```
 
-One difference between Haskell and OOP languages is that Haskell separates out data from behaviour while OOP languages combine data or state and behaviour into one construct - a class.
+One difference between Haskell and OOP languages is that Haskell separates out data from behaviour while OOP languages combine data (or state) and behaviour into one construct - a class.
 
--- TODO: Insert diagram
+![State and Behaviour in OOP vs FP](/images/java-planet-enum/java-haskell-state-behaviour.png)
 
 
-In Java, `surfaceGravity` and `surfaceWeight` are bound to a particular Planet instance. In Haskell, as mentioned above we don't have behaviour and state stored together. How do we go about implementing these functions in Haskell?
+In Java, `surfaceGravity` and `surfaceWeight` are bound to a particular Planet instance. In Haskell, as mentioned above, we don't have behaviour and state stored together. How do we go about implementing these functions in Haskell?
 
-Instead of having state and behaviour combined, we can *use* the state to derive any behaviour we need:
+Instead of having state and behaviour combined, we can **use** the state to derive any behaviour we need:
 
 ```{.haskell .scrollx}
 surfaceGravity :: Planet -> SurfaceGravity
@@ -108,7 +108,7 @@ surfaceWeight (Mass otherMass) planet =
     in SurfaceWeight $ otherMass * sg
 ```
 
-Notice how we pass in the `Planet` instance we need to each function above. We don't have a `this` reference. Here's the Java implementation of the above functions with an explicit `this` reference added:
+Notice how we pass in the `Planet` instance we need to each function above. We don't have a `this` reference as in most OOP languages. Here's the Java implementation of the above functions with an explicit `this` reference added:
 
 ```{.java .scrollx}
     double surfaceGravity() {
@@ -123,7 +123,7 @@ Notice how we pass in the `Planet` instance we need to each function above. We d
 That solves one problem, but there's another. It has to do with retrieving all the values of an enumeration. In the Java example we use:
 
 ```{.java .scrollx}
-for (Planet p : Planet.values())
+Planet.values()
 ```
 
 How do we get all the values of an enumeration in Haskell?
@@ -186,7 +186,7 @@ planetStat URANUS  = PlanetStat (Mass 8.686e+25) (Radius 2.5559e7 )
 planetStat NEPTUNE = PlanetStat (Mass 1.024e+26) (Radius 2.4746e7 )
 ```
 
-This way we don't have to deal with any optionality - this is a total function.
+This way we don't have to deal with any optionality; this is a total function.
 
 It's interesting that Java gives us this mapping for "free" because it combines state and behaviour. In Haskell you need to bring state and behaviour together as required. A big thanks to my friend [Adam](http://twitter.com/ajfitzpatrick) for pointing this out. In hindsight it seems obvious.
 
