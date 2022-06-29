@@ -367,7 +367,7 @@ runPlanets earthWeight =
 
 </details>
 
-<details>
+<details open>
   <summary>Final Update</summary>
 
 And here's the final implementation I decided to use given the above recommendations:
