@@ -1,0 +1,261 @@
+---
+title: Extending Scala Case Class With NoStacktrace Leads To Unexpected Tostring Behaviour
+author: sanjiv sahayam
+description: Extending a Scala case class with NoStacktTrace leads to unexpected tostring behaviour
+tags: scala
+comments: true
+---
+
+Say you had an ADT similar to this:
+
+```{.scala .scrollx}
+import scala.util.control.NoStackTrace
+
+sealed trait MyError extends NoStackTrace
+final case class MyError1(message: String) extends  MyError
+final case class MyError2(message: String) extends  MyError
+```
+
+This might seem weird to some. Why are we extending `NoStackTrace` ? This allows us to use the `MyError` type both as a value through something like an `Either`:
+
+```{.scala .scrollx}
+def sanitiseInput(value: String): Either[MyError, ValidInput]
+```
+
+and we can also use it an error that can be raised into `cats.IO`, `fs2.Stream`, `Monix.eval.Task` or equivalent:
+
+```{.scala .scrollx}
+object IO {
+  def raiseError[A](t: Throwable): IO[A] //`t` has to extend Throwable if we want to use this function.
+
+  //other functions
+}
+```
+
+You can read more about it in [Make error ADTs subtypes of Exception](https://nrinaudo.github.io/scala-best-practices/adts/errors_extend_exception.html).
+
+Now if we use this in a test:
+
+```{.scala .scrollx}
+package com.example.validation.extra
+
+import scala.util.control.NoStackTrace
+
+object MyErrorSuite extends weaver.FunSuite {
+
+sealed trait MyError extends NoStackTrace
+final case class MyError1(message: String) extends  MyError
+final case class MyError2(message: String) extends  MyError
+
+  test("error message") {
+    expect.same(MyError1("error1"), MyError2("error2"))
+  }
+
+}
+
+```
+
+ the test output from [Weaver-Test](https://github.com/disneystreaming/weaver-test) gets truncated somewhat:
+
+```{.scala .scrollx}
+[info] com.example.validation.extra.MyErrorSuite
+[info] - error message 30ms
+[info] *************FAILURES**************
+[info] com.example.validation.extra.MyErrorSuite
+[error] - error message 30ms
+[error]   Values not equal: (src/test/scala/com/example/validation/extra/MyErrorSuite.scala:12)
+[error]
+[error]   com.example.validation.extra.MyErrorSuite$[MyError1]  |  com.example.validation.extra.MyErrorSuite$[MyError2]
+```
+
+All we get are the class names returned in the diff:
+
+```{.terminal .scrollx}
+com.example.validation.extra.MyErrorSuite$[MyError1]  |  com.example.validation.extra.MyErrorSuite$[MyError2]
+```
+
+The diff we expected was:
+
+```{.terminal .scrollx}
+ [MyOtherError1](my other [error1])  |  [MyOtherError2](my other [error2])
+```
+
+The default case class behaviour generates a `toString` implementation of the form: `ClassName(field1Value, field2Value, ....)`.
+
+Let' try a simpler example in the REPL:
+
+```{.scala .scrollx}
+case class MyError1(message: String)
+
+scala> MyError1("Oh noes")
+val res35: MyError1 = MyError1(Oh noes) //"Oh noes" is output
+```
+
+We can see that we do get the contents of all fields of the case class written out.
+
+Let's try extending `NoStackTrace` and see if it makes a difference:
+
+```{.scala .scrollx}
+import scala.util.control.NoStackTrace
+
+case class MyError2(message: String) extends NoStackTrace
+
+scala> MyError2("Oh noes")
+val res36: MyError2 = MyError2 //no message output
+```
+
+We can see that although the class name is output the contents of the `message` field has not been provided. Interesting. This seems to be the cause of our issue in the test.
+
+It turns out a case class doesn't generate a `toString` method (and other implementations such has hashCode etc) if you **already** have a custom implementation for that method in a super type. [It's not a bug, it's a feature](https://github.com/scala/bug/issues/1549).
+
+So where does our `MyError2` class get a custom `toString` implementation from?
+
+Lets have a look at the `NoStackTrace` class, since `MyError2` extends that:
+
+```{.scala .scrollx}
+trait NoStackTrace extends Throwable {
+  override def fillInStackTrace(): Throwable =
+    if (NoStackTrace.noSuppression) super.fillInStackTrace()
+    else this
+
+  ...
+}
+```
+
+No `toString` implementation here. Let's follow the inheritance trail to `java.lang.Throwable`. Here, we see that it indeed [does](https://github.com/EricChows/JDK-1.8-sourcecode/blob/d34a693ffa76fdbb0fea022b5bb7bfbd2c6df0bd/java/lang/Throwable.java#L390) have a custom `toString` implementation:
+
+```{.java .scrollx}
+public String toString() {
+    String s = getClass().getName();
+    String message = getLocalizedMessage();
+    return (message != null) ? (s + ": " + message) : s;
+}
+```
+
+From the above implementation we can deduce that `message` is `null` because we only get back the class name `s` as output (`MyError2`) as opposed to `MyError2: message`.
+
+Let's follow along to `getLocalizedMessage` to see how message is calculated:
+
+```{.java .scrollx}
+public String getLocalizedMessage() {
+    return getMessage();
+}
+```
+
+and also to `getMessage`:
+
+```{.java .scrollx}
+public String getMessage() {
+    return detailMessage;
+}
+```
+
+The `detailMessage` field is set through the many of the constructor methods:
+
+```{.java .scrollx}
+public Throwable(String message) {
+    fillInStackTrace();
+    detailMessage = message; //set
+}
+
+//or
+
+public Throwable(String message, Throwable cause) {
+    fillInStackTrace();
+    detailMessage = message; //set
+    this.cause = cause;
+}
+
+//or
+
+public Throwable(Throwable cause) {
+    fillInStackTrace();
+    detailMessage = (cause==null ? null : cause.toString());  //set
+    this.cause = cause;
+}
+
+//or
+
+protected Throwable(String message, Throwable cause,
+                    boolean enableSuppression,
+                    boolean writableStackTrace) {
+    if (writableStackTrace) {
+        fillInStackTrace();
+    } else {
+        stackTrace = null;
+    }
+    detailMessage = message;  //set
+    this.cause = cause;
+    if (!enableSuppression)
+        suppressedExceptions = null;
+}
+```
+
+Since we have a field named `message` and not `detailMessage`, we don't really override the value used by `Throwable` to generate its `toString` implementation.
+
+If this were true, if we renamed our `message` field to `detailMessage` we should be able to get our `toString` implementation working:
+
+```{.scala .scrollx}
+import scala.util.control.NoStackTrace
+
+case class MyError2(detailMessage: String) extends NoStackTrace
+
+scala> MyError2("Oh noes")
+val res37: MyError2 = MyError2 //Doesn't work
+```
+
+Wow! That didn't work either. Why though?
+
+If we look at the definition of the `detailMessage` field on `java.lang.Throwable` we see that it's **private**:
+
+```{.java .scrollx}
+private String detailMessage;
+```
+
+This means we can't override it from a sub class. Boo!
+
+From our previous investigation we can see that all we need to is override either `getLocalizedMessage` or `getMessage` or `toString` which are all **public**:
+
+```
+public String toString() {
+    String s = getClass().getName();
+    String message = getLocalizedMessage(); //message calculated from here
+    return (message != null) ? (s + ": " + message) : s;
+}
+
+
+public String getLocalizedMessage() {
+    return getMessage(); //message content retrieved from here
+}
+
+
+public String getMessage() {
+    return detailMessage; //message content
+}
+```
+
+Let's give that a go:
+
+```{.scala .scrollx}
+import scala.util.control.NoStackTrace
+
+case class MyError2(override val getMessage: String) extends NoStackTrace
+
+scala> MyError2("Oh noes")
+val res38: MyError2 = MyError2: Oh noes //We did it!
+```
+
+By overriding `getMessage` in our case class, we can get some form of `toString`-ery happening. While this is not idea it "works".
+
+If you want a more case classy `toString` implementation, you're going to have to do it yourself:
+
+```{.scala .scrollx}
+case class MyError2(message: String) extends NoStackTrace {
+  override def toString: String = s"MyError2($message)"
+}
+
+scala> MyError2("Oh noes")
+val res39: MyError2 = MyError2(Oh noes) //we have case classiness
+```
+
+All this seems a bit tedious... as does extending the `Exception` hierarchy. But if you do decide to go this route, hopefully this will help you stave off at least one of the issues with extending `java.lang.Throwable` and friends.
