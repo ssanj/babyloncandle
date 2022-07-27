@@ -1,8 +1,8 @@
 ---
-title: Extending Scala Case Class With NoStackTrace Leads To Unexpected Tostring Behaviour
+title: Extending Scala Case Class With NoStackTrace Leads To Unexpected toString Behaviour
 author: sanjiv sahayam
-description: Extending a Scala case class with NoStackTrace leads to unexpected tostring behaviour
-tags: scala
+description: Extending a Scala case class with NoStackTrace leads to unexpected toString behaviour
+tags: scala, java
 comments: true
 ---
 
@@ -82,6 +82,8 @@ When you create a case class it generates a `toString` implementation of the for
 
 So why are we loosing our `toString` implementation?
 
+## Cause
+
 Let's try a simpler example in the REPL:
 
 ```{.scala .scrollx}
@@ -129,7 +131,7 @@ trait NoStackTrace extends Throwable {
 }
 ```
 
-No `toString` implementation here. Let's follow the inheritance trail to `java.lang.Throwable`. Here, we see that it indeed [does](https://github.com/EricChows/JDK-1.8-sourcecode/blob/d34a693ffa76fdbb0fea022b5bb7bfbd2c6df0bd/java/lang/Throwable.java#L390) have a custom `toString` implementation:
+No `toString` implementation here. Let's follow the inheritance trail to `java.lang.Throwable`. Here, we see that it [does](https://github.com/EricChows/JDK-1.8-sourcecode/blob/d34a693ffa76fdbb0fea022b5bb7bfbd2c6df0bd/java/lang/Throwable.java#L390) have a custom `toString` implementation:
 
 ```{.java .scrollx}
 public String toString() {
@@ -139,9 +141,9 @@ public String toString() {
 }
 ```
 
-From the above implementation we can deduce that `message` is `null` because we only get back the class name `s` as output (`MyError2`) as opposed to `MyError2: message`.
+From the above implementation we can deduce that for `MyError2` the `getLocalizedMessage` method returns `null` because we only get back the class name `s` as output: (`MyError2`) as opposed to: `MyError2: message`.
 
-Let's follow along to `getLocalizedMessage` to see how message is calculated:
+Let's follow along to `getLocalizedMessage` to see how `message` is calculated:
 
 ```{.java .scrollx}
 public String getLocalizedMessage() {
@@ -157,7 +159,7 @@ public String getMessage() {
 }
 ```
 
-The `detailMessage` field is set through the many of the constructor methods:
+The `detailMessage` field is set through the many of the constructor methods for `Throwable`:
 
 ```{.java .scrollx}
 public Throwable(String message) {
@@ -200,7 +202,9 @@ protected Throwable(String message, Throwable cause,
 
 Since we have a field named `message` and not `detailMessage`, we don't really override the value used by `Throwable` to generate its `toString` implementation.
 
-If this were true, if we renamed our `message` field to `detailMessage` we should be able to get our `toString` implementation working:
+## Workarounds
+
+If we renamed our `message` field in `MyError2` to `detailMessage` we should be able to get our `toString` implementation working:
 
 ```{.scala .scrollx}
 import scala.util.control.NoStackTrace
@@ -213,6 +217,7 @@ val res37: MyError2 = MyError2 //Doesn't work
 
 Wow! That didn't work either. Why though?
 
+
 If we look at the definition of the `detailMessage` field on `java.lang.Throwable` we see that it's **private**:
 
 ```{.java .scrollx}
@@ -221,7 +226,7 @@ private String detailMessage;
 
 This means we can't override it from a sub class. Boo!
 
-From our previous investigation we can see that all we need to is override either `getLocalizedMessage` or `getMessage` or `toString` which are all **public**:
+From our previous investigation we can see that all we need to do is override either `getLocalizedMessage` or `getMessage` or `toString` which are all **public**:
 
 ```
 public String toString() {
@@ -241,7 +246,9 @@ public String getMessage() {
 }
 ```
 
-Let's give that a go:
+### Override getMessage or getLocalizedMessage
+
+By overriding `getMessage` or `getLocalizedMessage` in our case class, we can get some form of `toString`-ery happening. While this is not ideal, it "works".
 
 ```{.scala .scrollx}
 import scala.util.control.NoStackTrace
@@ -252,7 +259,9 @@ scala> MyError2("Oh noes")
 val res38: MyError2 = MyError2: Oh noes //We did it!
 ```
 
-By overriding `getMessage` in our case class, we can get some form of `toString`-ery happening. While this is not idea it "works".
+
+
+### Override toString
 
 If you want a more case classy `toString` implementation, you're going to have to do it yourself:
 
