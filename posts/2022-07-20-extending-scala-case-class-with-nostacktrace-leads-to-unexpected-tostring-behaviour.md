@@ -1,7 +1,7 @@
 ---
-title: Extending Scala Case Class With NoStacktrace Leads To Unexpected Tostring Behaviour
+title: Extending Scala Case Class With NoStackTrace Leads To Unexpected Tostring Behaviour
 author: sanjiv sahayam
-description: Extending a Scala case class with NoStacktTrace leads to unexpected tostring behaviour
+description: Extending a Scala case class with NoStackTrace leads to unexpected tostring behaviour
 tags: scala
 comments: true
 ---
@@ -16,13 +16,13 @@ final case class MyError1(message: String) extends  MyError
 final case class MyError2(message: String) extends  MyError
 ```
 
-This might seem weird to some. Why are we extending `NoStackTrace` ? This allows us to use the `MyError` type both as a value through something like an `Either`:
+This might seem weird to some. Why are we extending `NoStackTrace` ? This allows us to use the `MyError` as a return value through something like an `Either`:
 
 ```{.scala .scrollx}
 def sanitiseInput(value: String): Either[MyError, ValidInput]
 ```
 
-and we can also use it an error that can be raised into `cats.IO`, `fs2.Stream`, `Monix.eval.Task` or equivalent:
+We can also use it as an error that can be thrown or raised into [cats.IO](https://typelevel.org/cats-effect/), [fs2.Stream](https://fs2.io/#/), [Monix.eval.Task](https://monix.io/) or equivalent:
 
 ```{.scala .scrollx}
 object IO {
@@ -32,13 +32,11 @@ object IO {
 }
 ```
 
-You can read more about it in [Make error ADTs subtypes of Exception](https://nrinaudo.github.io/scala-best-practices/adts/errors_extend_exception.html).
+You can also read about some related ideas in [Make error ADTs subtypes of Exception](https://nrinaudo.github.io/scala-best-practices/adts/errors_extend_exception.html).
 
-Now if we use this in a test:
+Now if we use `MyError` in a test:
 
 ```{.scala .scrollx}
-package com.example.validation.extra
-
 import scala.util.control.NoStackTrace
 
 object MyErrorSuite extends weaver.FunSuite {
@@ -48,14 +46,14 @@ final case class MyError1(message: String) extends  MyError
 final case class MyError2(message: String) extends  MyError
 
   test("error message") {
-    expect.same(MyError1("error1"), MyError2("error2"))
+    expect.same(MyError1("error1"), MyError2("error2")) //this is an error
   }
 
 }
 
 ```
 
- the test output from [Weaver-Test](https://github.com/disneystreaming/weaver-test) gets truncated somewhat:
+the test output from [Weaver-Test](https://disneystreaming.github.io/weaver-test/) gets truncated somewhat:
 
 ```{.scala .scrollx}
 [info] com.example.validation.extra.MyErrorSuite
@@ -74,15 +72,17 @@ All we get are the class names returned in the diff:
 com.example.validation.extra.MyErrorSuite$[MyError1]  |  com.example.validation.extra.MyErrorSuite$[MyError2]
 ```
 
-The diff we expected was:
+The diff we expected was something like:
 
 ```{.terminal .scrollx}
- [MyOtherError1](my other [error1])  |  [MyOtherError2](my other [error2])
+ [MyError1]([error1]) | [MyError2]([error2]) //we can see that the class and error messages are different
 ```
 
-The default case class behaviour generates a `toString` implementation of the form: `ClassName(field1Value, field2Value, ....)`.
+When you create a case class it generates a `toString` implementation of the form: `ClassName(field1Value, field2Value, ....)`.
 
-Let' try a simpler example in the REPL:
+So why are we loosing our `toString` implementation?
+
+Let's try a simpler example in the REPL:
 
 ```{.scala .scrollx}
 case class MyError1(message: String)
@@ -104,9 +104,16 @@ scala> MyError2("Oh noes")
 val res36: MyError2 = MyError2 //no message output
 ```
 
-We can see that although the class name is output the contents of the `message` field has not been provided. Interesting. This seems to be the cause of our issue in the test.
+We can see that although the class name is output the contents of the `message` field has not.
 
-It turns out a case class doesn't generate a `toString` method (and other implementations such has hashCode etc) if you **already** have a custom implementation for that method in a super type. [It's not a bug, it's a feature](https://github.com/scala/bug/issues/1549).
+Interesting. This seems to be the cause of our issue in the test.
+
+It turns out a case class doesn't generate a `toString` method (and other implementations such has hashCode etc) if you **already** have a custom implementation for that method in a super type.
+
+
+[It's not a bug, it's a feature](https://github.com/scala/bug/issues/1549).
+
+![Nope](https://media.giphy.com/media/l41YqG5h9gIWrcSBy/giphy.gif)
 
 So where does our `MyError2` class get a custom `toString` implementation from?
 
@@ -258,4 +265,41 @@ scala> MyError2("Oh noes")
 val res39: MyError2 = MyError2(Oh noes) //we have case classiness
 ```
 
-All this seems a bit tedious... as does extending the `Exception` hierarchy. But if you do decide to go this route, hopefully this will help you stave off at least one of the issues with extending `java.lang.Throwable` and friends.
+Now we can get our test to fail with a better error message:
+
+```{.scala .scrollx}
+import scala.util.control.NoStackTrace
+
+object MyErrorSuiteTake2 extends weaver.FunSuite {
+
+sealed trait MyError extends NoStackTrace {
+  val message: String
+
+  override def toString: String = {
+    val className = getClass.getName
+    s"$className($message)"
+   }
+}
+
+final case class MyError1(message: String) extends  MyError
+final case class MyError2(message: String) extends  MyError
+
+  test("error message") {
+    expect.same(MyError1("error1"), MyError2("error2"))
+  }
+}
+```
+
+
+Which results in:
+
+```{.terminal .scrollx}
+info] com.example.validation.extra.MyErrorSuiteTake2
+[error] - error message 38ms
+[error]   Values not equal: (src/test/scala/com/example/validation/extra/MyErrorSuiteTake2.scala:20)
+[error]
+[error]   com.example.validation.extra.MyErrorSuiteTake2$[MyError1]([error1])  |  com.example.validation.extra.MyErrorSuiteTake2$[MyError2]([error2])
+
+```
+
+All this seems a bit tedious... as does extending the `Exception` hierarchy. If you do decide to go this route, hopefully this will help you stave off at least one of the issues with extending `java.lang.Throwable` and friends.
