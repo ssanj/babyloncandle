@@ -14,7 +14,7 @@ I have one horizontal 32" monitor which is my primary screen and a 27" monitor t
 
 ![Monitors](/images/add-different-icons-to-applications-macos/monitors.png)
 
-### Main Monitor
+### Primary Monitor
 
 The main monitor runs Alacritty with Gitui.
 
@@ -61,6 +61,16 @@ takes about 2 seconds. That's way to long to maintain any kind of flow state whe
 ```{.terminal .scrollx}
   cp -r /Applications/Alacritty.app /Applications/Alacritty-Whatever.app
 ```
+
+_Now at this point you can try and update the `/Applications/Alacritty-Whatever.app/Contents/Info.plist` file with your new icon file at the following keys_:
+
+```{.xml  .scrollx}
+  <key>CFBundleIconFile</key>
+  <string>your_icon.icns</string> <!-- your_icon.icns should be at Contents/Resources/your_icon.icns
+-->
+```
+
+_I couldn't get this to work._ Follow the next steps for what did work.
 
 2. Open `Finder` and browse to the freshly copied application folder (`/Applications/Alacritty-Whatever.app` in the above example)
 
