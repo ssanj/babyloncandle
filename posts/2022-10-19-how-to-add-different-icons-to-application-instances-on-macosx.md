@@ -6,7 +6,7 @@ tags: macosx
 comments: true
 ---
 
-I run multiple [Alacritty](https://alacritty.org/) instances for my development workflow. Each instance uses [tmux](https://github.com/tmux/tmux) to manage multiple windows - one per project. I have one Alacritty instance that runs [gitui](https://github.com/Extrawurst/gitui) in full screen mode and the other instance runs the continuous compilation of each project in its own window. Oh, and they also run on separate monitors.
+I run multiple [Alacritty](https://alacritty.org/) instances for my development workflow. Each instance uses [tmux](https://github.com/tmux/tmux) to manage multiple windows - one per project. I have one Alacritty instance that runs [GitUI](https://github.com/Extrawurst/gitui) in full screen mode and the other instance runs the continuous compilation of each project in its own window. Oh, and they also run on separate monitors.
 
 ## Monitor Configuration
 
@@ -16,13 +16,13 @@ I have one horizontal 32" monitor which is my primary screen and a 27" monitor t
 
 ### Primary Monitor
 
-The main monitor runs Alacritty with Gitui.
+The main monitor runs Alacritty with GitUI.
 
 ![Gitui](/images/add-different-icons-to-applications-macos/gitui.png)
 
 ### Secondary Monitor
 
-The secondary monitor runs another Alacritty instance with continuous compilation in the respective project's compiler. If the project doesn't have a compiler, the window opens to the project location from which I can run various commands.
+The secondary monitor runs another Alacritty instance with continuous compilation with the respective project's compiler. If the project doesn't have a compiler, the window opens to the project location from which I can run various commands.
 
 ![Continuous Compilation](/images/add-different-icons-to-applications-macos/compilation.png)
 
@@ -31,7 +31,7 @@ The secondary monitor runs another Alacritty instance with continuous compilatio
 
 So what's the problem that requires different application icons per instance?
 
-When I run two instances of Alacritty, this is what my Application Switcher (`CMD` + `TAB`) is like:
+When I run two instances of Alacritty, this is what my Application Switcher (`CMD` + `TAB`) looks like:
 
 ![Application Switcher](/images/add-different-icons-to-applications-macos/application-switcher.png)
 
@@ -48,7 +48,7 @@ The reason I don't want to do this is because I've got an old MacBook Pro and zo
 - Choose your Alacritty Window
 - Switch to that Window
 
-takes about 2 seconds. That's way to long to maintain any kind of flow state when coding.
+takes about 2 seconds. That's way too long to maintain any kind of flow state when coding.
 
 
 ### The Solution
@@ -59,18 +59,8 @@ takes about 2 seconds. That's way to long to maintain any kind of flow state whe
   For example to create an Alacritty instance for `Whatever`s I can create a copy with:
 
 ```{.terminal .scrollx}
-  cp -r /Applications/Alacritty.app /Applications/Alacritty-Whatever.app
+cp -r /Applications/Alacritty.app /Applications/Alacritty-Whatever.app
 ```
-
-_Now at this point you can try and update the `/Applications/Alacritty-Whatever.app/Contents/Info.plist` file with your new icon file at the following keys_:
-
-```{.xml  .scrollx}
-  <key>CFBundleIconFile</key>
-  <string>your_icon.icns</string> <!-- your_icon.icns should be at Contents/Resources/your_icon.icns
--->
-```
-
-_I couldn't get this to work._ Follow the next steps for what did work.
 
 2. Open `Finder` and browse to the freshly copied application folder (`/Applications/Alacritty-Whatever.app` in the above example)
 
@@ -80,7 +70,7 @@ _I couldn't get this to work._ Follow the next steps for what did work.
 
 ![Icon Placeholder](/images/add-different-icons-to-applications-macos/icon-placeholder.png)
 
-4. Find a new image - just use [Google Images](https://images.google.com)
+4. Find a new image (use [Google Images](https://images.google.com), [macosicons](https://macosicons.com/#/) etc)
 5. Drag the new image to the icon placeholder
 
 ![Drag in the New Image](/images/add-different-icons-to-applications-macos/drag-icon.png)
@@ -98,6 +88,8 @@ _I couldn't get this to work._ Follow the next steps for what did work.
 
 ### Final Result
 
+I used the above steps to create custom icons for Alacritty for both my projects and GitUI instances.
+
 ![Alacritty Icons](/images/add-different-icons-to-applications-macos/custom-icons-workflow.png)
 
 
@@ -111,8 +103,92 @@ If you know of an easier/better way to do this please drop me comment.
 
 Unfortunately any time you update the original application (Alacritty in this instance) you need to recreate your copies and do the whole updating icon dance.
 
-There are some ways to automate the icon creation which can get around some of this hassle, but these techniques seemed a little overkill for what they provide. YMMV. Some links are provided below:
+### Scripting
 
+This whole process is pretty easy to script, providing you can create an icns file for the image you require or already have an alternate icns file. But it is not as reliable as the steps outlined above, as sometimes icon caching issues makes it hard to refresh the new icons. See below for more details
+
+#### Generating an icns File
+
+There's a program called [mkicns](http://www.amnoid.de/icns/makeicns.html) that lets you convert images from various formats like jpg, png etc to icns files that are used for your application icons.
+
+You can install it through [Homebrew](https://brew.sh/):
+
+```{.terminal .scrollx}
+brew install makeicns
+```
+
+You can generate an icns file for a given image with:
+
+```{.terminal .scrollx}
+makeicns -in your-image_file -out your.icns
+```
+
+There are a bunch [more options for makeicn](http://www.amnoid.de/icns/makeicns.html), so make sure to check the `--help` option for any customizations you want to make.
+
+#### Icon Refresh Issues
+
+Now that we have our own icns file, we can do the following:
+
+1. Create a copy of the application folder as above
+1. Copy across the custom icns file into the `Content/Resources` folder and replace the **existing** icns file you want to replace.
+
+For example for Alacritty, the main ics file is `Content/Resources/alacritty.icns`, so you'd do:
+
+```{.terminal .scrollx}
+cp your.icns /Applications/Alacritty-Whatever.app/Content/Resources/alacritty.icns
+```
+
+Now if you try to launch your custom application with your new shiny icon you will notice that it has not been updated.
+
+![Sad Face](https://media.giphy.com/media/OPU6wzx8JrHna/giphy.gif)
+
+In order to do that you need to help macos understand that the application has changed and you may need to some or all of the steps below:
+
+1. touch the application folder
+
+```{.terminal .scrollx}
+touch /Applications/Alacritty-Whatever.app
+```
+
+If that doesn't work you may also need to do the following:
+
+2. Kill all the things
+
+```{.terminal .scrollx}
+sudo killall Finder
+sudo killall Dock
+```
+
+These steps are from [Changing Mac OS X Application Icons Programmatically](https://www.sethvargo.com/replace-icons-osx/).
+
+A full working script:
+
+```{.terminal .scrollx}
+cp -r /Applications/Alacritty.app /Applications/Alacritty-Whatever.app
+cp whatever.icns /Applications/Alacritty-Whatever.app/Content/Resources/alacritty.icns
+touch /Applications/Alacritty-Whatever.app
+sudo killall Finder && sudo killall Dock
+```
+
+
+And hopefully that should be it. But sometimes it isn't.
+
+![Aaaaaaaaaaaaaaaargh](https://media.giphy.com/media/22CEvbj04nLLq/giphy.gif)
+
+If that doesn't work you may need more [drastic](https://osxdaily.com/2022/05/23/clear-icon-cache-mac/) workarounds.
+
+And at end of those drastic workarounds you might revert to just using the list of steps at the top of this article.
+
+![Small Smile](https://media.giphy.com/media/B0vFTrb0ZGDf2/giphy.gif)
+
+A big thank you to Apple for making all this so damn hard.
+
+![The End](https://media.giphy.com/media/l0MYJlyOwdlT0SeU8/giphy.gif)
+
+### Links
+
+- [Changing Mac OS X Application Icons Programmatically](https://www.sethvargo.com/replace-icons-osx/)
+- [How to Clear Icon Cache on Mac](https://osxdaily.com/2022/05/23/clear-icon-cache-mac/)
 - [How do I set the icon for my application's Mac OS X app bundle?](https://stackoverflow.com/questions/646671/how-do-i-set-the-icon-for-my-applications-mac-os-x-app-bundle)
 - [Icon for Mac OSX bundle](https://stackoverflow.com/questions/14362063/icon-for-mac-osx-bundle)
 
