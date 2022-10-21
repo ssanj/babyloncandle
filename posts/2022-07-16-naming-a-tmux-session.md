@@ -28,7 +28,7 @@ In the above the name of the tmux session is **2**. Remembering these numbers ca
 The easier way to create a new session is by giving it a name of your choosing:
 
 ```{.terminal .scrollx}
-tmux new -s your_cool_here
+tmux new -s your_cool_name_here
 ```
 
 And now when you list your tmux sessions, you can easily find the session you just created:

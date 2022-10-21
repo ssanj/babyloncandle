@@ -92,6 +92,7 @@ I used the above steps to create custom icons for Alacritty for both my projects
 
 ![Alacritty Icons](/images/add-different-icons-to-applications-macos/custom-icons-workflow.png)
 
+The key is to launch the Alacritty-Projects application for projects and Alacritty-GitUI application for git-related work.
 
 ### Downsides
 
@@ -164,6 +165,8 @@ These steps are from [Changing Mac OS X Application Icons Programmatically](http
 A full working script:
 
 ```{.terminal .scrollx}
+#!/bin/bash
+
 cp -r /Applications/Alacritty.app /Applications/Alacritty-Whatever.app
 cp whatever.icns /Applications/Alacritty-Whatever.app/Content/Resources/alacritty.icns
 touch /Applications/Alacritty-Whatever.app
