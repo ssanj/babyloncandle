@@ -6,7 +6,7 @@ tags: alfred, macosx
 comments: true
 ---
 
-I recently found myself thinking it would be cool to control [Spotify](spotify.com/) through [Alfred](https://www.alfredapp.com/).
+I recently found myself thinking it would be cool to control [Spotify](https://www.spotify.com/) through [Alfred](https://www.alfredapp.com/).
 
 ![That's Cool](https://media.giphy.com/media/cnuS67F8IoVTYRvJXE/giphy.gif)
 
@@ -228,6 +228,16 @@ on run
 end run
 ```
 
+## Magic Happens
+
 Once you've setup your Alfred Workflows for Spotify you can simply change to your favourite album or playlist from the search box:
 
 ![Folk Playlist](/images/how-to-automate-spotify-through-alfred/alfred-spotify.gif)
+
+
+## Links
+
+- [Applescript play track spotify](https://stackoverflow.com/questions/11607618/applescript-play-track-spotify)
+ - [Sample AppleScript to Control Spotify](https://gist.github.com/NoobsArePeople2/5121597)
+ - [Controlling Spotify with AppleScript](https://stackoverflow.com/questions/8901556/controlling-spotify-with-applescript)
+
