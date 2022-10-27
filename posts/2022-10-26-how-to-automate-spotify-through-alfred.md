@@ -6,7 +6,13 @@ tags: alfred, macosx
 comments: true
 ---
 
-I recently found myself thinking it would be cool to control [Spotify](spotify.com/) through [Alfred](https://www.alfredapp.com/). I use Alfred as my defacto launcher app and search tool on MacOSX. You can achieve this through Alfred [Workflows](https://www.alfredapp.com/workflows/). One way to do this is by using the [AppleScript](https://developer.apple.com/library/archive/documentation/AppleScript/Conceptual/AppleScriptLangGuide/introduction/ASLR_intro.html) integration provided in the Workflow editor.
+I recently found myself thinking it would be cool to control [Spotify](spotify.com/) through [Alfred](https://www.alfredapp.com/).
+
+![That's Cool](https://media.giphy.com/media/cnuS67F8IoVTYRvJXE/giphy.gif)
+
+I use Alfred as my defacto launcher app and search tool on MacOSX. You can achieve this through Alfred [Workflows](https://www.alfredapp.com/workflows/). One way to do this is by using the [AppleScript](https://developer.apple.com/library/archive/documentation/AppleScript/Conceptual/AppleScriptLangGuide/introduction/ASLR_intro.html) integration provided in the Workflow editor.
+
+![Alfred Workflow Editor](https://www.alfredapp.com/help/workflows/workflow-canvas.png)
 
 See [Learn to Create Workflows with Alfred's Built-In Examples](https://www.alfredapp.com/blog/tips-and-tricks/learn-to-create-workflows-with-alfreds-built-in-examples/) if you're new to creating Alfred Workflows.
 
@@ -14,7 +20,7 @@ The challenging part, for me at least, was crafting the AppleScript necessary. I
 
 The basic outline of an AppleScript to use Spotify is of the form:
 
-```{.applescript .scrollx}
+```{.command .scrollx}
 on run
   tell application "Spotify"
     <your Spotify functionality>
@@ -38,7 +44,7 @@ To see a full list of Spotify functionality supported through AppleScript, do th
 
 Rather than playing and stopping Spotify, my workflow is to toggle playing or stopping a track.
 
-```{.applescript .scrollx}
+```{.command .scrollx}
 on run
   tell application "Spotify"
     playpause
@@ -50,7 +56,7 @@ As expected this would stop a playing track or play a stopped track.
 
 ## Next Track
 
-```{.applescript .scrollx}
+```{.command .scrollx}
 on run
   tell application "Spotify"
     next track
@@ -60,7 +66,7 @@ end run
 
 ## Previous Track
 
-```{.applescript .scrollx}
+```{.command .scrollx}
 on run
   tell application "Spotify"
     previous track
@@ -72,7 +78,7 @@ end run
 
 The general syntax is for the AppleScript automation is:
 
-```{.applescript .scrollx}
+```{.command .scrollx}
 on run
   tell application "Spotify"
         play track "spotify:track:<first_track_id>" in context "spotify:album:<album_id>"
@@ -107,7 +113,7 @@ The first_song_id is `7tWyfy3ySgLMbH9R0xeqzZ` in the above link.
 
 Putting it all together we get:
 
-```{.applescript .scrollx}
+```{.command .scrollx}
 on run
   tell application "Spotify"
         play track "spotify:track:7tWyfy3ySgLMbH9R0xeqzZ" in context "spotify:album:41Ywc4XSD3GChkeAfzhRIR"
@@ -120,7 +126,7 @@ end run
 
 The general syntax is for the AppleScript automation is:
 
-```{.applescript .scrollx}
+```{.command .scrollx}
 on run
   tell application "Spotify"
         play track "spotify:track:<first_track_id>" in context "spotify:user:<user_id>:playlist:<playlist_id>"
@@ -182,7 +188,7 @@ The `first_track_id` in the above url is: `1nsMASRDWwUwlBMmOuh80d`. The `?si=` p
 
 Below is the ApplesSript code, to run the `The Piano Bar` playlist using the attributes: `first_track_id`, `playlist_id` and `user_id`, collected above:
 
-```{.applescript .scrollx}
+```{.command .scrollx}
 on run
   tell application "Spotify"
         play track "spotify:track:1nsMASRDWwUwlBMmOuh80d" in context "spotify:user:spotify:playlist:37i9dQZF1DWVvXA824aCbn"
@@ -214,7 +220,7 @@ Given the following attributes:
 
 Our script is:
 
-```{.applescript .scrollx}
+```{.command .scrollx}
 on run
   tell application "Spotify"
        play track "spotify:track:5PAnntRTBk6qgst5Fw84Y8" in context "spotify:user:ssanj:playlist:7znakCCH9jS9fpl0GmJYah"
