@@ -1,7 +1,7 @@
 ---
 title: macOS Loses Connection To Bluetooth Mouse
 author: sanjiv sahayam
-description: macOS loses connection to bluetooth mouse
+description: How to fix macOS Blueooth connection issues
 tags: alfred, macosx, bluetooth
 comments: true
 ---
