@@ -1,7 +1,7 @@
 ---
 title: How To Connect The Brother Hl-2170W To Wifi on macOSX
 author: sanjiv sahayam
-description: how to connect the brother hl-2170w to wifi 
+description: How to connect the brother hl-2170w printer to Wifi without the installation CD-ROM
 tags: printer, wireless, macosx
 comments: true
 ---
